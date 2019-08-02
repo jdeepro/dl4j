@@ -1,3 +1,11 @@
+java/.classpath
+java/.project
+java/.idea
+java/target/*
+java/out/*
+workspace.xml
+.vscode
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
