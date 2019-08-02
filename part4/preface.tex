@@ -1,0 +1,35 @@
+% !Mode:: "TeX:UTF-8"
+\part{综合运用}
+\label{part:ai_exercise}
+
+\newpage
+
+%二维码
+\begin{center}{\includegraphics[width=3cm]{barcode.png}}\end{center}\par
+
+十年前，\emph{手写识别}还只是专业技术人员的玩物，而如今\emph{手写识别}已经变成深度学习的入门教程。
+而\emph{模式识别}（Pattern Recognition）意味着需要专业人员提供很多特征。
+模式识别从19世纪50年代开始出现，在20世纪80年代左右曾经风靡一时，也是信息科学和人工智能的重要组成部分。
+它被应用于图像分析与处理、语音识别、数据挖掘等很多方面。
+尽管模式识别也很高大上，也有了较长时间的应用，但效果一直差强人意。
+
+这种由人提取特征交给机器，再交给机器去判断的方法识别率一直差强人意。
+而\emph{机器学习}可以从海量数据学习\emph{特征}，使用已知经验数据（样本）自己提炼特征。
+另外，再强调一下概念，深度学习只是机器学习算法的一种，而人工智能也不限于机器学习一种。
+
+\begin{figure}[!htb] \centering
+\begin{tikzpicture}
+\node(learning) [draw, rectangle] at (2,0) {学习};
+\node(knowledge) [draw, ellipse] at(2,1.5) {经验};
+\draw[->](0,0) node[left]{新数据} -- node[above]{输入} (learning);
+\draw[->](learning) -- node[above]{预测} (4,0) node[right]{人工智能};
+\draw[->](knowledge) -- (learning);
+\end{tikzpicture}
+\end{figure}
+
+大数据和深度学习，让我们能够摆脱人工特征提取的繁琐和束缚，让更多的人参与人工智能并为社会创造价值。
+互联网+没有过时，再加上分布式和云计算，使得\emph{人工智能+}如鱼得水，再次迎来十年兴盛，相信接下来是数据为王的时代！
+
+\include{part4/cloud}
+\include{part4/recognition}
+\include{part4/writepoem}

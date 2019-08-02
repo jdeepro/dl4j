@@ -1,0 +1,60 @@
+% !Mode:: "TeX:UTF-8"
+\part{数学基础与算法}
+\label{part:math_learning}
+
+\newpage
+
+\gls{AI}最近变得非常流行了，但它的历史已经有六十多年。在1956年的达特茅斯会议，首次提出了\gls{AI}的概念，
+而在一年后，\emph{Rosenblatt}就提出了\emph{感知机}（perceptron）模型。
+
+
+\begin{figure}[!htb]
+\newcounter{TempEqCnt}
+\setcounter{TempEqCnt}{\value{chapter}}
+\setcounter{chapter}{0} 
+\centering
+\begin{tikzpicture}[node distance=1cm]
+%定义流程图具体形状
+\node[perceptron](circle){$\Sigma$};
+%连接具体形状
+\node[left of=circle,xshift=-2cm,yshift=1cm,draw=none,fill=none](x1){x1};
+\node[left of=circle,xshift=-2cm, draw=none,fill=none](x2){x2};
+\node[left of=circle,xshift=-2cm,yshift=-1cm, draw=none,fill=none](x3){x3};
+\node[right of=circle,xshift=2cm,draw=none,fill=none](output){output};
+\draw [arrow](x1) -- (circle);
+\draw [arrow](x2) -- (circle);
+\draw [arrow](x3) -- (circle);
+\draw [arrow](circle)--(output);
+\end{tikzpicture}
+\caption{感知机}
+\label{fig:part2_math_perceptron}
+\end{figure}
+\setcounter{chapter}{\value{TempEqCnt}} 
+
+如上\figref{fig:part2_math_perceptron}，\emph{感知机}就是二分类的线性分类模型，其输入为样本的特征向量，输出为样本的类别，取+1和-1二值。即通过某样本的特征，就可以准确判断该样本属于哪一类。顾名思义，感知机能够解决的问题首先要求特征空间是线性可分的，再者是二分类，即将样本分为{+1, -1}两类。
+
+
+使用\emph{感知机}可轻松解决异、或、非的问题，却存在一个致命缺陷：无法解决异或问题。导致\emph{AI}进入第一个衰退期，直到19世纪八十年代，才逐渐复苏。
+1984年，Hiton 教授提出\emph{Boltzman}机模型。到1986年 Kumelhart 等人提出\emph{误差反向传播}（Back Propagation）算法，简称 BP 网络。然而90年中期\emph{支持向量机}（Support Vector Machines，SVM）强势登场，全方位碾压NN。SVM具有 1）\emph{高效}，可以快速训练；2）\emph{无需调参}，没有梯度消失问题；3）\emph{高效泛化，全局最优解}，不存在过拟合问题。几乎全方位的碾压NN，NN也再次被打入冷宫。
+
+
+目前，BP网络已成为广泛使用的网络。1987年至今为发展期，神经网络受到各个国家的重视，纷纷展开研究，形成神经网络发展的另一个高潮。
+\gls{AI}是一个将数学、算法和工程相结合的学科，包含微积分、概率论、统计学等数学知识。
+本章将为大家简要介绍人工智相关的数学基础理论。
+
+
+% \include{part2/math}
+\include{part2/calculus}
+\include{part2/probability}
+\include{part2/linear}
+\include{part2/math}
+\include{part2/machinelearning}
+\include{part2/supervised}
+\include{part2/unsupervised}
+\include{part2/neuralnetwork}
+\include{part2/deeplearning}
+
+
+
+
+

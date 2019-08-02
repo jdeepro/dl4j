@@ -1,0 +1,233 @@
+% !Mode:: "XeLaTeX:UTF-8"
+%
+% 内部书籍，谨慎参考！
+% 撰写阶段错误难免~
+%
+
+%使用onesie去掉空白页
+\documentclass[oneside, UTF8]{ctexbook}
+
+%文献
+\usepackage{natbib}
+
+%章节标题左对齐和格式
+\CTEXsetup[format={\LARGE\raggedright\bfseries}]{chapter} %修改每章的字体
+\CTEXsetup[format={\Large\bfseries}]{section}
+\CTEXsetup[format={\large\bfseries}]{subsection}
+\CTEXsetup[format={\normalsize\bfseries}]{subsubsection}
+
+%消除小字号警告
+\usepackage{lmodern}
+\usepackage{titling}
+
+%页面设置
+\usepackage[vcentering]{geometry}
+\geometry{
+	papersize={7in,9in},
+	bottom=3pc,top=5pc,left=5pc,right=5pc,
+	bmargin=4.5pc,
+	footskip=18pt,
+	headsep=25pt
+}
+\setlength\emergencystretch{1.5em}
+
+%章节索引- 消除目录红框
+\usepackage[pdfpagelabels=true,
+pdffitwindow=false,
+pdfview=FitH,
+pdfstartview=FitH,
+pagebackref=true,
+breaklinks=true,
+colorlinks=false,
+bookmarks=true,
+hidelinks,
+bookmarksnumbered=true,
+bookmarksopen=true,
+bookmarksopenlevel=1,
+bookmarksdepth=2,
+plainpages=true]{hyperref}
+\usepackage{bookmark}
+
+%章节索引
+%\usepackage[bookmarksnumbered]{hyperref}
+
+%表格相关
+\usepackage{multirow}
+\usepackage{colortbl}
+\usepackage{booktabs}
+
+%数学公式
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{pgfplots}
+\usepgfplotslibrary{colorbrewer}
+
+%引用图片
+\usepackage{graphicx}
+
+%加水印
+\usepackage{draftwatermark}
+\SetWatermarkText{DRAFT}
+
+%伪代码
+\usepackage[chapter]{algorithm}
+\usepackage{algorithmic}
+
+%编号方式
+\newcommand{\firstgls}[1]{\textbf{\,\gls{#1}}（\glsdesc{#1}）}
+\newcommand{\firstacr}[1]{\textbf{\,\gls{#1}}（\glssymbol{#1}）}
+\newcommand{\glsacr}[1]{\gls{#1}（\glssymbol{#1}）}
+\newcommand{\firstall}[1]{\textbf{\,\gls{#1}}（\glsdesc{#1}, \glssymbol{#1}）}
+\newcommand{\ENNAME}[1]{\text{#1}}
+\newcommand{\NUMTEXT}[1]{\text{#1}}
+\newcommand{\figref}[1]{图\,\ref{#1}\,}
+\newcommand{\chapref}[1]{第\ref{#1}章}
+\newcommand{\secref}[1]{第\,\ref{#1}\,节}
+\newcommand{\algref}[1]{算法\,\ref{#1}\,}
+\newcommand{\eqnref}[1]{式\,\eqref{#1}\,}
+\newcommand{\tabref}[1]{表\,\ref{#1}\,}
+\newcommand{\coderef}[1]{代码\,\ref{#1}\,}
+\newcommand{\srclink}[1]{\underline{\color{blue}{#1}}}
+
+%脚注改为①②-⑨样式
+\usepackage{pifont}
+\usepackage[perpage,symbol*]{footmisc}
+\DefineFNsymbols{circled}{
+     {\ding{192}}{\ding{193}}{\ding{194}}{\ding{195}}{\ding{196}}
+     {\ding{197}}{\ding{198}}{\ding{199}}{\ding{200}}{\ding{201}}}
+\setfnsymbol{circled}
+
+% 支持表格分页 begin{longtable}, end{longtable}
+\usepackage{longtable}
+
+%流程图
+\usepackage{tikz}
+\usepackage{tikz-uml}
+\usepackage{pgfopts}
+\usepackage{calc}
+\usepackage{xstring}
+\usepackage{ifthen}
+\usepackage{pgfkeys}
+\usetikzlibrary{shapes.geometric, arrows, calc}
+%流程图定义基本形状
+%开始和结束
+\tikzstyle{startstop} = [rectangle, rounded corners, minimum width = 1cm, minimum height=0.6cm,text centered, draw = black]
+\tikzstyle{io} = [trapezium, trapezium left angle=70, trapezium right angle=110, minimum width=1cm, minimum height=0.6cm, text centered, draw=black]
+%处理节点
+\tikzstyle{process} = [rectangle, text centered, draw=black]
+%条件判断
+\tikzstyle{decision} = [diamond, aspect = 3, text centered, draw=black]
+%runnable
+\tikzstyle{runnable} = [circle, text centered, draw=black]
+\tikzstyle{arrow} = [->,>=stealth] % 箭头形式
+\tikzstyle{perceptron} = [circle,minimum size=2cm,draw=black]
+
+%封面插入图片 ??暂时搞不清楚\\[\bigskipamount]双斜线用法
+\preauthor{
+\begin{center}
+\includegraphics[width=6cm]{dl4j.png} \\[\bigskipamount]
+}
+\postauthor{\end{center}}
+
+%标题间距
+% From en book -B
+\setlength{\parskip}{0.25 \baselineskip}
+
+%新尺寸间距
+% Sean said to make figures 26 picas wide
+\newlength{\figwidth}
+\setlength{\figwidth}{64pc}
+% Spacing between notation sections
+\newlength{\notationgap}
+\setlength{\notationgap}{1pc}
+% From en book -E
+
+%支持段落首行不缩进\noindent
+\usepackage{indentfirst}
+
+%Java代码语法高亮
+\usepackage{parcolumns} %分栏
+\usepackage{listings}
+\renewcommand{\lstlistingname}{代码}% Listing -> 代码
+\usepackage{color}
+\usepackage{xcolor}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+     language=Java,
+     aboveskip=3mm,
+     belowskip=3mm,
+     showstringspaces=false,
+     columns=flexible,
+     basicstyle = \ttfamily\small,
+     numbers=left,
+     numberstyle=\tiny\color{gray}, %设置行号的字体和颜色
+     numbersep=4pt,  %设置行号与代码的距离，默认是5pt
+     keywordstyle=\color{blue},
+     commentstyle=\color{dkgreen},
+     stringstyle=\color{mauve},
+     breaklines=true,
+     breakatwhitespace=true,
+     tabsize=3
+}
+
+% http://tex.stackexchange.com/questions/198140/glossaries-and-custom-section-headings-broken  \glsentrytext!
+\usepackage[nomain,acronym,xindy,toc,nopostdot]{glossaries}
+\makeglossaries
+\usepackage[xindy]{imakeidx}
+\makeindex
+
+
+% symbol and 
+\include{math_symbol}
+\include{terminology}
+
+%文档开始
+\begin{document}
+
+%目录用罗马数字就行了
+\frontmatter
+%定义书籍标题
+\title{\Huge\textbf{人工智能基础(Java)}}
+\author{@YangJ9966, @imbbty, @simbaba}
+\date{\today}
+
+%显示书籍标题
+\maketitle
+
+%扉页
+\centerline {\large {关于本书}}
+\quad \par
+2018年4月，教育部在研究制定《高等学校引领人工智能创新行动计划》，
+并研究设立人工智能专业，进一步完善中国高校人工智能学科体系。
+
+%书籍目录
+\tableofcontents
+
+%致谢
+\input{acknowledgments}
+\input{website}
+\input{notation}
+
+\mainmatter
+\input{part1/preface} %JAVA
+\input{part2/preface} %MATH
+\input{part3/preface} %AI
+\input{part4/preface} %Ex.
+
+\backmatter
+\bookmarksetup{startatroot}
+
+\appendix
+
+\small{
+\bibliography{dl4j}
+\bibliographystyle{natbib}
+\clearpage
+}
+
+\printglossary[title=术语]
+
+\end{document}
