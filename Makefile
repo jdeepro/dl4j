@@ -1,6 +1,6 @@
 #-*-compile book pdf -*-#
 all:
-	xelatex dl4j.tex && xelatex dl4j.tex
+	cd book && xelatex dl4j-book.tex && xelatex dl4j-book.tex
 
 demo:
 	cd java && mvn compile

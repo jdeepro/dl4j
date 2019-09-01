@@ -87,10 +87,6 @@ try (FileOutputStream fos = new FileOutputStream(file)) {
 00000000:  0001 0203 0405          
 \end{lstlisting}
 
-\noindent
-由以上差异，可见所谓的“012345”和实际的数据“012345”是由差别的。
-UTF-8编码的“012345”，实际上对应ASCII码表中的值：
-
 \begin{table}[!htbp]\centering
 	\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|}
 	\hline
@@ -104,7 +100,8 @@ UTF-8编码的“012345”，实际上对应ASCII码表中的值：
 	\end{tabular}
 \end{table}
 
-\noindent
+由以上差异，可见所谓的“012345”和实际的数据“012345”是由差别的。
+UTF-8编码的“012345”，实际上对应ASCII码表中的值：
 所以，读写文件的方式分为：文本、二进制方式。采用文本方式读写文件的时候，
 如果遇到无法解码的数据，就会显示为乱码。通常你的笔记，都是以文本的方式
 读写的，而图片和视频都是二进制的方式存储。
@@ -197,28 +194,31 @@ UTF-8编码的“012345”，实际上对应ASCII码表中的值：
 \figref{fig:part1_io_framewk}中，每个输入流的具体用法，可参考下表：
 \vspace{0.3cm}
 \begin{table}[!htbp]\centering
-	\begin{tabular}{|p{4cm}|p{3cm}|p{5cm}|}
+	\lstset{frame=none, language=Java}
+	\begin{tabular}{|p{4cm}|p{9cm}|}
 	\hline
-	IO类&作用&示例\\ 
+	IO类&示例\\ 
 	\hline
-	ByteArrayInputstream&
-	包装一个byte[]作为输入&
-	b = new byte[]\{100,2,3,4\}; \newline
-	bInput = new ByteArrayInputStream(b);\newline
-	int n1 = bInput.read(); //100 \newline
-	int n2 = bInput.read(); //2 \newline \\
+	ByteArrayInputstream \newline 包装一个byte[]作为输入&
+\begin{lstlisting}
+	b = new byte[]{100,2,3,4};
+	bInput = new ByteArrayInputStream(b);
+	int n1 = bInput.read(); //100
+	int n2 = bInput.read(); //2
+\end{lstlisting} \\
 	\hline
-	StringBufferInputstream&
-	把字符串作为输入&
-	bInput = new StringBufferInputStream("123456");\newline
-	int n1 = bInput.read() - '0'; //1\newline
-	char n2 = (char) bInput.read(); //2\\
+	StringBufferInputstream \newline 把字符串作为输入&
+\begin{lstlisting}
+	bInput = new StringBufferInputStream("123456");
+	int n1 = bInput.read() - '0'; //1
+	char n2 = (char) bInput.read(); //2
+\end{lstlisting} \\
 	\hline
-	FileInputStream&读文件&省略。\\
+	FileInputStream \newline 读文件& 略。\\
 	\hline
-	ObjectInputStream&从流中获取一个对象&参考代码见后\\
+	ObjectInputStream \newline 从流中获取一个对象&参考代码见后。\\
 	\hline
-	SequenceInputStream&合并流&参考代码见后\\
+	SequenceInputStream \newline 合并流&参考代码见后。\\
 	\hline
 	\end{tabular}
 \end{table}

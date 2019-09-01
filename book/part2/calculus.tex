@@ -107,7 +107,7 @@ $$ grad f(x_0, x_1,\cdots, x_n) = (
 既然，沿梯度方向具有最大的变化率，所以沿着负梯度方向去减小函数值，
 才能最快达到优化目标。
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \begin{tikzpicture}[scale=0.6]
 	\begin{axis}
@@ -154,7 +154,7 @@ After 18 steps: x = 0.500213, f(x)= -2.250000.
 \section{线性拟合}
 样本的散点图有助于发现关键特征，建立正确的模型。
 如下图，可直观地识别出线性关系，尽管有干扰数据。
-\begin{figure}[!h]
+\begin{figure}[!ht]
 	\begin{center}
 	\begin{tikzpicture}
 			\pgfmathsetmacro{\ticker}{0.125}
@@ -390,9 +390,6 @@ $$i=1,\cdots,n.$$
 若干次迭代之后就会落入局部最小点附近，有可能来回震荡无法达到极值点。
 所以，调整学习率就非常关键，因此到极值点附近的时候收敛速度也会变慢。
 
-
-
-
 \subsection{反向传播（Back Propgation）}
 前述几节，我们利用偏导获得梯度，然后逐步调节参数，朝着误差越来越小的方向迭代。
 这还算不上神经元，实际比这还要复杂一些，通常还有一个激活函数（Activation Function），
@@ -401,7 +398,7 @@ $$i=1,\cdots,n.$$
 
 \begin{figure}[!htb] \centering 
 	\begin{tikzpicture}
-		\node at (0,0) {\includegraphics[width=\textwidth]{images/activation-function.png}};
+		\node at (0,0) {\includegraphics[width=0.8\textwidth]{images/activation-function.png}};
 		\node at (1,1) {$\sigma = \text{激活函数}$};
 	\end{tikzpicture}
 	\caption{神经网络}

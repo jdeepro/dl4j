@@ -45,9 +45,9 @@ x=\left[\begin{array}{c} x_1\\x_2\\\dots\\x_n\end{array}\right]
     dot(v : InVector) : int \\
     cross(v : InVector) : IntVector
 }
-\label{fig:part2_math_vector}
 \end{tikzpicture}\end{center}
 \caption{类图：IntVector}
+\label{fig:part2_math_vector}
 \end{figure}
 
 \begin{lstlisting}[language=Java]
@@ -65,11 +65,10 @@ public int dot(IntVector vector) {
 }
 \end{lstlisting}
 
-\noindent
 如上代码，构造函数用到了可变参数，你可以理解成一个\lstinline{int[]}。在编译的时候，Java会自动地把函数声明和调用代码都转换成数组。
 \emph{add}运算返回\lstinline{this}，用来支持链式运算：$v1.add(v2).add(v3)\dots$。容易看出，
 \emph{add}和\emph{dot}运算，是对应元素相加、相乘的过程。
-使用\emph{foreach}从相加的2个向量中，逐个地取出数据并执行$\lambda$操作。\\
+使用\emph{foreach}从相加的2个向量中，逐个地取出数据并执行$\lambda$操作。
 
 \begin{lstlisting}[language=Java,caption=叉乘运算]
 public IntVector cross(IntVector vector) {
