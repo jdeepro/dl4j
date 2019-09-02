@@ -69,17 +69,12 @@ JRE（Java Runtime Environment）是Java程序的运行环境，不要下载错�
 Windows上的配置相对比较简单，参考下图打开环境变量配置窗口。
 选择系统环境变量或者帐号环境变量里面都可以，区别是系统环境变量会影响所有用户。
 通常建议修改帐号环境变量，有些帐号可能也没权限修改系统环境变量。
-在其中，新建2个条目：
-\begin{enumerate}
-	\item JAVA\_HOME, java的安装目录
-	\item 在path后面追加, \text{\%JAVA\_HOME\%}$\backslash$bin
-\end{enumerate}
 
 \begin{figure}[!htb]
-	\centerline{\includegraphics[width=.4\figwidth]{images/windows_java_home.png}}
+	\centerline{\includegraphics[scale=.5]{images/windows_java_set.png}}
 \end{figure}
 
-Linux和Mac的配资方法大致相同，需要修改配置文件。
+\remark{Linux和Mac的配资方法大致相同，需要修改配置文件。}
 \footnote{.bash\_profile、.bashrc或.profile等。}
 \begin{lstlisting}[language=bash]
 	# Mac、Linux
