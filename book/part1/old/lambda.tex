@@ -1,0 +1,411 @@
+% !Mode:: "TeX:UTF-8"
+\chapter{Lambda表达式}
+\label{chap:java_lambda}
+
+Lambda表达式是Java8引入的一个重要新特性，允许你通过表达式来代替函数。
+用起来和方法一样，有一个参数列表和使用这些参数的代码。
+Lambda对集合做了必要扩展，使用流(stream)遍历和操作数据。
+先看几个例子：\vspace{0.3cm}
+
+\begin{lstlisting}[language=Java]
+	// 1. 无参数, 返回值为7
+	IntSupplier fn = () -> 7;
+	
+	// 2. 接收一个参数(数字类型),返回它的2倍
+	IntFunction<String> fx = x -> (2 * x) + "$";
+	
+	// 3. 接受2个参数(数字),并返回他们的乘积
+	IntBinaryOperator f_xy_mul = (x, y) -> x * y;
+	
+	// 4. 接收2个int型整数,返回他们的和
+	IntBinaryOperator f_xy_add = (int x, int y) -> x + y;
+	
+	// 5. 接受一个 string 对象,并在控制台打印,不返回任何值(看起来像是返回void)
+	Consumer<String> print = (String s) -> System.out.print(s);
+	
+	int n = fn.getAsInt();
+	String d = fx.apply(3);
+	int mul = f_xy_mul.applyAsInt(2, 3);
+	int add = f_xy_add.applyAsInt(2, 4);
+	print.accept(String.format("%d, %s, %d, %d", n , d, mul, add));
+
+	\\输出： 7, 6$, 6, 6
+\end{lstlisting}
+
+\section{函数分类}
+
+$\lambda$表达式由来已久，并不是Java提出的概念，在计算机诞生之初就出现了。
+这种$\lambda$表达式不仅自然，而且短小精悍。
+设计之初，原本$\lambda$表达式是线程安全的，
+因它不会产生副作用（影响外部的值，side effect）。
+
+\begin{longtable}{|p{4cm}|p{9cm}|}
+	分类&说明\\
+	\hline
+	Function
+	\begin{itemize}
+		\small
+		\setlength{\itemindent}{-1.2em}
+		\setlength{\itemsep}{0pt}
+		\item R apply(T t...);
+		\item applyAsInt(double);
+		\item applyAsLong(double);
+	\end{itemize} & \emph{运算，有入参有返回值}
+	\begin{enumerate}
+		\setlength{\itemsep}{0pt}
+		\small
+		\item BiFunction<T, U, R> 参数T和U类型，返回R类型的值
+		\item DoubleFunction<R> 返回R类型的值
+		\item DoubleToIntFunction 类似于类型转换
+		\item DoubleToLongFunction 类似于类型转换
+		\item IntFunction<R> 一个整数参数返回R类型的值
+		\item IntToDoubleFunction 类似于类型转换
+		\item IntToLongFunction 类似于类型转换
+		\item LongFunction<R> 一个长整数返回R类型的值
+		\item LongToDoubleFunction 类似于类型转换
+		\item LongToIntFunction 类似于类型转换
+		\item ToDoubleBiFunction<T, U> 接收T和U类型参数返回实数
+		\item ToDoubleFunction<T> 类似于强制转换
+		\item ToIntBiFunction<T, U> 收T和U类型参数返回整数
+		\item ToIntFunction<T> 类似于强制转换
+		\item ToLongBiFunction<T, U> 收T和U类型参数返回长整数
+		\item ToLongFunction<T> 类似于强制转换
+	\end{enumerate} \\
+	\hline
+	Consumer
+	\begin{itemize}
+		\small
+		\setlength{\itemindent}{-1.2em}
+		\setlength{\itemsep}{0pt}
+		\item accept(T t, U u);
+		\item andThen(after);
+	\end{itemize} &
+	\emph{有参无返回值}
+	\begin{enumerate}
+		\setlength{\itemsep}{0pt}
+		\small
+		\item Consumer 一个参数无返回值
+		\item BiConsumer 两个参数无返回值
+		\item DoubleConsumer 实数的特例
+		\item IntConsumer 整数特例
+		\item LongConsumer 长整数特例
+		\item ObjDoubleConsumer 一个Obj和实数
+		\item ObjIntConsumer 一个Obj和整数
+		\item ObjLongConsumer 一个Obj和长整数
+	\end{enumerate} \\
+	\hline
+	Operator
+	\begin{itemize}
+		\small
+		\setlength{\itemindent}{-1.2em}
+		\setlength{\itemsep}{0pt}
+		\item Function接口;
+		\item minBy(Comparator);
+		\item maxBy(Comparator);
+		\item compose();
+		\item andThen();
+		\item identity();
+	\end{itemize} & \emph{操作，Function的特殊类别}
+	\begin{enumerate}
+		\setlength{\itemsep}{0pt}
+		\small
+		\item BinaryOperator<T> 同BiFunction<T,T,T>
+		\item DoubleBinaryOperator 同BiFunction<T,T,T>
+		\item DoubleUnaryOperator 单目运算
+	\end{enumerate} \\
+	\hline
+	Predicate
+	\begin{itemize}
+		\small
+		\setlength{\itemindent}{-1.2em}
+		\setlength{\itemsep}{0pt}
+		\item test(value);
+		\item and (value);
+		\item negate();
+		\item or(other);
+	\end{itemize} & \emph{谓词，用于真假判断}
+	\begin{enumerate}
+		\setlength{\itemsep}{0pt}
+		\small
+		\item BiPredicate<T, U> 入参类型T和U条件检查
+		\item DoublePredicate 入参是实数类型
+		\item IntPredicate 入参是整数类型
+		\item LongPredicate 入参是长整数类型
+		\item Predicate 入参是T类型
+	\end{enumerate} \\
+	\hline
+	Supplier 
+	\begin{itemize}
+		\small
+		\setlength{\itemindent}{-1.2em}
+		\setlength{\itemsep}{0pt}
+		\item T get();
+		\item int getAsInt);
+		\item double getAsDouble();
+		\item long getAsLong();
+	\end{itemize} & \emph{产生器，无入参有返回值}
+	\begin{enumerate}
+		\setlength{\itemsep}{0pt}
+		\small
+		\item Supplier 返回一个值
+		\item BooleanSupplier 返回一个布尔值
+		\item DoubleSupplier 返回一个实数值
+		\item IntSupplier 返回一个整数值
+	\end{enumerate} \\
+	\hline
+\end{longtable}
+\noindent
+除了以上已定义的$\lambda$表达式，你也可以自定义。
+实际上，$\lambda$表达式都是用接口（interface）定义的。
+然而在使用的时候，函数名又被省略了，所以其中存在某种对应关系。
+那又怎么消除二义性的呢？这就要求接口中只能有一个未知函数。
+就像这样：
+
+\begin{lstlisting}[language=java]
+	/// 定义Ixy接口
+	interface Ixy {
+    int add(int x, int y);
+    default int sub(int x, int y) {return x-y;}
+	}
+  /// 定义xy变量
+	Ixy xy = (a, b)-> a+b;
+	int sum = xy.add(1,2);
+	int sub = xy.sub(1,2);
+	System.out.printf("sum=%d, sub=%d", sum, sub);
+\end{lstlisting}
+\noindent
+注意\lstinline{default}的特殊用法，代表的是该函数接口有默认实现，
+可定义多个default接口。
+
+你也许发现了，$\lambda$表达式根本不关心关联的函数叫什么名字，只关注
+名字以外的参数和类型是否一致。
+\begin{lstlisting}[language=java]
+	// 借用Math类的addExact
+	Ixy xy = Math::addExact;
+	int sum = xy.add(1,2);
+	int sub = xy.sub(1,2);
+	// 借用System.out::printf
+	Consumer<String> print = System.out::printf;
+	print.accept(String.format("sum=%d, sub=%d", sum, sub));
+\end{lstlisting}
+
+\section{应用示例}
+使用$\lambda$表达式可以极大地简化代码，也使代码更加容易理解。
+但$\lambda$表达式不要太复杂，建议功能单一。
+接下来，将针对每一种$\lambda$表达式，举例二三。
+
+\emph{1.过滤数组的例子}
+\begin{lstlisting}[language=java]
+	int[] ids = {0,1,2,3,4,5,6,7,8,9};
+
+	Consumer<String> print = System.out::print;
+	Consumer<String> println = System.out::println;
+	IntPredicate isOdd = (n) -> n%2==1;
+
+	IntConsumer c1 = (n)-> {
+			if (isOdd.test(n))print.accept("单数");
+			else print.accept("双数");
+	};
+
+	IntConsumer c2 = (n)-> {
+			if (isOdd.test(n))println.accept("->"+n);
+			else println.accept("~>"+n);
+	};
+
+	IntStream.of(ids).forEach(c1.andThen(c2));
+\end{lstlisting}
+
+这段过滤数组的例子，输出是应该怎样的呢？使用了2个Consumer连续处理数据，
+而IntStream提供了这种流式动力。从Stream中每取出一个数字，先给c1处理
+然后再交给c2处理。所以，以上代码的输出是：
+\begin{lstlisting}
+	双数=>0
+	单数->1
+	双数=>2
+	单数->3
+	双数=>4
+	单数->5
+	双数=>6
+	单数->7
+	双数=>8
+	单数->9
+\end{lstlisting}
+
+\emph{2.读写文件}
+\begin{lstlisting}[language=java]
+	Path path = Paths.get("/Users/simbaba",
+												"Desktop",
+												"test.txt");
+	Files.lines(path).forEach(System.out::println);
+\end{lstlisting}
+使用Files轻松应对大多数的文件操作，借助$\lambda$表达式也非常简单。
+
+\emph{3.找出最大和最小}
+\begin{lstlisting}[language=java]
+	Integer[] ids = {11, 2, 6, 4, 7, 10, 5};
+	OptionalInt min = Stream.of(ids).mapToInt(id->id).min();
+	OptionalInt max = Stream.of(ids).mapToInt(id->id).max();
+	
+	min.ifPresent(System.out::println);
+	max.ifPresent(System.out::println);
+\end{lstlisting}
+需要注意Integer[]和int[]的区别，同学们可以尝试改成int[]怎么才能获得结果，
+又为什么出现这种问题呢？
+
+\section{数学推理}
+$\lambda$表达式，对数学是非常友好的，不必再写一堆函数或者分支语句，
+可以写出更自然的代码。
+
+\begin{tikzpicture}[scale=0.5]
+  \draw[very thin,color=gray] (-2,-2) grid (12,5);
+  \draw[->] (-0.2,0) -- (11.4,0) node[right] {$x$};
+  \draw[->] (0,-1.2) -- (0,4.4) node[above] {$f(x)$};
+  \draw[color=red, domain=0:3]    plot (\x,{2*\x*\x/9}) node[right] {$f(x) =2x^2/9$};
+  \draw[color=blue, domain=3:5]   plot (\x,{(\x+1)/2}) node[right] {$f(x) = (x+1)/2$};
+	\draw[color=purple, domain=5:7] plot (\x, -\x+8) node[right] {$f(x) = -x+8$};
+	\node at(18, 2) {$f(x)=\begin{cases}
+		2x^2/9 & \text{x<3}, \\
+		(x+1)/2 & \text{[3,5]} \\
+		-x+8 & \text{x>=5}
+	\end{cases}$};
+\end{tikzpicture}
+
+\emph{参考代码：}
+\begin{lstlisting}[language=java]
+	DoubleUnaryOperator op1 = (d)->2*d*d/9;
+	DoubleUnaryOperator op2 = (d)->(d+1)/2;
+	DoubleUnaryOperator op3 = (d)->-d+8;
+  // 浮点数不建议直接比较大小，此处忽略
+	double d = 4.5d;
+	if (d > 5) {
+			d = op3.applyAsDouble(d);
+	} else if (d > 3) {
+			d = op2.applyAsDouble(d);
+	} else {
+			d= op1.applyAsDouble(d);
+	}
+	System.out.println("d = " + d);
+\end{lstlisting}
+
+\section{更加强大的集合}
+支持$\lambda$表达式的编程语言，提供的集合操作也都非常强大。
+限于篇幅，本节不能全部涵盖，只介绍基本的使用方法。
+
+\subsection{获得stream}
+借助接口的default扩展语法，现在所有的Java集合都已经支持数据流stream，用以遍历和操作数据。
+这里的stream和文件流(file stream)稍微有些差别，都是对集合的映射。
+
+我们先看数组是如何转换成stream的，分为两种情况：基本类型和对象类型。
+处理方式上有一些区别，请注意使用上的差异。
+Java是通过泛型实现的数据容器，其中的\emph{T类型}指的是引用类型。
+\vspace{0.5cm}
+\noindent
+以下是int[]和Integer[]的样例代码：
+\begin{lstlisting}[language=Java]
+	@Test
+	public void visitIntList() {
+			int[] intList = {1,2,3,4,5};
+			IntStream stream = IntStream.of(intList);
+			int[] array = stream.map(n -> n * 2).toArray();
+			assertArrayEquals(array, new int[]{2,4,6,8,10});
+	}
+
+	@Test
+	public void visitIntegerList() {
+			Integer[] intList = {1,2,3,4,5};
+			IntStream stream = Arrays.stream(intList).mapToInt(n->n);
+			int[] array = stream.map(n -> n * 2).toArray();
+			assertArrayEquals(array, new int[]{2,4,6,8,10});
+	}
+\end{lstlisting}
+
+与List不一样，Map相当于有2个集合：keySet, values。
+遍历数据的时候，根据需要把keySet或values转换为stream。
+使用示例如下：
+\begin{lstlisting}[language=Java]
+  @Test
+	public void map2Stream() {
+			HashMap<Integer, String> n2ch = new HashMap<>();
+			n2ch.put(1, "abcdefg");
+			n2ch.put(2, "hijklmn");
+			n2ch.put(3, "opqrst");
+
+			Stream<Integer> keyStream = n2ch.keySet().stream();
+			Object[] even = keyStream.filter(key -> key % 2 == 0).map(n2ch::get).toArray();
+
+			assertArrayEquals(even, new String[]{"hijklmn"});
+	}
+\end{lstlisting}
+
+上述代码，遍历keySet的时候先进行一次过滤，然后再进行一次map操作。
+通过map操作又把key遍历转换为values遍历，也就是经过map()操作之后，
+stream<Integer>已经转换为了stream<String>。
+而n2ch::get语法，是一种lambda表达式借用代码和省略参数的写法。
+
+\subsection{统计功能}
+仅把stream当作for循环的替代品，只是用于遍历就有点大材小用了。
+对于函数式编程，比较有特色的一个操作\emph{reduce}在此表现地淋漓尽致。
+\begin{lstlisting}[language=Java]
+	int[] intList = {1,2,3,4,5};
+	IntStream stream = IntStream.of(intList);
+
+	OptionalInt optSum = stream.reduce((a, b)->a+b);
+
+	int sum = optSum.getAsInt();
+	assertEquals(sum, 1+2+3+4+5);
+\end{lstlisting}
+
+使用stream还可以对数据进行分类集约，本书不作详细解释，仅提供演示代码。
+如下代码，根据性别把学生分为两类。
+
+\begin{lstlisting}[language=Java]
+	Student jim = new Student("jim", 1);
+	Student jane = new Student("jane", 0);
+	Student tom = new Student("tom", 1);
+	Student sunny = new Student("sunny", 0);
+
+	Student[] students = new Student[] {jim, jane, tom, sunny};
+
+	Map<Integer, List<Student>> group = Stream.of(students).collect(
+									Collectors.groupingBy(s -> s.sex));
+
+	List female = group.get(1);
+	Student[] dst = new Student[]{jim, tom};
+	assertArrayEquals(female.toArray(), dst);
+\end{lstlisting}
+
+对于数据排序、求最大值/最小值和平均值，使用stream处理也都很简单直观。
+
+\subsection{并行处理}
+也可以把stream分成多个子流，同时在多个线程并发处理，充分发挥系统多核硬件性能。
+将一个顺序执行的流转变成一个并发的流只需要调用parallel()方法。
+先用不同的线程分别处理，最后再合并每个数据流的计算结果。
+
+\begin{lstlisting}[language=Java]
+	@Test
+	public void parallelSum() {
+			int[] nums = {1,2,3,4,5,6,7,8,9,10};
+
+			OptionalInt sum = IntStream.of(nums)
+							.parallel()
+							.reduce((a, b)->a+b);
+			assertEquals(sum.getAsInt(), 55);
+	}
+\end{lstlisting}
+
+\subsection{无限流}
+无论是List还是Map，所能提供的数据都是有限的，并不是取之不竭。
+使用stream可以实现一种随取随提供的数据流。典型的应用场景，如随机数集合，每次都可以取不同的数据。
+如下代码，产生1000~9999之间的数据，取10个数据出来打印。
+
+\begin{lstlisting}[language=Java]
+	Random random = new Random(System.currentTimeMillis());
+	IntStream stream = random.ints(1000, 9999);
+	stream.limit(10).forEach(System.out::println);
+\end{lstlisting}
+
+\section{本章小结}
+很显然，使用lambda表达式和stream可以极大地简化程序。
+不过这不是JDK8语法糖，确实通过语法和语义手段实现了函数式编程。
+值得关注的是，lambda表达式的上下文的依赖值得你去思考。
+还有很多的知识不能详尽列举，请自行查阅相关资料。

@@ -1,0 +1,968 @@
+% !Mode:: "TeX:UTF-8"
+\chapter{面向对象}
+\label{chap:java_oo}
+
+从控制流程的角度来看，if、switch和while语句在自己的粒度上控制代码的执行过程。广义上，面向对象（Object Oriented，简称OO）也是一种流程控制。字面意思上的区别：面向过程和面向对象。
+但想要解释面向对象是什么，很多资料也都是非常抽象。
+
+使用\emph{OOP}的目的当然不是流程控制，而是从数据对象的角度建立整个软件系统。
+使用面向对象当然会用到流程控制，也离不开函数调用。
+但\emph{OO}的提出，为\emph{软件工程}提供了理论支持，为纷繁复杂的项目提供了设计工具和开发语言。
+可以说\emph{OO}是为设计师创造的语言，是为具备由上而下掌控全局的程序员开发的语言。
+所以，OO是一种顶层设计，与面向过程不是一个层面上的开发语言。
+尽管\emph{OO}分解到底层实现，还是要编写函数和控制语句。
+
+\vspace{0.4cm} \noindent
+使用面向对象编写的代码，具备以下优点：
+\begin{itemize}
+\item[1.] 复用代码，相同的处理逻辑，往往放在\emph{基类}实现。
+\item[2.] 容易扩展，通过\emph{继承}轻松加入新类型。
+\item[3.] 模块化设计，代码与需求的等价性高。
+\item[4.] 经验多，UML、设计模式等。
+\end{itemize}
+\ \\
+\noindent
+以下是多边形（Polygon）的经典例子：
+\begin{lstlisting}[language=Java]
+/**
+ * 多边形：三角形、矩形、圆形
+ * 作为参数的polygon是哪个呢？
+ */
+void print(Polygon polygon) {
+    String name = polygon.name;
+    double area = polygon.area();
+    System.out.println("面积: " + area);
+}
+\end{lstlisting}
+
+\noindent
+该代码体现了\emph{面向对象}的2个特点：面向抽象、复用代码。
+面向抽象（基类）是复用和多态的前提，作为参数的抽象对象polygon可能是什么（长方形、圆形等）不重要，
+重要的是传入的实际对象是否实现了Polygon的接口，是否加入了Polygon的Family Tree。
+只要三角形、长方形继承了Polygon就能被看作Polygon对象。
+
+如何继承，如何加入这样Polygon的家族？
+在本章都会详细说明，我们先看看Java语言用到的一些关键字。
+下表列出的关键字，我们都会介绍到。
+\begin{table}[!htbp]\centering
+\begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|}
+\hline
+\multicolumn{5}{|c|}{关键词}\\
+\hline
+class&interface&new&this&super\\
+public&protected&private&package&import\\
+instanceof&extends&implements&abstract&final\\
+default&static&enum&-&-\\
+\hline
+\end{tabular}
+\label{table:part1_oo_keywords}
+\end{table}
+
+
+\section{对象封装}
+面向对象是一种顶层设计，我们要像设计师那样思考，才能写出正统的面向对象代码。
+在coding之前，要先充分理解业务、创建需求、分解用例和识别交互。
+现在，我们以多边形计算工具为假设项目，开始本章的内容。
+\begin{table}[!htbp]\centering
+\begin{tabular}{|p{3cm}|p{4cm}|p{4cm}|}
+\hline
+\multicolumn{3}{|c|}{需求分析}\\
+\hline
+支持的多边形&正方形、长方形、圆形、椭圆、三角形&可能还会要求支持其它多边形\\
+\hline
+支持的功能&面积、周长&--\\
+\hline
+提供的数据&坐标点&矩形支持长、宽\\
+\hline
+\end{tabular}
+\caption{多边形计算工具}
+\label{table:part1_oo_polygon}
+\end{table}
+
+
+根据\tabref{table:part1_oo_polygon}的内容，是要做一个计算多边形面积和周长的工具。现在不先急于考虑三角形的面积怎么计算、椭圆的周长公式是什么。
+先从更高的角度看待这些问题，不考虑形状、不考虑实现。能稍微具体一点的是，客户输入坐标之后，我们就能提供面积和周长。
+这种抽象非常有利，使得软件架构极具扩展性，实际上我们还可能要支持六边形的面积和周长。
+
+定义抽象的多边形类型，请参考左边部分代码，使用到了关键字\lstinline{class}。
+定义好了\emph{祖先Polygon}，就等其它对象加入这个Family了。
+三角形Triangle首当其冲，通过关键字\lstinline{extends}表面自己也是一个Polygon。
+Polygon作为家族树的根，起到了聚合相同接口、划分对象类型的作用。
+
+\begin{center}
+\begin{minipage}
+{\textwidth}\begin{parcolumns}{2}
+\colchunk{
+\begin{lstlisting}[language=Java]
+class Polygon {
+    String name = "NA";
+    double[] points;
+
+    /** getter面积 */
+    double area(){
+        return 0;
+    }
+
+    /** getter名称 */
+    String name() {
+        return name;
+    }
+}
+\end{lstlisting}}
+\colchunk{
+\begin{lstlisting}[language=Java]
+/** 三角形和圆都继承自Polygon */
+class Triangle extends Polygon {
+    @Override
+    double area() {
+        return 1.0d; // 假设是1.0
+    }
+}
+
+class Circle extends Polygon {
+    @Override
+    double area() {
+        return 2.0d; // 假设是2.0
+    }
+}
+\end{lstlisting}}
+\colplacechunks
+\end{parcolumns}\end{minipage}\end{center}
+
+上述代码定义了三个类型，其中Triangle和Circle都继承自Polygon。
+使用\emph{extends}表示继承关系，也就是加入了Polygon类别。
+Java不支持继承多个类型，好比如你只能同时持有一种国籍，可以减少很多麻烦。
+还有一个和继承有关的关键字是\lstinline{interface}，它可看做\lstinline{extends}的特例，只允许父类有常量和\emph{抽象接口}。
+这种父类使用\lstinline{interface}声明，而不是\lstinline{class}。
+从JDK8开始，也允许接口类提供\lstinline{default}实现。
+\lstinline{interface}允许你有多本护照，虽然不是本国公民，但也享有很多权利。
+使用Java即使你没有显式地\emph{extends}任何类型，也会被继承于Object。
+也就是说，所有的Java类型，都直接或间接地继承于Object。
+
+定义\lstinline{class}就是封装对象的过程，以数据作为属性、以函数作为接口。
+使用\emph{面向对象}编写代码，所有的函数都依附于某个类型。所以使用Java的时候，你需要先定义一个\emph{class}，然后才能在其内部定义main函数。
+
+面向对象还包括设计工具和设计模式。类的这种基础关系，就可以使用UML表示，以下是本节例子的\emph{类图}：
+\begin{figure}[!htb]
+\begin{center}
+\begin{tikzpicture}
+\umlclass{Polygon}{
+  -points: float[];
+} {
+  +area(): float;
+  +name(): String;
+}
+\umlemptyclass[x=-2, y=-2, anchor=north]{Triangle}
+\umlemptyclass[x=2, y=-2, anchor=north]{Circle}
+\umlVHVinherit[arm2=-1.6cm]{Triangle}{Polygon}
+\umlVHVinherit[arm2=-1.6cm]{Circle}{Polygon}
+\end{tikzpicture}
+\end{center}
+\caption{UML：继承关系/泛化}
+\label{table:part1_oo_uml_extends}
+\end{figure}
+
+每个对象类型分为三部分：名称、属性、函数接口。其中，属性就是对象包含的数据，函数用于处理数据并向外提供数据。
+而在属性/函数之前的+、-、\#表面函数的可访问性。
+“+”代表是\emph{public}对我公开的；“-”代表\emph{private}是私有的，只能在内部使用；
+”\#“表示\emph{protected}是对外保护但对后代公开。
+如果不加符号修饰，访问限制也还是存在，它代表只能同由相同\emph{package}下的代码才能访问。
+
+什么是package？英文的意思就是打包，这里代表的就是把一些Java类放在一个\emph{文件下}。
+至少起到2个作用：
+\begin{itemize}
+\item[1.] 不同文件夹下的class可以重名了。
+\item[2.] 作为命名空间（namespace）使用。
+\end{itemize}
+\noindent
+package可以没有，但建议添加url倒序的方式作为Java文件的第一行代码，也就是以"\emph{$\cdot$}"分割的字符串作为包名。
+如以下代码：
+\begin{lstlisting}[language=Java]
+package com.simbaba;
+
+public class Triangle extends Polygon{
+   ......
+}
+\end{lstlisting}
+
+声明package之后，Java类就会出现在com文件夹下的simbaba文件夹里面。
+相同功能的Java类建议使用同一个package。
+
+
+\section{创建对象}
+使用\lstinline{class}定义类型之后，就能通过new创建它的实例，也称为对象。
+继承（extends）是一种泛化关系，所有的子类都可以称为是父类的类型。
+所以\emph{三角形对象}首先是一个三角形对象，但它也是一个多边形类型的对象。
+如下代码：
+\begin{lstlisting}[language=Java,mathescape]
+Triangle t1 = new Triangle();
+Polygon t2 = new Triangle(); // 可以使用基类，直观上三角形也是一个多边形
+
+Circle c1 = new Circle(); // 创建Circle对象
+
+Triangle $\color{red}\uwave{t3 = c1;}$ // 编译失败，圆形肯定不是三角形
+\end{lstlisting}
+
+使用\lstinline{new}关键字，最主要目的是用于区别你调用是当前\emph{类}的静态方法，还是调用某个类的\emph{构造函数}。
+如下代码，定义了Produce这样一个静态函数。
+\begin{lstlisting}[language=Java,mathescape]
+class Polygon {
+    Polygon() {
+        System.out.println("new polygon");
+    }
+}
+class Main{
+    static Main Polygon(){
+        return new Main();
+    }
+    public static void main(String[] args){
+        Main m = Polygon();
+        Polygon p = new Polygon();
+    }
+}
+\end{lstlisting}
+这里引入的\lstinline{static}关键字，可用它修饰函数和变量，作为该类型对象共享的数据。
+\emph{构造函数}用于对象的初始化，并且可定义多个不同参数列表的构造函数。
+\begin{lstlisting}[language=Java,mathescape]
+class Polygon {
+    Polygon() {}
+    Polygon(int n) {}
+    Polygon(String m) {}
+    // 静态函数可以与类型同名
+    static Polygon Polygon(){}
+}
+\end{lstlisting}
+
+值得注意的是，静态函数允许和构造函数一样，使用类型的名称。区别是构造函数没有返回值，而函数需要显式地返回对象类型。
+实际上，类型内部还可以定义其它类型，称为内部类型（inner），有静态内部类型和非静态之分。
+对于非静态内部类型，它的存储空间是依赖于外部类型的，不能直接定义内部类型的对象。
+\begin{lstlisting}[language=Java,mathescape]
+class Main{
+    class Test{}
+
+    public static void main(String[] args){
+        Test t = new Main().new Test();
+    }
+}
+\end{lstlisting}
+
+使用\lstinline{new}创建对象,就是调用它的构造函数，但如果没有定义也没问题，因为在你没定义\emph{任何}构造函数的时候
+，Java编译器会自动生成一个无参构造函数。
+
+
+\section{可见性和权限}
+\lstinline{class}的确用于定义类型，但它也同时声明了一个namespace。其中的函数和变量，都是在它的范围内，必须通过它才能访问。
+命名空间（namespace）是最原始的一种访问限制。访问自有的\lstinline{static}函数，不需要引用命名空间，但外部的静态对象或方法，就必须加类型作为前缀使用。
+\begin{lstlisting}[language=Java,mathescape]
+class Polygon {
+    static void printOfPolygon() {
+    }
+}
+class Main{
+    static void printOfMain() {
+    }
+
+    public static void main(String[] args){
+        Polygon.printOfPolygon();
+        printOfMain();
+    }
+}
+\end{lstlisting}
+
+使用namespace只是限制数据的有效范围，算不上真正的访问限制。
+Java提供了以下关键字限制属性、函数的可见性。
+
+\begin{table}[!htbp]\centering
+\begin{tabular}{|p{3cm}|p{1.6cm}|p{1.6cm}|p{2cm}|p{2.4cm}|}
+\hline
+\multicolumn{5}{|c|}{Java访问权限}\\ \hline
+&同一个类&同一个包&不同包子类&不同包非子类\\ \hline
+private&$\surd$&&&\\ \hline
+public&$\surd$&$\surd$&&\\\hline
+protected&$\surd$&$\surd$&$\surd$&\\ \hline
+缺省(package)&$\surd$&$\surd$&$\surd$&$\surd$\\ \hline
+\end{tabular}
+\label{table:part1_oo_protect}
+\end{table}
+
+访问限制可加在类、属性、函数（包括构造函数）的前面，用于限制外部的可见性。
+使用面向对象减少对外的可见性，灵活性就会越高。因为耦合度低，不会牵一发而动全身。
+注意，\emph{同一个包}不要理解为同一个jar、同一个文件夹。
+实际上，可以分布在多个jar或多个文件夹下面。
+\footnote{jar文件是class的zip包，当然Java也是可以直接使用zip文件的}
+
+
+\section{如何编译}
+使用IDE（集成开发环境）的同学，编写Java非常简单，不作更多介绍。本节带大家用记事本，编写和编译Java。
+记事本建议使用notepad++或sublime。
+
+\begin{figure}[!htb]
+\centerline{\includegraphics[width=.25\figwidth]{images/java_step1.png}}
+\label{fig:part1_oo_step1}
+\caption{创建三个java文件}
+\end{figure}
+\noindent
+刚创建的三个Java文件都是空的，并且也都是放在src目录下。
+
+\noindent
+在Polygon.java添加以下代码：
+\begin{lstlisting}[language=Java,mathescape]
+package com.simbaba;
+
+public class Polygon {
+    float[] points; // 坐标点序列 x1,y1,x2,y2..
+
+    float area() {
+        log("Polygon", "由我的子孙实现吧！");
+        return 0;
+    }
+
+    void log(String tag, String s) {
+        System.out.printf("%s: %s", tag, s);
+    }
+}
+\end{lstlisting}
+\noindent
+在Triangle和Circle类中加入以下代码：
+\begin{lstlisting}[language=Java,mathescape]
+package com.simbaba;
+
+public class Triangle extends Polygon {
+
+    float area() {
+        log("Triangle", "我还没来得及写好");
+        return 0;
+    }
+}
+\end{lstlisting}
+
+\noindent 文件\emph{Circle.java}:
+\begin{lstlisting}[language=Java,mathescape]
+package com.simbaba;
+
+public class Circle extends Polygon {
+
+    float area() {
+        log("Circle", "我还没来得及写好");
+        return 0;
+    }
+}
+\end{lstlisting}
+
+\noindent
+启动CMD或shell，在命令行编译这几个Java文件\emph{javac Polygon.java Triangle.java Circle.java}。
+编译成功的话，就会在当前文件夹下生成3个class文件。
+
+\begin{figure}[!htb]
+\includegraphics[width=.3\figwidth]{images/java_class_file.png}
+\label{fig:part1_class_file}
+\caption{生成三个class文件}
+\end{figure}
+
+\noindent
+执行javac出错的同学，请参考本书Java安装和配置部分，检查JDK环境变量是否配置正确。单独编译各个java文件会怎么样呢？
+只有\emph{Polygon}编译通过了，另外2个都没有成功。
+
+\begin{lstlisting}[language=Java,mathescape]
+Triangle.java:3: 错误: 找不到符号
+public class Triangle extends Polygon {
+                              ^
+  符号: 类 Polygon
+Triangle.java:6: 错误: 找不到符号
+        log("Triangle", "我还没来得及写好");
+        ^
+  符号:   方法 log(String,String)
+  位置: 类 Triangle
+2 个错误
+\end{lstlisting}
+
+\noindent
+尽管Triangle和Polygon都在src目录下，但依旧找不到符号。
+仔细参考\lstinline{package作用}部分内容，创建com/simbaba目录，并cd到simbaba再编译还是失败了。
+尝试把包名从3个java文件中都删掉，再编译又能通过了。
+
+\vspace{0.3cm}
+有2种解决方案：1. 设置环境变量；2. 让CMD/shell在src目录编译，而不是在java文件所在目录编译。
+\vspace{0.3cm} 
+
+\noindent \emph{1. 设置环境变量，可使用cp传递}
+\begin{lstlisting}[language=Java,mathescape]
+javac Triangle.java  -cp /Users/simbaba/Desktop/gitee/book/part1/src
+\end{lstlisting}
+
+\noindent \emph{2. 在src目录下}
+\begin{lstlisting}[language=Java,mathescape]
+javac com/simbaba/Triangle.java
+javac com/simbaba/Circle.java
+\end{lstlisting}
+
+设置环境变量的方式，可以使Triangle.java在simbaba目录下编译通过，但在当前目录运行该class依旧还会失败。
+请记住，包名对应的文件夹也是class文件的一部分，你应当在src目录下编译和执行。
+否则，你可能会遇错误: 找不到或无法加载主类 Triangle。
+\lstinline{main}是java的默认入口函数，并且每个java类都可以有一个\lstinline{main}函数。
+如下，分别在3个java文件添加main函数：
+
+\begin{lstlisting}[language=Java,mathescape]
+public static void main(String[] args) {
+    Polygon p = new Polygon();
+    p.log("Polygon", "main~");
+}
+
+public static void main(String[] args) {
+    Polygon p = new Circle();
+    p.log("Circle", "main~");
+}
+
+public static void main(String[] args) {
+    Polygon p = new Triangle();
+    p.log("Triangle", "main~");
+}
+\end{lstlisting}
+
+怎么执行class文件？如果\emph{CLASSPATH}设置正确，你可在任何地方都可以执行，但必须把\emph{包名}带着！
+也请注意，设置CLASSPATH之后，如果是linux/unix请export。
+不想修改电脑的CLASSPATH也可以，可以使用：“\lstinline{-cp 包所在文件夹，注意不是类。}”
+\vspace{0.3cm}
+\begin{lstlisting}[language=Java,mathescape]
+java com.simbaba.Triangle -cp /Users/simbaba/Desktop/gitee/book/part1/src
+\end{lstlisting}
+
+
+\section{使用多态}
+\emph{多态}的核心是复用代码，同一个祖先就可以（is a关系，也称泛化关系）。
+从创建对象开始，我们就已经接触到了多态的本质特征。
+\vspace{0.3cm}
+\begin{lstlisting}[language=Java,mathescape]
+Polygon p = new Triangle();
+\end{lstlisting}
+\noindent
+所以，只要可以使用\emph{Polygon}的地方，都可以替换成它的子类（Triangle、Circle）。
+这个替换原则，是面向对象开发的灵魂，也是很多人倡导的\emph{面向抽象}编程。
+
+什么是抽象？并不是说只有抽象类才叫抽象，而是更加概括的方式处理问题。
+实际上，把Polygon定义抽象类也才符合现实情况。
+单纯的\emph{多边形Polygon}没有什么意义，不允许这种对象的存在。
+所以定义为\lstinline{abstract}类型，就不再允许被创建出来。
+\vspace{0.3cm}
+
+\begin{lstlisting}[language=Java]
+public abstract class Polygon {}
+\end{lstlisting}
+\begin{lstlisting}[language=Java]
+javac com/simbaba/Circle.java
+./com/simbaba/Polygon.java:17: 错误: Polygon是抽象的; 无法实例化
+        Polygon p = new Polygon();
+                    ^
+1 个错误
+\end{lstlisting}
+
+\noindent
+\lstinline{abstract}限制class的用途还不明显，但放在函数前之后功效就大了！首先，\emph{class类型}也必须是\lstinline{abstract}抽象的，抽象的函数只能保留声明不能有函数内容。现在，我们的Polygon.java如下：
+
+\begin{lstlisting}[language=Java,mathescape]
+package com.simbaba;
+
+public abstract class Polygon {
+    String name = "我是谁？";
+    float[] points; // 坐标点序列 x1,y1,x2,y2..
+
+    abstract float area();
+
+    void log(String tag, String s) {
+        System.out.printf("%s: %s, %s\n", tag, name, s);
+    }
+
+    public static void main(String[] args) {
+        //Polygon p = new Polygon();
+        //p.log("Polygon", "main~");
+    }
+}
+\end{lstlisting}
+\noindent
+把\emph{area}声明为\lstinline{abstract}就会强制要求\emph{Triangle、Circle}都必须实现area函数。
+可见，抽象类与普通类是一样的，但它允许只声明函数而不用实现，且不允许创建它的实例（对象）。
+但如果该抽象类全部都是抽象函数或常量，建议使用\lstinline{interface}！
+
+接口主要用于声明函数，也称为"协议接口"。它要求支持它的对象，都必须实现协议中规定的接口。
+譬如，所有实现IArea接口的对象，都是可以计算面积的。
+演示代码如下：
+
+\noindent IArea.java
+\begin{lstlisting}[language=Java,mathescape]
+package com.simbaba;
+
+public interface IArea {
+    float area();
+}
+\end{lstlisting}
+\noindent Polygon.java
+\begin{lstlisting}[language=Java,mathescape]
+public abstract class Polygon implements IArea {
+    String name = "我是谁？";
+    float[] points; // 坐标点序列 x1,y1,x2,y2..
+
+    public void log(String tag, String s) {
+        System.out.printf("%s: %s, %s\n", tag, name, s);
+    }
+}
+\end{lstlisting}
+\noindent Triangle.java
+\begin{lstlisting}[language=Java,mathescape]
+public class Triangle extends Polygon {
+
+    public float area() {
+        log("Triangle", "我还没来得及写好");
+        return 0;
+    }
+}
+\end{lstlisting}
+
+使用\lstinline{interface}定义\emph{IArea}之后，
+函数area强制为\lstinline{public}函数，所有的实现它的类也不能降低访问权限，实际上继承也不可以。
+根据替换原则很好理解，所有使用父类的地方，都可以换成子类。如果父类一个\lstinline{public}供别人使用，
+你换成子类之后，代码就编译失败了！
+
+使用\lstinline{interface}有一个特别的使用方式，建议多使用\emph{组合}而不是继承。
+当把IArea定义为对象的成员变量，可以灵活替换IArea的实现方式，而不用修改现有代码，譬如增加硬件加速。
+
+\section{设计模式}
+\emph{面向对象编程}使我们站在前人的肩膀上设计软件，这种说法一点都不为过。
+在面向过程的年代，很多C语言的初学者很难做到用\lstinline{struct}维护数据和函数关系的技巧。想要灵活使用面向对象，有以下几个要点需要掌握：
+
+\begin{itemize}
+\item [1.] 面向抽象、面向基类、面向接口编程。
+\item [2.] 接口隔离原则、单一职责原则。
+\item [3.] 开闭原则。
+\item [4.] 最少知识原则。
+\item [5.] 增加一层比少一层有更多的灵活性，但不要跨层交互！
+\end{itemize}
+
+\noindent
+以上五条，说的就是代码要简单、减少互相依赖。要做到简单，你需要经常重构你的代码：分解类、分解函数、合并冗余。
+
+\subsection{工厂模式}
+使用工厂模式，就是用来创建对象。使用工厂方法比使用\lstinline{new}多了一层，实际上就是多了一层灵活。
+既然使用工厂生产对象，该对象的构造函数一般都是\lstinline{private}私有的。
+以下是URL的例子，请仔细斟酌。
+
+\noindent \emph{1. 打开FTP地址}
+\begin{lstlisting}[language=Java,mathescape]
+URL url = new URL("ftp://simbaba.com:1234@192.168.1.47:21/test.txt");
+URLConnection connection = url.openConnection();
+System.out.println(connection);
+//sun.net.www.protocol.ftp.FtpURLConnection:
+//     ftp://simbaba.com:1234@192.168.1.47:21/test.txt
+\end{lstlisting}
+
+\noindent \emph{2. 打开HTTP地址}
+\begin{lstlisting}[language=Java,mathescape]
+URL url = new URL("http://simbaba.com/test.txt");
+URLConnection connection = url.openConnection();
+System.out.println(connection);
+//sun.net.www.protocol.http.HttpURLConnection:
+//      http://simbaba.com/test.txt
+\end{lstlisting}
+\noindent
+这里使用了工厂方法\emph{openConnection}，根据不同的参数创建不同的对象。
+其中，也用到了面向抽象编程，FtpURLConnection和HttpURLConnection都是URLConnection的具体实现。
+由于工厂方法生产的是抽象类型，很容易扩展现有工厂的生产能力。
+在不影响现有客户端的情况，增加对“ssh://simbaba.com:21”的支持。
+
+
+\subsection{装饰模式}
+\emph{装饰模式}可用于动态地为对象增加一系列的功能，当然继承就可以复用父类代码并增加功能，为何不使用继承呢？
+首先，继承讲究顺序A->B->C->D，这会导致逐级增加对象的复杂度，不符合接口隔离原则，导致非常臃肿。
+然而，使用装饰模式可以灵活的进行各种附加功能组合。
+装饰模式凸显了\emph{面向抽象编程}和\emph{接口隔离的原则}的作用。
+
+
+\begin{figure}[!htb]
+\begin{center}
+\begin{tikzpicture}
+\umlsimpleclass{Inputstream}
+\umlsimpleclass[x=4, y=-1, anchor=west]{FilterInputStream}
+\umlsimpleclass[x=0.5, y=-2, anchor=west]{ByteArrayInputstream}
+\umlsimpleclass[x=0.5, y=-3, anchor=west]{StringBufferInputstream}
+\umlsimpleclass[x=0.5, y=-4, anchor=west]{FileInputStream}
+\umlsimpleclass[x=0.5, y=-5, anchor=west]{ObjectInputStream}
+\umlsimpleclass[x=0.5, y=-6, anchor=west]{SequenceInputStream}
+
+\umlsimpleclass[x=7, y=-2, anchor=west]{BufferedInputstream}
+\umlsimpleclass[x=7, y=-3, anchor=west]{DataInputstream}
+\umlsimpleclass[x=7, y=-4, anchor=west]{LineNumberInputstream}
+\umlsimpleclass[x=7, y=-5, anchor=west]{PushbackInputstream}
+
+\umlVHVinherit[arm2=-4cm]{FileInputStream}{Inputstream}
+\umlVHVinherit[arm2=-2cm]{ByteArrayInputstream}{Inputstream}
+\umlVHVinherit[arm2=-3cm]{StringBufferInputstream}{Inputstream}
+\umlVHVinherit[arm2=-1cm]{FilterInputStream}{Inputstream}
+\umlVHVinherit[arm2=-5cm]{ObjectInputStream}{Inputstream}
+\umlVHVinherit[arm2=-6cm]{SequenceInputStream}{Inputstream}
+
+\umlVHVinherit[arm2=-1cm]{BufferedInputstream}{FilterInputStream}
+\umlVHVinherit[arm2=-2cm]{DataInputstream}{FilterInputStream}
+\umlVHVinherit[arm2=-3cm]{LineNumberInputstream}{FilterInputStream}
+\umlVHVinherit[arm2=-4cm]{PushbackInputstream}{FilterInputStream}
+\end{tikzpicture}
+\end{center}
+\caption{UML：装饰模式之IO}
+\label{fig:part1_oo_uml_decor}
+\end{figure}
+
+使用\emph{装饰模式}的好处是，你可以像拼积木一样自由的添加。
+需要缓冲能力，你就来一个\emph{BufferedInputStream}；
+要读写各种类型的数据（int、char、double等），那就来一个\emph{DataInputStream}。
+你可以不关心它们之间的顺序，结果总能是正确的，不过合理的使用才能提高IO的读写效率。
+一般来说，\emph{BufferedInputStream}总是放在入口处，这个字节流的蓄水池有8M打下，可有效减少磁盘读写。
+
+\vspace{0.3cm}
+\noindent
+以下代码，转换文件输入流中的\emph{单引号}为\emph{双引号}：
+
+\begin{lstlisting}[language=Java,mathescape]
+// try...resoruce语法
+try (FileInputStream fis = new FileInputStream("test.dat")) 
+{
+    // 提供缓冲区
+    BufferedInputStream bis = new BufferedInputStream(fis);
+    // 提供读取撤回功能
+    PushbackInputStream pis = new PushbackInputStream(bis);
+
+    String dst = "";
+    int dat = pis.read();
+
+    while (dat != -1) {
+        if ((char) dat == '\'') {
+            pis.unread('"');
+        } else {
+            dst += (char) dat;
+        }
+        dat = pis.read();
+    }
+    System.out.println(dst);
+} catch (Exception e){
+    e.printStackTrace();
+}
+\end{lstlisting}
+
+
+\subsection{建造者模式}
+函数的参数最多能有多少个？没必要知道答案，但函数有太多参数的话就非常难使用了。
+Java也不支持给参数提供默认值，假如你的构造函数有十几个参数的话，创建个对象也变得非常困难了。
+\emph{工厂模式}可以解决这个问题，使用\emph{建造模式}可以更灵活的解决。
+\vspace{0.3cm}
+
+\noindent
+这种情况，即使是\emph{工厂模式}也要借助\emph{建造者模式}构建对象。它们的区别是：
+\begin{itemize}
+\item [1.] \emph{工厂模式}解决如何获取对象，而\emph{建造者模式}解决如何创建对象。
+\item [2.] \emph{建造者模式}可逐步丰满这个对象，可化解对象参数多的问题。
+\end{itemize}
+
+\noindent
+以下是Android创建对话框的示例代码：
+\begin{lstlisting}[language=Java,mathescape]
+new AlertDialog.Builder(this)
+    .setTitle("请输入")
+    .setIcon(android.R.drawable.ic_dialog_info)
+    .setView(new EditText(this))
+    .setPositiveButton("确定", null)
+    .setNegativeButton("取消", null)
+    .show();
+\end{lstlisting}
+
+\begin{figure}[!htb]
+\begin{center}
+\begin{tikzpicture}
+\umlclass[anchor=north]{Director}{}{
+    +construct:void
+}
+\umlclass[x=5, y=0, type=abstract, anchor=north]{Builder}{}{
+    \#buildPart1:void\\
+    \#buildPart2:void\\
+    +build:Product\\
+}
+\umlclass[x=5, y=-4, anchor=north]{ConcreteBuilder}{}{
+    \#buildPart1:void\\
+    \#buildPart2:void\\
+    +build:Product\\
+}
+\umlemptyclass[x=9, y=-4, anchor=north]{Product}
+
+\umluniaggreg[pos1=0.3,arg1=构建,anchor2=163]{Director}{Builder}
+\umlVHVinherit{ConcreteBuilder}{Builder}
+\umluniassoc[pos1=0.3,arg1=创建,anchor1=20,anchor2=184]{ConcreteBuilder}{Product}
+\end{tikzpicture}
+\end{center}
+\caption{UML：建造者模式}
+\label{fig:part1_oo_uml_builder}
+\end{figure}
+
+\noindent
+\figref{fig:part1_oo_uml_builder}中，抽象的Builder提供了丰富的扩展性，
+在不调整现有代码的情况下，支持更多的Builder。
+更重要的是Builder限制了对象不可或缺的部分，甚至也限制它们的调用顺序。
+
+
+\section{枚举类}
+使用Java定义常量，最常见的手段是\lstinline{public static final int MSG_XXX=0;}
+这样定义的多数情况下都是好的，但隐藏着很大的隐患。常量的值现在定义为0，改天可能会被改成1。
+常量的名字虽然没改变，但值被人改了。其它同学看了常量定义之后，也直接与0比较的！
+
+\begin{itemize}
+\item [1.] 之前已编译的class虽然引用的是MSG\_XXX实际上固定为0了。
+\item [2.] MSG\_XXX的值可以被随意修改。
+\item [3.] 这种定义，误导其它代码直接使用常量的值，丢失常量的全局性。
+\end{itemize}
+
+\noindent
+做一个实际的例子，加深对此问题的体会。首先，在IArea.java定义PI=3.15，然后在Circle.java中添加PI的打印。
+编译IArea.java和Circle.java。执行java com.simbaba.Circle输出3.15。
+后来，更正PI为3.14之后，没有重新编译Circle.java，重新执行还是3.14。
+这个问题，主要出现在常量和引用它的类不在一个jar的情况。
+
+\noindent IArea.java
+\begin{lstlisting}[language=Java,mathescape]
+package com.simbaba;
+  
+public interface IArea {
+    float PI = 3.15f; // 接口中变量，默认都是public static final
+    float area();
+}
+\end{lstlisting}
+
+\noindent Circle.java
+\begin{lstlisting}[language=Java,mathescape]
+package com.simbaba;
+  
+public class Circle extends Polygon {
+    ...省略部分代码
+    public static void main(String[] args) {
+        Polygon p = new Circle();
+        p.log("Circle", "PI=" + PI);
+    }
+}
+\end{lstlisting}
+
+枚举（enum）的字面意思，就是一个可枚举的列表，并且值不可更改，一般不用于定义单个常量。
+在Java中一切皆对象，定义常量使用的枚举类型也不例外，它靠什么保证的呢。
+下面，我们以颜色Color举例说明，它包括：RED、YELLOW、GREEN、BLUE、GRAY。
+
+\begin{lstlisting}[language=Java,mathescape]
+// 定义Color枚举类型
+enum Color {
+    RED,YELLOW,GREEN,BLUE,GRAY
+}
+// 在main函数打印
+Color red = Color.RED;
+System.out.println(red); // 输出RED
+\end{lstlisting}
+
+\noindent
+实际上，Java还是依靠\lstinline{static final}实现的常量，但它是对象引用类型，不存在之前提到的问题。
+在Java中，一切皆对象可通过javap反编译Color.class文件验证。
+
+\begin{lstlisting}[language=Java,mathescape]
+Classfile classes/com/simbaba/Color.class
+  Last modified 2018-12-19; size 1055 bytes
+  Compiled from "Triangle.java"
+final class com.simbaba.Color extends java.lang.Enum<com.simbaba.Color>
+  flags: ACC_FINAL, ACC_SUPER, ACC_ENUM
+Constant pool:
+。。。
+public static final com.simbaba.Color RED;
+    descriptor: Lcom/simbaba/Color;
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL, ACC_ENUM
+
+  public static final com.simbaba.Color YELLOW;
+    descriptor: Lcom/simbaba/Color;
+    flags: ACC_PUBLIC, ACC_STATIC, ACC_FINAL, ACC_ENUM
+。。。
+ private com.simbaba.Color();
+    descriptor: (Ljava/lang/String;I)V
+    flags: ACC_PRIVATE
+\end{lstlisting}
+
+\noindent
+细心的同学也会发现，\lstinline{enum}被编译成class，并且构造函数是私有（\lstinline{private}）的。
+之前定义的RED、YELLOW等全都是\lstinline{static final}类型的常量了。
+所以，你无法创建更多的Color对象，只有列表中的那几个。
+
+RED在Color的构造函数中被初始化\lstinline{RED=new Color("RED", 0)}。
+并且Color继承于Enum类型，它有2个重要的属性：name、ordinal。
+想要获得RED整数值，就使用ordinal，而它的name就是RED。
+默认情况下，RED的值只能是0，如何修改为0xFF0000呢？你你要自己显示定义\lstinline{private}的构造函数了。
+
+\begin{lstlisting}[language=Java,mathescape]
+enum Color {
+    RED(0xFF0000),
+    YELLOW(0xFFFF00),
+    GREEN(0x00FF00),
+    BLUE(0x0000FF),
+    GRAY(0x888888);
+
+    // 不允许定义为public，否则无法编译通过
+    Color(int ordinal) {
+        this.ordinal = ordinal;
+    }
+
+    public int value() {
+        return ordinal;
+    }
+    private int ordinal;
+}
+// 在main函数打印
+Color red = Color.RED;
+System.out.println(Integer.toHexString(red.value())); //输出ff0000
+System.out.println(Integer.toHexString(red.ordinal()));//输出0
+\end{lstlisting}
+
+\noindent
+关于枚举类型的知识基本就是这些，只要你抓住enum类型的本质，可以自由使用。
+
+
+\section{不可忽视的注解}
+\emph{注解}（annotation）是很多初学者都会跳过的内容，包括笔者初学Java的时候也是如此。
+自从一些依赖注解的编程框架出现之后，它变得越来越重要，已经成为代码不可或缺的一部分。
+比较典型的应用：JavaDoc、JUnit4+、Spring、Struts2。
+
+使用注解可以在\emph{权限修饰符}之上，为\emph{函数/类/属性}提供更细粒度地控制。
+一个很典型的例子，早期的JUnit版本要检查函数的名字是否以\emph{test}开头，才被识别为一个测试用例函数。
+
+\begin{lstlisting}[language=Java,mathescape]
+public void setup() {
+    //初始化函数，名字必须是setup
+}
+public void test_circle_area() {
+    //测试函数必须以test开头
+}
+\end{lstlisting}
+
+\noindent
+如上代码，想要忽略一个测试用例，只有把函数的名字去掉test才能避免。
+而在JUnit3之后，使用注解之后，控制就非常灵活了。
+
+\begin{lstlisting}[language=Java,mathescape]
+@Before
+public void init() {
+    //初始化函数，名字必须是setup
+}
+@Test
+public void circle_area() {
+    //测试函数必须以test开头
+}
+\end{lstlisting}
+
+\noindent
+使用面向对象编程，特别要求属性必须是\lstinline{private}，任何读写都通过Setter/Getter完成。
+这可保护对象的健壮性，避免对象处于一种紊乱的状态。
+譬如，\emph{Triangle}对象t1的长、宽、名称创建出来之后，还可以被外部直接修改，
+甚至修改为\lstinline{t1.name=“Circle”}。对外部暴露的隐式越多，越容易出现耦合问题，导致代码粘连在一起。
+\ \\
+\noindent
+正确的做法是，定义name为private的，并且只提供Getter函数。
+\begin{lstlisting}[language=Java,mathescape]
+private String name;
+
+public String getName() {
+    return name;
+}
+\end{lstlisting}
+\noindent
+这种只有一个字段（属性）的情况，添加Getter比较简单。但如果有十几个或者更多的时候，就满屏是Getter、Setter了。
+借助\emph{lombok}提供的@Getter和@Setter注解，可以使情况变得简单。
+\begin{lstlisting}[language=Java,mathescape]
+@Getter
+private String name;
+\end{lstlisting}
+\noindent
+使用@Getter注解，可在编译阶段为对象生成get函数。从事Web/数据库开发的同学，经常要编写有十来个属性的Java Bean对象。在该注解出现之前，经常要借助反射（Reflect）才能减少这种重复性工作。\footnote{反射可以读写私有成员，并在运行期临时修改可访问权限。} 
+在此总结一下，注解可以提供的功能：
+\begin{itemize}
+\item [1.] 修饰函数，以便在执行、编译阶段检出需要的函数，譬如JUnit。
+\item [2.] 插入代码，添加特殊功能的注解，可在编译阶段插入代码，譬如Lombok。
+\item [3.] JavaDoc等
+\item [4.] 全局注解，自动应用于所有类型，譬如IDE插件、特殊增强（运算符重载）。
+\end{itemize}
+
+\noindent
+实际上，我们很少编写注解，但工作中经常使用。关于注解的知识，在这有限的篇幅只能介绍这么多，大家了解会使用即可。
+
+\section{使用反射}
+面向对象提供的\emph{权限修饰}主要在编译阶段进行检查，这种限制在运行阶段就很容易被打破。
+即使是C++对象，通过对象地址偏移量也可访问其私有成员。
+Java干脆提供了相关的API，帮助你在运行期动态访问对象的任意成员，
+对于私有成员，临时调整accessable就可正常访问。
+\begin{lstlisting}[language=Java,mathescape]
+Circle = Class.forName("com.simbaba.Circle");
+Object circle  = Circle.newInstance();
+Method area = Circle.getMethod("area");
+
+Field circle_name = Circle.getSuperclass().getDeclaredField("name");
+circle_name.setAccessible(true);
+circle_name.set(circle, "Circle");
+printf("型号=%s, 面积=%f", circle_name.get(circle), area.invoke(circle));
+\end{lstlisting}
+
+\noindent
+JDK提供的反射API有很多，以下仅列举Field部分API。
+\begin{table}[!htbp]\centering
+\begin{tabular}{|p{4cm}|p{8cm}|}
+\hline
+\multicolumn{2}{|c|}{JDK反射Field的API}\\
+\hline
+getFields()&获取所有public字段,包括父类字段\\
+\hline
+getDeclaredFields()&获取所有字段,public和protected和private,但是不包括父类字段\\
+\hline
+\end{tabular}
+\label{table:part1_oo_getfield}
+\end{table}
+
+
+近年来，AOP编程已经非常流行。在不改变既有类库的情况下，运行期间动态地插入代理，包装监视调用过程，譬如API鉴权。
+\begin{lstlisting}[language=Java,mathescape]
+before("调用之前");
+invoke(object, method, args); // 调用对象的函数
+after("调用之后")
+\end{lstlisting}
+
+\noindent
+常见的动态代理有2中实现方式：JDK、CGlib。
+但JDK仅支持接口的动态代理，使用非常受限。所以主流的框架，使用CGlib更多一些。
+在这里仅演示JDK提供的方式。
+
+\begin{lstlisting}[language=Java,mathescape]
+Polygon polygon = new Triangle();
+
+InvocationHandler invoker = (proxy, method, arg) -> {
+    System.out.println("调用之前");
+    Object obj = method.invoke(polygon, arg);
+    System.out.println("调用之后");
+    return obj;
+};
+
+IArea iArea = (IArea) Proxy.newProxyInstance(
+        AreaProxy.class.getClassLoader(),
+        Polygon.class.getInterfaces(),
+        invoker);
+
+iArea.area();
+\end{lstlisting}
+
+需要注意的是getInterfaces要用它的直接\emph{继承/实现类}获取。动态代理技术结合注解（Annotation）改变了java改变了工作方式。
+相关内容超出本书篇幅，请感兴趣的读者自行查阅资料学习。对于本书，我们比较感兴趣的是，如何使2个向量类型直接相加。
+
+\section{本章总结}
+本章对java基础和常见开发方法作了较为详细的介绍，限于篇幅不作更多展开。面向对象编程不是一门语言，它是一种开发理念。
+通过本章的学习，要掌握Java创建对象的方法，并学会运用面向对象设计软件。
+Java不支持运算符重载，但有GitHub开源项目\url{https://github.com/amelentev/java-oo}，
+能在编译阶段把对象的“+-*/”替换为add、subtract、multiply、divide。
+实际上，它和本章介绍的注解（Annotation）有一些渊源，有兴趣的读者还是自己阅读开源代码。
+
+\begin{lstlisting}[language=Java,mathescape]
+//不使用运算符重载
+c1 = a.negate().add(b.multiply(b)).add(b.divide(a));
+//使用开源的运算符重载
+c2 = -a + b*b + b/a;
+\end{lstlisting}
