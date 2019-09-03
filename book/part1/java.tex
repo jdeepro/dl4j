@@ -1,3 +1,58 @@
 % !Mode:: "TeX:UTF-8"
 \chapter{Java基础}
-xxxxx
+
+\begin{introduction}
+	\item 变量和类型
+	\item 输入和输出
+	\item 面向对象
+	\item 异常处理
+	\item 多线程
+\end{introduction}
+
+相比于其它编程语言，Java的语法不算多的，很容易掌握。
+本章将以最短的篇幅带大家掌握Java编程语言。
+编程语言三大核心要素：数据、语句和函数。
+数据要先存放在变量中，才能被程序处理，不同类型的变量可存放不同的数据；
+需要遍历所有的数据的时候，就会用到循环语句；
+判断是否成立，使用判断语句等。
+把常用的程序逻辑，就会被封装成一个函数。
+
+\section{变量和类型}
+与其他静态类型语言一样，java支持的数据类型有：
+\lstinline{byte、char、short、int、long、float、double}
+等。
+
+\begin{table}[!htbp] \centering \small
+\begin{tabular}{|p{1cm}|p{3cm}|p{9cm}|}
+\toprule
+	\multicolumn{3}{|c|}{基本类型 - 范围}\\
+\midrule
+	byte&8位(一个字节)&$-128\sim127$\\
+	short&16位(两个字节)&$-32768\sim32767$\\
+	char&16位(两个字节)&$-32768\sim32767$\\
+	int&32位(四个字节)&$-2147483648\sim2147483647$\\
+	long&64位(八个字节)&$-9223372036854774808\sim9223372036854774807$\\
+	float&32位(四个字节)&$3.402823e+38\sim1.401298e-45$\\
+	double&64位(八个字节)&$1.797693e+308\sim4.9000000e-324$\\
+\bottomrule
+\end{tabular}
+	\caption{基本数据类型}
+\end{table}
+
+\begin{definition}{变量}{var}
+	$[\text{类型}]$ 变量名称, 变量名称 $=$ 初值, $\dots$;\\
+	$[\text{类型}]$ 变量名称 $=$ 初值;
+\end{definition}
+
+\begin{lstlisting}[language=java]
+	int n1, n2=2, n3;
+	float f1 = 0.2f;
+\end{lstlisting}
+
+\remark{
+	变量要在初始化之后，才能使用。代码中小数默认是double类型，需要加后缀f才代表float。
+}
+
+\section{语句}
+
+\section{函数}
