@@ -15,7 +15,7 @@
 数据要先存放在变量中，才能被程序处理，不同类型的变量可存放不同的数据；
 需要遍历所有的数据的时候，就会用到循环语句；
 判断是否成立，使用判断语句等。
-把常用的程序逻辑，就会被封装成一个函数。
+把常用的逻辑放在一起，就可被封装成一个函数。
 
 \section{变量和类型}
 与其他静态类型语言一样，java支持的数据类型有：
@@ -52,6 +52,80 @@
 \remark{
 	变量要在初始化之后，才能使用。代码中小数默认是double类型，需要加后缀f才代表float。
 }
+
+\bigskip
+当数据与类型不一致时，就会发生数据类型转换。
+Java语言提供从小范围到大范围的自动转换，但反过来必须显式强制转换。
+
+\begin{lstlisting}[language=java]
+	byte b = 100; // 超过127会提示错误！编译器识别为int
+	int n = b;
+	float f = 0.2f;
+	double d = f;
+
+	int n2 = 100;
+	byte b2 = (byte)n2
+	double d2 = 0.2; // 小数默认是double类型
+	float f2 = (float)d2;
+\end{lstlisting}
+
+\subsection{数组}
+表示很多个某一类数据的时候，就要用到数组，譬如某地区的房价。
+通过下标使用数组中的值，第一个下标为0，依次往后递增，最后一个下标是length-1。
+Java数组下标只能是整数，不支持字符串等其他类型。
+房价数据保留小数点后2-3位精度就足够了，定义float类型数组如下：
+
+\begin{definition}{数组}{array}
+	$[\text{类型}]\quad[]$变量名称;\\
+	$[\text{类型}]\quad[]$变量名称 = \{131.2, 110.8, 117.34\};\\
+	$[\text{类型}]\quad[]$变量名称 = new 类型$[$总数$]$\};\\
+	$[\text{类型}]\quad[]$变量名称 = new 类型$[]$\{131.2, 110.8\};
+\end{definition}
+
+\begin{lstlisting}[language=java]
+	float []prices = {131.2, 110.8, 117.34};
+	float []areas = new float[]{90, 120, 114};
+\end{lstlisting}
+
+\remark{
+	byte数组内容，不能赋值给int类型的数组，强制转换也不行。
+}
+\bigskip
+
+以上称之为一位数组。
+若提供的房价数据，不止一个地区的，就需要二维数组表示：
+houses[地区][下标]。
+若需要创建更多维度的数组，以此类推：
+patients[性别][年龄][下标]可定位某个病人的状态。
+Java数组不要求每一行的长度相等，譬如30岁女性的病人有17个而34岁女性的病人可能是2个或者0个。
+
+\begin{lstlisting}[language=java]
+	float [][]houses = {
+				{131.2f, 110.8f, 91.09f},
+				{157.8f, 107.13f, 105.71f},
+				{98.4f, 119.54f, 117.44f},
+	};
+	int area = 1, index = 2; // 第2地区，第3处房子的价格
+	float price23 = prices[area][index];
+	System.out.printf("%f", price23); // 输出105.709999
+\end{lstlisting}
+
+\remark{
+	浮点类型：float和double不是准确数字，只能保证精度。
+	因此不要直接和某个浮点数比较是否相等，在允许范围内即可。
+}
+\bigskip
+
+\begin{exercise}
+	double类型的精度是多少？
+\end{exercise}
+
+\begin{exercise}
+	检查是否与3.14相等的代码？
+\end{exercise}
+
+\section{字典}
+
 
 \section{语句}
 
