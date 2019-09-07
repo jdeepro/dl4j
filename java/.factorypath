@@ -223,6 +223,8 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/xerial/sqlite-jdbc/3.15.1/sqlite-jdbc-3.15.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/deeplearning4j/deeplearning4j-ui-resources/1.0.0-beta/deeplearning4j-ui-resources-1.0.0-beta.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/com/google/guava/guava/19.0/guava-19.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/knowm/xchart/xchart/3.5.4/xchart-3.5.4.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/de/erichseifert/vectorgraphics2d/VectorGraphics2D/0.13/VectorGraphics2D-0.13.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/datavec/datavec-data-codec/1.0.0-beta/datavec-data-codec-1.0.0-beta.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/jcodec/jcodec/0.1.5/jcodec-0.1.5.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/jfree/jfreechart/1.0.13/jfreechart-1.0.13.jar" enabled="true" runInBatchMode="false"/>

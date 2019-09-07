@@ -1,8 +1,8 @@
-java/.classpath
-java/.project
-java/.idea
-java/target/*
-java/out/*
+java/part*/.classpath
+java/part*/.project
+java/**/.idea
+java/part*/target/*
+java/part*/out/*
 workspace.xml
 .vscode
 
