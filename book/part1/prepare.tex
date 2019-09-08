@@ -133,3 +133,72 @@ git的安装比较简单，使用Windows的同学可在\url{https://git-scm.com/
 git的使用方法不在此赘述，请参照其它书籍学习。
 掌握git init, git add, git commit, git push基本就可以了。
 对于git branch之类更高级的使用方法，可以暂时不掌握。
+
+\section{创建项目}
+Apache Maven是一个软件项目管理和综合工具，是Apache下的一个纯Java的开源项目
+它基于项目对象模型（POM）进行项目管理和构建自动化，
+可以对Java项目进行构建和依赖管理。
+下载安装之后，使用Maven可以快速创建一个Java项目：
+
+\begin{lstlisting}[language=bash, backgroundcolor=\color{lightgray!10}]
+macbook-pro:tmp simbaba$ mvn archetype:generate -DgroupId=cn.simbaba -DartifactId=Helloworld -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] >>> maven-archetype-plugin:3.0.1:generate > generate-sources @ standalone-pom >>>
+[INFO] 
+[INFO] <<< maven-archetype-plugin:3.0.1:generate < generate-sources @ standalone-pom <<<
+[INFO] 
+[INFO] --- maven-archetype-plugin:3.0.1:generate @ standalone-pom ---
+[INFO] Generating project in Batch mode
+[INFO] Parameter: basedir, Value: /Users/simbaba/Works/learn/tmp
+[INFO] Parameter: package, Value: cn.simbaba
+[INFO] Parameter: groupId, Value: cn.simbaba
+[INFO] Parameter: artifactId, Value: Helloworld
+[INFO] Parameter: packageName, Value: cn.simbaba
+[INFO] Parameter: version, Value: 1.0-SNAPSHOT
+[INFO] project created from Old (1.x) Archetype in dir: /Users/simbaba/Works/learn/tmp/Helloworld
+[INFO] ------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------
+[INFO] Total time: 03:10 min
+[INFO] Finished at: 2019-09-08T14:45:14-05:00
+[INFO] ------------------------------------------------------
+\end{lstlisting}
+
+现在，我们就用VSCode打开Helloworld工程（Helloworld文件夹），发现已经生成了Java标准项目结构，
+打开VSCode的Terminal执行mvn test，就会执行自动化测试。
+
+\begin{figure}[!htb]
+	\centerline{\includegraphics[width=\textwidth]{part1/mvn-vscode.png}}
+\end{figure}
+
+\noindent
+执行某个Java代码的main方法，参照官网的说明：\\
+mvn exec:java -Dexec.mainClass="com.example.Main" [-Dexec.args="argument1"] ...\\
+相应操作如下：
+\begin{lstlisting}[language=bash, backgroundcolor=\color{lightgray!10}]
+	bash-3.2$ mvn exec:java -Dexec.mainClass="cn.simbaba.App"
+	[INFO] Scanning for projects...
+	[INFO] -------------< cn.simbaba:Helloworld >-----------------
+	[INFO] Building Helloworld 1.0-SNAPSHOT
+	[INFO] ---------------[ jar ]---------------------------------
+	[INFO] 
+	[INFO] --- exec-maven-plugin:1.6.0:java @ Helloworld ---
+	Hello World!
+	[INFO] -------------------------------------------------------
+	[INFO] BUILD SUCCESS
+	[INFO] -------------------------------------------------------
+	[INFO] Total time: 1.580 s
+	[INFO] Finished at: 2019-09-08T15:08:03-05:00
+	[INFO] -------------------------------------------------------
+\end{lstlisting}
+\bigskip
+
+\begin{exercise}
+	如何查看系统的所有环境变量？（Windows、Mac、Linux）
+\end{exercise}
+
+\begin{exercise}
+	创建一个Maven项目cn.dl4j.xxxxx，其中xxxxx是学号。
+	然后修改Maven生成的代码，使用git提交2次。
+\end{exercise}

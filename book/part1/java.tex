@@ -58,14 +58,16 @@
 
 \section{变量和类型}
 与其他静态类型语言一样，java支持的基本数据类型有：
-\lstinline{byte、char、short、int、long、float、double}
+\lstinline{boolean、byte、char、short、int、long、float、double}
 等。
 
 \begin{table}[!htbp] \centering \small
-\begin{tabular}{|p{1cm}|p{3cm}|p{9cm}|}
+	\caption{基本数据类型}
+\begin{tabular}{|p{1.5cm}|p{3cm}|p{8.5cm}|}
 \toprule
 	\multicolumn{3}{|c|}{基本类型 - 范围}\\
 \midrule
+  boolean&1位(4个字节)\footnotemark&true, false \\
 	byte&8位(一个字节)&$-128\sim127$\\
 	short&16位(两个字节)&$-32768\sim32767$\\
 	char&16位(两个字节)&$-32768\sim32767$\\
@@ -75,8 +77,14 @@
 	double&64位(八个字节)&$4.9000000e-324\sim1.797693e+308$\\
 \bottomrule
 \end{tabular}
-	\caption{基本数据类型}
 \end{table}
+
+\footnotetext{
+	Java虚拟机没有针对boolean的字节码指令，
+	boolean值在编译之后，在Java虚拟机使用int类型替代，
+	而boolean数组会被编码成byte数组，每个元素占8位。
+	因此boolean类型单独使用是4个字节，在数组中是1个字节。
+}
 
 基本类型的数值范围，可在相应的封装类型中获得。
 譬如\lstinline{int}的封装类型是Integer，称为装箱，反之称为拆箱。
@@ -269,6 +277,18 @@ Java数组不要求每一行的长度相等，譬如30岁女性的病人有17个
 	\footnote{C order: 行优先；F order：列优先。}
 \end{exercise}
 
+\section{字符串}
+
+\begin{lstlisting}[language=Java]
+	String a = "233";
+	String b = "2" + "33";
+	String c = new String("233");
+	String d = c.intern();
+	System.out.println(a == b); true
+	System.out.println(a == c); false
+	System.out.println(a == d); true
+\end{lstlisting}
+
 \section{字典Map<K,V>}
 	在Java语言中Map不是关键字，也不是基本类型，但提供了几个实现可以直接使用。
 	由定义Map<K, V>，它是一个泛型类，可以存放很多类型的数据。
@@ -276,7 +296,7 @@ Java数组不要求每一行的长度相等，譬如30岁女性的病人有17个
 	典型的Map实现有HashMap、LinkedMap\footnote{linked串联代表着有序}，
 	其余的请参考其它书籍。
 
-	\begin{lstlisting}[language=Java]
+	\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
 		jshell> HashMap<String, Integer> hashMap = new HashMap<>();
 		jshell> hashMap.put("A", 10)
 		jshell> hashMap.put("C", 12)
@@ -296,7 +316,7 @@ Java数组不要求每一行的长度相等，譬如30岁女性的病人有17个
 		修改本节代码为LinkedhashMap，再执行一遍，比较其差异。
 	\end{exercise}
 
-\section{编程语句}
+\section{运算符}
 	到这里，应当已经掌握赋值语句和声明语句，但还不能表达逻辑推理。
 	算式和逻辑运算，和其它语言没有太大的区别。
 	下表是Java支持的运算符和优先级。
@@ -376,7 +396,7 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 比较运算产生布尔结果，且只有布尔值才能参与逻辑运算。
 运算符\lstinline{&&}，具有截断效果：
 
-\begin{lstlisting}[language=Java]
+\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
 	jshell> var a = 2
 	a ==> 2
 	jshell> var b = 3
@@ -407,6 +427,7 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 		}
 	\end{lstlisting}
 	\end{minipage}
+	\quad
 	\begin{minipage}[t]{0.4\textwidth}
 	\begin{lstlisting}[language=Java]
 		while( 布尔表达式 ) {  
@@ -430,12 +451,20 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 		房均价["24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"];
 	\end{example}
 
+\note{这里用到了String类型，它不是基本类型，底层是用char[]存放的数据。}
 \begin{lstlisting}[language=Java]
-	String []rooms = {"6.575", "6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"};
-	String []values = {"24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"};
-
+	String []rooms = {
+		"6.575", "6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"
+	};
+	String []values = {
+		"24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"
+	};
 	double []RM = new double[20];
 	double []MDEV = new double[20];
+\end{lstlisting}
+
+\note{这里用到了异常处理，未正确解析为数字，就执行语句块（空的）。}
+\begin{lstlisting}[language=Java]
 	int pos = 0;
 
 	for (int i = 0; i < rooms.length; i++) {
@@ -444,13 +473,18 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 			double d2 = Double.parseDouble(values[i]);
 			RM[pos] = d1;
 			MDEV[pos++] = d2;
-		} catch (NumberFormatException ignored){}
+		} catch (NumberFormatException ignored){
+			// 出错了，什么都不做
+		}
 	}
 
 	while (--pos >= 0) {
 		System.out.printf("%.3f -> %.3f\n", RM[pos], MDEV[pos]);
 	}
 \end{lstlisting}
+
+\noindent
+请认真阅读以上代码，对于++/--运算符要掌握清楚！
 
 \section{判断语句}
 

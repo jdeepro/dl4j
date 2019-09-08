@@ -5,6 +5,11 @@
 %
 \documentclass[cn,11pt]{elegantbook}
 
+% Mac上字体不支持STKaiti粗体/斜体，屏蔽警告
+\usepackage{silence}
+\WarningFilter{latexfont}{Font shape}
+\WarningFilter{latexfont}{Some font}
+
 \title{DL4J：人工智能基础（Java版）}
 \subtitle{jdeepro 经典之作}
 
