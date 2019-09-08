@@ -144,6 +144,14 @@ Java语言提供从小范围到大范围的自动转换，但反过来必须显�
 	已知byte=-1原本是正整数赋值得到的，如何再赋值给int类型变量，该正数是多少呢？
 \end{exercise}
 
+\begin{exercise}
+	double类型的精度是多少？试研究float和double的区别？
+\end{exercise}
+
+\begin{exercise}
+	如何编写判断x与3.14相等的代码？
+\end{exercise}
+
 \subsection{数组}
 表示很多个某一类数据的时候，就要用到数组，譬如某地区的房价。
 通过下标使用数组中的值，第一个下标为0，依次往后递增，最后一个下标是length-1。
@@ -222,28 +230,242 @@ Java数组不要求每一行的长度相等，譬如30岁女性的病人有17个
 	借助Excel把散点图绘制出来，可直观发现各因素与房价的关系。
 	其中，RM就和MDEV就明显存在强线性关系，毕竟房子越大房价就会越贵。
 	现在我们用Java数组把RM、MEDV列所有数据表示出来。
+	\medskip
+
+	\begin{figure}[!htb]
+		\centerline{\includegraphics{part1/boston-rm.png}}
+	\end{figure}
+
 	\begin{lstlisting}[language=java]
 	double []RM = {6.575, 6.421, 7.185, 6.998, 7.147, 6.43, 6.012, 6.172, 5.631};
 	double []MDEV = {24, 21.6, 34.7, 33.4, 36.2, 28.7, 22.9, 27.1, 16.5};
 	\end{lstlisting}
 
-	\begin{figure}[!htb]
-		\centerline{\includegraphics{part1/boston-rm.png}}
-	\end{figure}
+	使用最小二乘法就可得出上图的结果，在后续章节我们会逐步实现相关的算法。
+	很明显二乘法没有体现任何机器学习的过程，模型和参数直接通过数学推算得来。
+	而“学习”是指，计算机从已有数据缓慢逼近真实结果，通常利用梯度下降算法实现。
+\end{example}
+\bigskip
+
+\begin{exercise}
+	创建和初始化数组的方法有哪几种？请写出示例代码。
+\end{exercise}
+
+\begin{exercise}
+	定义一个数组，表示魔方的2个状态：旋转前、旋转后。
+\end{exercise}
+
+\begin{figure}[!htb] \centering
+	\begin{minipage}{0.4\textwidth}
+		\centerline{\includegraphics[scale=.5]{part1/rubik.png}}
+	\end{minipage}
+	\begin{minipage}{0.4\textwidth}
+		\centerline{\includegraphics[trim=0 4.6cm 0 2.6cm,scale=.45, clip]{c_vs_f_order.png}}
+	\end{minipage}
+\end{figure}
+
+\begin{exercise}
+	如何定义矩阵（Matrix），你认为哪种方式更好？试对比行优先和列优先策略。
+	\footnote{C order: 行优先；F order：列优先。}
+\end{exercise}
+
+\section{字典Map<K,V>}
+	在Java语言中Map不是关键字，也不是基本类型，但提供了几个实现可以直接使用。
+	由定义Map<K, V>，它是一个泛型类，可以存放很多类型的数据。
+	其中K是关键字的类型、V是值的类型。
+	典型的Map实现有HashMap、LinkedMap\footnote{linked串联代表着有序}，
+	其余的请参考其它书籍。
+
+	\begin{lstlisting}[language=Java]
+		jshell> HashMap<String, Integer> hashMap = new HashMap<>();
+		jshell> hashMap.put("A", 10)
+		jshell> hashMap.put("C", 12)
+		jshell> hashMap.put("B", 11)
+
+		jshell> hashMap.keySet()
+		$7 ==> [A, B, C]
+		jshell> hashMap.values()
+		$5 ==> [10, 11, 12]
+		jshell> hashMap.entrySet()
+		$6 ==> [A=10, B=11, C=12]
+		jshell> hashMap.get("A")
+		$8 ==> 10
+	\end{lstlisting}
+
+	\begin{exercise}
+		修改本节代码为LinkedhashMap，再执行一遍，比较其差异。
+	\end{exercise}
+
+\section{编程语句}
+	到这里，应当已经掌握赋值语句和声明语句，但还不能表达逻辑推理。
+	算式和逻辑运算，和其它语言没有太大的区别。
+	下表是Java支持的运算符和优先级。
+
+\begin{table}[!htbp] \centering \small
+	\begin{tabular}{p{4cm}|p{8cm}}
+	\toprule
+	运算符     & 优先级 \\
+	\midrule
+	单目运算符   & {\lstinline@++（前/后） --（前/后） +expr -expr ~ !@} \\ \hline
+	乘、除、余   & {\lstinline@* / %@} \\ \hline
+	加、减      & {\lstinline@+ -@} \\ \hline
+	位移        & {\lstinline@<< >> >>>@} \\ \hline
+	关系运算符   & {\lstinline@< > <= >= instanceof@} \\ \hline
+	判等        & {\lstinline@== !=@} \\ \hline
+	按位与      & {\lstinline@&@} \\ \hline
+	按位异或    & {\lstinline@^@} \\ \hline
+	按位或      & {\lstinline@|@} \\ \hline
+	逻辑与      & {\lstinline@&&@} \\ \hline
+	逻辑或	    & {\lstinline@||@} \\ \hline
+	三目运算符   & {\lstinline@?:@} \\ \hline
+	赋值        & {\lstinline@= += -= *= /= \%= &= ^= |= <<= >>= >>>=@} \\
+	\bottomrule
+	\end{tabular}
+	\caption{Java运算符和优先级}
+\end{table}
+\remark{\~是数值取反，！是布尔取反。}
+
+\subsection{算术运算}
+常见的数值运算符号，在此不作介绍，需要重点关注的是递增/减运算符和逻辑运算符。
+递增/减运算符放在变量前面，就会先计算再赋值；后面则是先赋值后计算。
+\begin{example} ++、--运算符示例：
+\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
+	jshell> var a=2
+	a ==> 2
+	jshell> var b=++a
+	b ==> 3
+	jshell> var c=b++
+	c ==> 3
+	jshell> var d=c--
+	d ==> 3
+	jshell> c
+	c ==> 2
+\end{lstlisting}
 \end{example}
 
+位运算，通常用于标志位检查。譬如short类型有16位可以使用，可代表16+1个状态。
+下述代码检查s的第一位是否为1，检查第三位是否为1。
+\begin{example}
+	\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
+		jshell> short s=0b0000_0100_0011
+		s ==> 67
+		jshell> Integer.toHexString(s)
+		$34 ==> "43"
+		jshell> s & 0b0001 // 二进制以 0b 开头
+		$36 ==> 1
+		jshell> s & 0b0100
+		$37 ==> 0
+	\end{lstlisting}
+\end{example}
 
-\begin{exercise}
-	double类型的精度是多少？
-\end{exercise}
+位移，可把int/long划分成多个字节，也可以拼接为一个int/long数值。
+譬如RGB颜色，包含3个部分：0xRRGGBB(十六进制)。
+如果要把某图像编程灰度图像，典型的代码如下：
 
-\begin{exercise}
-	检查是否与3.14相等的代码？
-\end{exercise}
+\begin{lstlisting}[language=Java]
+	int r = (color >> 16) & 0xff;
+  int g = (color >> 8) & 0xff;
+	int b = color & 0xff;
+	int gray = (int) (0.3 * r + 0.59 * g + 0.11 * b);
+\end{lstlisting}
 
-\section{字典}
+\remark{为什么要按位与0xff呢？数据类型哪一节作业完成了吗？}
+
+\subsection{逻辑运算}
+Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、false}。
+比较运算产生布尔结果，且只有布尔值才能参与逻辑运算。
+运算符\lstinline{&&}，具有截断效果：
+
+\begin{lstlisting}[language=Java]
+	jshell> var a = 2
+	a ==> 2
+	jshell> var b = 3
+	b ==> 3
+	jshell> b < 3 && a++ > 2 // a++被截断没有执行
+	$41 ==> false
+	jshell> a
+	a ==> 2
+	jshell> b <= 3 && a++ > 2 // b<=3成立，a++获得执行
+	$43 ==> false
+	jshell> a
+	a ==> 3
+\end{lstlisting}
+
+\section{循环语句}
+	数组和字典存可存放很多数据，经常要遍历逐一取出来处理。
+	Java中有四种循环结构：
+	\lstinline[language=Java]{for/foreach/while/do...while}语句等。
+
+	\begin{minipage}[t]{0.45\textwidth}
+	\begin{lstlisting}[language=Java]
+		for(初始化; 布尔表达式; 更新) {
+			//代码语句
+		}
+
+		for(声明语句 : 表达式) {
+			//代码句子
+		}
+	\end{lstlisting}
+	\end{minipage}
+	\begin{minipage}[t]{0.4\textwidth}
+	\begin{lstlisting}[language=Java]
+		while( 布尔表达式 ) {  
+			//代码语句
+		}
+
+		do {
+			//代码句子
+		} while(布尔表达式);
+	\end{lstlisting}
+	\end{minipage}
+	
+	\noindent
+	循环语句还可以嵌套循环语句，使用\lstinline[language=Java]{break}只可跳出一层循环，但如果只有一层就执行循环后面的代码。
+	\bigskip
+
+	\begin{example}
+		波士顿房价数据中，存在一些无效数据(非数值，如N/A等)，要把它们剔除掉。
+		假设我们读出来都是字符串：\\
+		房间数["6.575", "6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"];\\
+		房均价["24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"];
+	\end{example}
+
+\begin{lstlisting}[language=Java]
+	String []rooms = {"6.575", "6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"};
+	String []values = {"24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"};
+
+	double []RM = new double[20];
+	double []MDEV = new double[20];
+	int pos = 0;
+
+	for (int i = 0; i < rooms.length; i++) {
+		try {
+			double d1 = Double.parseDouble(rooms[i]);
+			double d2 = Double.parseDouble(values[i]);
+			RM[pos] = d1;
+			MDEV[pos++] = d2;
+		} catch (NumberFormatException ignored){}
+	}
+
+	while (--pos >= 0) {
+		System.out.printf("%.3f -> %.3f\n", RM[pos], MDEV[pos]);
+	}
+\end{lstlisting}
+
+\section{判断语句}
+
+\section{分支语句}
+
+\section{定义函数}
+程序具有三个特征：有限步之后可退出；有0个或多个输入；有一个或多个输出。
 
 
-\section{语句}
+\section{定义向量}
 
-\section{函数}
+\section{定义矩阵}
+
+\section{导数运算}
+
+\section{梯度下降}
+
+\section{线性回归}
