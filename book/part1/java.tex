@@ -89,6 +89,7 @@
 基本类型的数值范围，可在相应的封装类型中获得。
 譬如\lstinline{int}的封装类型是Integer，称为装箱，反之称为拆箱。
 \begin{enumerate}
+	\item boolean -> Boolean
 	\item byte -> Byte
 	\item short-> Short
 	\item int -> Integer
@@ -278,16 +279,52 @@ Java数组不要求每一行的长度相等，譬如30岁女性的病人有17个
 \end{exercise}
 
 \section{字符串}
+字符串广泛存在于各种编程语言中，在Java中字符串属于对象，提供了String创建和操作字符串。
+String内部维护着一个char[]数组，你也可以用char[]初始化一个String类型。
+Java虽然不支持运算符重载，但字符串可以和其它类型相"+"拼接。
+\medskip
 
 \begin{lstlisting}[language=Java]
-	String a = "233";
-	String b = "2" + "33";
-	String c = new String("233");
-	String d = c.intern();
-	System.out.println(a == b); true
-	System.out.println(a == c); false
-	System.out.println(a == d); true
+	String fullName    = "张三";
+	String lastAndName = "张" + "三";
+
+	String fullNameNew = new String("张三");
+	String intern      = fullNameNew.intern();
+	System.out.println ( fullName    == lastAndName ); true
+	System.out.println ( lastAndName == fullNameNew ); false
+	System.out.println ( fullName    == intern      ); true
 \end{lstlisting}
+
+\begin{exercise}
+	请调查字符串的默认编码？
+\end{exercise}
+
+\section{集合Collection<E>}
+数组创建之后不能再改变大小，删除和插入都不太方便。
+Java提供了Collection<E>的多种实现：ArrayList<E>、LinkedList<E>等。
+其中E是值的类型，可是任意\underline{\emph{非基本}}类型。
+因此，基本类型都必须改成相应的封装类型，才能使用Collection。
+
+实际上ArrayList没比数组好太多，毕竟也是通过数组实现的，对于插入、删除操作还是LinkedList更擅长。
+不过，ArrayList继承了数组访问块的有点。
+更多Collection的知识，大家可以参照Java专门书籍深入学习。
+
+\begin{example}
+	基本类型的数组，要转换为对应的封装类型数组，不能强转赋值。
+\end{example}
+\begin{lstlisting}[language=Java]
+	int[] dataInt = {1, 2, 6, 7, 9, 5, 1};
+	Integer[] dataInteger = Arrays.stream(dataInt)
+							.boxed()
+							.toArray(Integer[]::new);
+	String s = Arrays.asList(dataInteger).stream()
+							.map(n->n.toString())
+							.collect(Collectors.joining("-"));
+  System.out.println(s);
+\end{lstlisting}
+
+\remark{这里用到Java语言的$\lambda$语法和方法，在后面章节会作简要说明。}
+
 
 \section{字典Map<K,V>}
 	在Java语言中Map不是关键字，也不是基本类型，但提供了几个实现可以直接使用。
@@ -315,6 +352,27 @@ Java数组不要求每一行的长度相等，譬如30岁女性的病人有17个
 	\begin{exercise}
 		修改本节代码为LinkedhashMap，再执行一遍，比较其差异。
 	\end{exercise}
+
+\section{赋值和引用}
+在一些编程语言中，存在值传递和引用传递的区别。
+Java中基本类型都是值传递，譬如\lstinline{a=b}之后，就再无关系。
+但数组和对象（如String）不是这样的，赋值之后就指向了同一个对象。
+
+\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
+	jshell> int []age_list = {1,2,3,4};
+	age_list ==> int[4] { 1, 2, 3, 4 }
+	jshell> var p = age_list
+	p ==> int[4] { 1, 2, 3, 4 }
+	jshell> p[0]=10
+	$3 ==> 10
+	jshell> age_list
+	age_list ==> int[4] { 10, 2, 3, 4 }
+\end{lstlisting}
+
+\begin{exercise}
+	从内存的角度，如何理解值传递和引用传递？
+\end{exercise}
+
 
 \section{运算符}
 	到这里，应当已经掌握赋值语句和声明语句，但还不能表达逻辑推理。
@@ -451,7 +509,8 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 		房均价["24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"];
 	\end{example}
 
-\note{这里用到了String类型，它不是基本类型，底层是用char[]存放的数据。}
+\noindent
+这里用到了String类型，它不是基本类型，底层是用char[]存放的数据。
 \begin{lstlisting}[language=Java]
 	String []rooms = {
 		"6.575", "6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"
@@ -463,7 +522,8 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 	double []MDEV = new double[20];
 \end{lstlisting}
 
-\note{这里用到了异常处理，未正确解析为数字，就执行语句块（空的）。}
+\noindent
+这里用到了异常处理，未正确解析为数字，就执行语句块（空的）。
 \begin{lstlisting}[language=Java]
 	int pos = 0;
 
@@ -485,14 +545,279 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 
 \noindent
 请认真阅读以上代码，对于++/--运算符要掌握清楚！
+\bigskip
+
+\begin{exercise}
+	请尝试用foreach的方式遍历rooms数组。
+\end{exercise}
+
+\begin{exercise}
+	请尝试用while的2种方式遍历rooms数组。
+\end{exercise}
 
 \section{判断语句}
+使用if语句可根据条件是否为真(true、false)，选择执行不同的代码。
+具体的形式有以下几种：
+
+\begin{table}[!htbp]\centering
+	\lstset{frame=none, aboveskip=0mm, belowskip=0mm}
+	\begin{tabular}{|p{6.5cm}|p{6.5cm}|}
+	\hline
+	\multicolumn{2}{|c|}{条件语句}\\
+	\hline
+	\begin{lstlisting}[language=Java]
+			// 只说明成立的时候做啥
+			if (条件) {
+					//TODO:成立做啥
+			}
+	\end{lstlisting}
+	&
+	\begin{lstlisting}[language=Java]
+			// 成立和不成立
+			if (条件) {
+					//TODO:条件成立
+			} else {
+					//TODO:条件不成立
+			}
+	\end{lstlisting} \\
+	\hline
+	\begin{lstlisting}[language=Java]
+			// 多个条件，都不成立啥也不做
+			if (条件1) {
+					//TODO:条件1成立
+			} else if (条件2) {
+					//TODO:条件2成立
+			} else if (条件3) {
+					//TODO:条件3成立
+			}
+	\end{lstlisting}
+	&
+	\begin{lstlisting}[language=Java]
+			// 多个条件
+			if (条件1) {
+					//TODO:条件1成立
+			} else if (条件2) {
+					//TODO:条件2成立
+			} else {
+					//TODO:否则只能
+			}
+	\end{lstlisting} \\
+	\hline
+	\end{tabular}
+	\caption{判断语句if-else}
+\end{table}
+	
+由上表可知else语句是可有可无的，写个空的\lstinline!else{}!也很常见（注意加上注释！）。
+\lstinline{if}语句可以有若干个\lstinline{else if}语句，但它们必须在\lstinline{else}语句之前。
+\bigskip
+
+\begin{example}
+	结合循环和判断语句，已经可以编写很多算法。
+	例如，使用随机打点法，检查落点是否在圆周内，以统计方法计算圆周率。
+\end{example}
+
+\begin{figure}[!htbp]
+	\centerline{\includegraphics[scale=0.4]{part1/dot-pi.png}}
+\end{figure}
+
+\begin{lstlisting}[language=Java]
+	Random random = new Random(System.currentTimeMillis());
+	int total = 1_0000, hit = 0; // 数字可以用下划线分割
+	double x = 0, y = 0;
+
+	for (int i = 0; i < total; i++) {
+			x = random.nextDouble();
+			y = random.nextDouble();
+			if (x*x+y*y < 1) hit++; // 只有一行代码的时候可以忽略大括弧
+	}
+
+	System.out.println(hit*4.0/total);
+\end{lstlisting}
 
 \section{分支语句}
+当然\lstinline{if}语句包含很多\lstinline{else if}的时候，
+你应当考虑是否可以优化为\lstinline{switch}或者函数表的形式。
+\lstinline{swtich}语句判断条件变量是否与某个\lstinline{case}的值中是否相等，
+每个值称为一个分支。
+
+\begin{lstlisting}[language=Java]
+	switch(expression){
+	case value: //可以有任意数量的case语句
+		//语句
+		break; //可选，不加会继续与下一个case比较！
+	case value:
+		//语句
+		break;
+	default : //可选，建议经常添加
+		//语句
+	}
+\end{lstlisting}
+
+\noindent
+switch 语句中的变量类型可以是： byte、short、int 或者 char。
+从JDK7开始，switch已支持字符串类型了。
+\bigskip
+\remark{同时case标签必须为字符串常量或字面量。}
+\bigskip
+
+\begin{example}
+	手写数字识别，最后使用10个bit位代表0-9的识别结果。
+	譬如，0000000001就代表识别结果为数字1。
+\end{example}
+
+\begin{lstlisting}[language=Java]
+	int ret = 1 << 5;
+	switch(ret) {
+		case 0b00000_0000: System.out.println("0");break;
+		case 0b00000_0001: System.out.println("1");break;
+		case 0b00000_0010: System.out.println("2");break;
+		case 0b00000_0100: System.out.println("3");break;
+		case 0b00000_1000: System.out.println("4");break;
+		case 0b00001_0000: System.out.println("5");break;
+		case 0b00010_0000: System.out.println("6");break;
+		case 0b00100_0000: System.out.println("7");break;
+		case 0b01000_0000: System.out.println("8");break;
+		case 0b10000_0000: System.out.println("9");break;
+		default: System.out.printf("NA, %d", ret);
+	}
+\end{lstlisting}
+
+\section{异常处理}
+在一些语言中，处理错误就是检查返回值。
+而Java提供了\lstinline!try{代码}catch{异常处理}finally{兜底代码}!。
+有些函数会明确自己会抛出异常（throws、throw），
+如果不是运行时异常，就必须得编写异常处理语句。
+异常被\lstinline{catch}捕获，就跳转执行异常处理代码，
+而finally代码块无论是否发生异常都会被执行。
+\medskip
+\begin{lstlisting}[language=Java]
+	try {
+		// 正常代码
+	} catch(XxxException e) { 
+		// 捕获到的异常，还可以重写抛出
+		throw e; // 再次抛出
+	}
+ 
+	try {
+		// 正常代码
+	} catch(XxxException e) {
+		// 异常处理代码
+	} finally { 
+		// 先try语句，再catch语句，最后finall语句，无异常也会执行finally
+	}
+ 
+	try {
+		// 正常代码
+	} finally { 
+		// 有没有异常不关心，但出现异常之后我有机会先执行
+	}
+ 
+	try {
+		// 正常代码
+	} catch(XxxException e) { 
+		// 多个异常类型，可以合并为一个catch语句
+	} catch(XxxException e) { 
+		// 存在继承关系的情况，子类放在前面，并且不能使用|合并
+	}
+ \end{lstlisting}
 
 \section{定义函数}
-程序具有三个特征：有限步之后可退出；有0个或多个输入；有一个或多个输出。
+程序的三个特征：有限步之后可退出；有0个或多个输入；有一个或多个输出。
+使用函数不仅可以把特定功能的代码打包在一起，还便于重用代码。
 
+\begin{definition}{函数}{func}
+	修饰符 \textvisiblespace 返回值类型 \textvisiblespace 方法名\(参数类型 参数名\) \{ \\
+  \codeident[1cm] $\dots$ \\
+  \codeident[1cm] 方法体 \\
+  \codeident[1cm] $\dots$ \\ 
+  \codeident[1cm] return 返回值; \\
+	\}
+\end{definition}
+
+\noindent
+方法的名字的第一个单词应以小写字母作为开头，后面的单词则用大写字母开头写，不使用连接符。
+修饰符是可选的，影响函数的调用方法和范围，定义了该方法的访问类型。
+返回值return，也是可选的。
+如果没有返回值，可去掉return，并把返回值类型改成void。
+\bigskip
+\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
+	jshell> double piByProbability(int total) {
+   ...>         Random random = new Random(System.currentTimeMillis());
+   ...>         int hit = 0;
+   ...>         double x = 0, y = 0;
+   ...> 
+   ...>         for (int i = 0; i < total; i++) {
+   ...>                 x = random.nextDouble();
+   ...>                 y = random.nextDouble();
+   ...>                 if (x*x+y*y < 1) hit++;
+   ...>         }
+   ...> 
+   ...>         return hit*4.0/total;
+   ...>     }
+|  已修改 方法 piByProbability(int)
+jshell> piByProbability(10000);
+$8 ==> 3.1464
+jshell> piByProbability(1000000000)
+$17 ==> 3.141672248
+\end{lstlisting}
+
+\noindent
+函数也可以自己调用自己，称为迭代。
+这有点类似于数学迭代公式：$f_n(x) = f_{n-1}(x)*n$。
+
+\bigskip
+\begin{exercise}
+	使用迭代，实现求n!的函数。
+\end{exercise}
+
+\begin{exercise}
+	使用迭代，实现求斐波那切数列的函数，输出前10个数字。
+\end{exercise}
+
+\section{Java对象}
+对象是对代码的一种编写方式，即使是C语言也可以使用类似的机制。
+它的好处在于把相关的代码和数据封装一起，并且可以限制外部对其数据和函数的访问。
+同时，对象作为一个母版刻画了一个类型应该具有的属性和方法（函数在对象内称为方法）。
+
+实际上，Java语言是不允许函数独立存在的，只能放在某个对象类型里面。
+jshell比较特殊，可以快速验证代码。
+面向对象编程涉及到的理论知识非常多，本书不作过多介绍。
+继承，是面向对象的核心，可理解为一种代码复用扩展的方法。
+
+\begin{definition}{类和接口}{class}
+	\lstinline@[修饰符] interface 接口 { @ \\
+	\lstinline@	常量和方法声明@ \\
+	\lstinline@}@ \\
+	\lstinline@[修饰符] class 父类 { @ \\
+	\lstinline@	属性和方法@ \\
+	\lstinline@}@ \\
+	\lstinline@[修饰符] class 子类 extends 父类 implements 接口 {@ \\
+	\lstinline@	子类的属性和方法，要实现接口方法@ \\
+	\lstinline@}@
+\end{definition}
+
+访问修饰符，可加在类、属性、函数（包括构造函数）的前面，用于限制其可见性。
+减少对外的可见性，能提供代码的灵活性。
+总之，对外提供功能减少细节暴露，可防止以后修改内部实现，导致牵一发而动全身的问题出现。
+
+\begin{table}[!htbp]\centering
+	\begin{tabular}{|p{3cm}|p{1.6cm}|p{1.6cm}|p{2cm}|p{2.4cm}|}
+	\toprule
+	\multicolumn{5}{|c|}{Java访问权限}\\ 
+	\midrule
+	&同一个类&同一个包&不同包子类&不同包非子类\\ \hline
+	private&$\surd$&&&\\ \hline
+	public&$\surd$&$\surd$&&\\\hline
+	protected&$\surd$&$\surd$&$\surd$&\\ \hline
+	缺省(package)&$\surd$&$\surd$&$\surd$&$\surd$\\
+	\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{lstlisting}[language=Java]
+	public class Vector{}  // 向量
+	public class Martrix{} // 矩阵
+\end{lstlisting}
 
 \section{定义向量}
 
