@@ -302,12 +302,34 @@ Java虽然不支持运算符重载，但字符串可以和其它类型相"+"拼�
 \section{集合Collection<E>}
 数组创建之后不能再改变大小，删除和插入都不太方便。
 Java提供了Collection<E>的多种实现：ArrayList<E>、LinkedList<E>等。
-其中E是值的类型，可是任意\underline{\emph{非基本}}类型。
-因此，基本类型都必须改成相应的封装类型，才能使用Collection。
+其中E是值的类型，但不能是\underline{\emph{基本}}类型。
+因此，基本类型要换成相应的封装类，才能使用Collection<E>。
 
-实际上ArrayList没比数组好太多，毕竟也是通过数组实现的，对于插入、删除操作还是LinkedList更擅长。
-不过，ArrayList继承了数组访问块的有点。
+\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
+	jshell> ArrayList<int> ages;
+	|  错误: 意外的类型
+	|  需要: 引用
+	|  找到:    int
+	|  ArrayList<int> ages;
+	|            ^-^
+	jshell> ArrayList<Integer> ages;
+	ages ==> null
+	jshell> ArrayList<int[]> ages;
+	ages ==> null	
+\end{lstlisting}
+
+\remark{
+	值得注意的是，虽然int是基本类型，但int[]不是。
+	基本类型不需要申请内存，放在方法栈里，而int[]是分配了一块连续内存。
+}
+\bigskip
+
+实际上ArrayList是通过数组实现的，默认大小为10。
+如果10个满足不了要求，最好设置一个默认长度。
+因此，ArrayList继承了数组的优点（访问快）和缺点（增删不易）。
+需要对频繁插入、删除操作，建议使用LinkedList。
 更多Collection的知识，大家可以参照Java专门书籍深入学习。
+\bigskip
 
 \begin{example}
 	基本类型的数组，要转换为对应的封装类型数组，不能强转赋值。
@@ -324,14 +346,26 @@ Java提供了Collection<E>的多种实现：ArrayList<E>、LinkedList<E>等。
 \end{lstlisting}
 
 \remark{这里用到Java语言的$\lambda$语法和方法，在后面章节会作简要说明。}
+\bigskip
 
+\begin{exercise}
+	分析以下代码，array1和array2存在什么不同？
+	\begin{lstlisting}[language=Java]
+		int[] times1 = {1, 2, 6, 7, 9, 5, 1};
+		Integer[] times2 = {1, 2, 6, 7, 9, 5, 1};
+		List<int[]> array1 = Arrays.asList(times1);
+		List<Integer> array2 = Arrays.asList(times1);
+	\end{lstlisting}
+\end{exercise}
 
 \section{字典Map<K,V>}
 	在Java语言中Map不是关键字，也不是基本类型，但提供了几个实现可以直接使用。
 	由定义Map<K, V>，它是一个泛型类，可以存放很多类型的数据。
 	其中K是关键字的类型、V是值的类型。
-	典型的Map实现有HashMap、LinkedMap\footnote{linked串联代表着有序}，
+	典型的Map实现有HashMap、LinkedHashMap\footnote{linked串联代表着有序}，
 	其余的请参考其它书籍。
+	与HashMap不同的是，LinkedHashMap会把插入数据的顺序记住。
+	\bigskip
 
 	\begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
 		jshell> HashMap<String, Integer> hashMap = new HashMap<>();
@@ -355,7 +389,7 @@ Java提供了Collection<E>的多种实现：ArrayList<E>、LinkedList<E>等。
 
 \section{赋值和引用}
 在一些编程语言中，存在值传递和引用传递的区别。
-Java中基本类型都是值传递，譬如\lstinline{a=b}之后，就再无关系。
+Java中基本类型都是值传递，譬如\lstinline{a=b}之后，a和b就再无关系。
 但数组和对象（如String）不是这样的，赋值之后就指向了同一个对象。
 
 \begin{lstlisting}[language=Java, backgroundcolor=\color{lightgray!10}]
@@ -470,60 +504,230 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 \end{lstlisting}
 
 \section{循环语句}
-	数组和字典存可存放很多数据，经常要遍历逐一取出来处理。
-	Java中有四种循环结构：
-	\lstinline[language=Java]{for/foreach/while/do...while}语句等。
+数组和字典存可存放很多数据，经常要遍历逐一取出来处理。
+Java提供了四种循环结构：
+\lstinline[language=Java]{for/foreach/while/do...while}语句等。
+\bigskip 
 
-	\begin{minipage}[t]{0.45\textwidth}
+\begin{table}[!htbp]\centering
+	\lstset{frame=none, aboveskip=0mm, belowskip=0mm}
+	\begin{tabular}{|p{6cm}|p{7cm}|}
+	\hline
+	\multicolumn{2}{|c|}{for语句}\\
+	\hline
 	\begin{lstlisting}[language=Java]
-		for(初始化; 布尔表达式; 更新) {
+		for(初值; 布尔表达式; 步进) {
 			//代码语句
 		}
-
+	\end{lstlisting}
+	&
+	\begin{lstlisting}[language=Java]
+		// sum = 1+2+...+100
+		int sum = 0;
+		for (int i=1; i<=100; i++) {
+			sum += i;
+		}
+	\end{lstlisting} \\
+	\hline
+	\begin{lstlisting}[language=Java]
+		// 类似for...in的方式
 		for(声明语句 : 表达式) {
 			//代码句子
 		}
 	\end{lstlisting}
-	\end{minipage}
-	\quad
-	\begin{minipage}[t]{0.4\textwidth}
+	&
+	\begin{lstlisting}[language=Java]
+		// sum = 1+2+...+9
+		int[] list = {1,2,3,4,5,6,7,8,9};
+		int sum = 0;
+		for (int i: list) {
+			sum += i;
+		}
+	\end{lstlisting} \\
+	\hline
+	\end{tabular}
+\end{table}
+
+近年来，Java也从其它语言汲取了很多改进，
+所有的集合（Collection的实现）不仅可以使用\lstinline{for(:)}的方式还可以使用forEach接口遍历数据。
+\bigskip
+
+\begin{lstlisting}[language=Java]
+	// 支持：数组、集合
+	for(Integer i : array) {
+    System.out.println(i);
+	}
+\end{lstlisting}
+
+\noindent 在Java8之后，现在你可以可以写成：
+\begin{lstlisting}[language=Java]
+	//array.forEach(i -> System.out.print(i));
+	array.forEach(System.out::print); // 已支持函数式编程
+\end{lstlisting}
+\bigskip
+
+与for明显不同的是，while循环只有一个布尔表达式。
+使用哪种循环表达式更好，取决于你的需要。
+如果需要下标，最好还是使用for循环。
+
+\begin{table}[!htbp]\centering
+	\lstset{frame=none, aboveskip=0mm, belowskip=0mm}
+	\begin{tabular}{|p{5cm}|p{8cm}|}
+	\hline
+	\multicolumn{2}{|c|}{while语句}\\
+	\hline
 	\begin{lstlisting}[language=Java]
 		while( 布尔表达式 ) {  
 			//代码语句
 		}
-
+	\end{lstlisting}
+	&
+	\begin{lstlisting}[language=Java]
+			// sum = 1+2+...+100
+			int sum = 0, i = 0;
+			while (i <= 100) {
+				sum += i;
+				i++;
+			}
+	\end{lstlisting} \\
+	\hline
+	\begin{lstlisting}[language=Java]
 		do {
 			//代码句子
 		} while(布尔表达式);
 	\end{lstlisting}
+	&
+	\begin{lstlisting}[language=Java]
+			// sum = 1+2+...+100
+			int sum = 0, i = 0;
+			do {
+				sum += i;
+				i++;
+			} while (i <= 100);
+	\end{lstlisting} \\
+	\hline
+	\end{tabular}
+\end{table}
+\noindent
+
+循环语句是可以嵌套的：先进入外层循环，再进入内层循环，
+然后直到内层循环条件不满足，跳出到外层循环。
+如果外层循环也不满足，执行结束。
+\lstinline{break}和\lstinline{continue}可以影响循环的执行顺序。
+使用\lstinline{break}跳出当前循环，注意只是跳出一层。
+而\lstinline{continue}是跳过一轮循环，执行下一轮。
+\bigskip
+
+\begin{lstlisting}[language=Java]
+	// 计算 sum = 1+3+5+7+9
+	int sum = 0;
+	for (int i = 0; i <= 20; i++) {
+		if (i%2 == 0) continue; // 可省略大括号
+		else if (i>10) break; // 可省略大括号
+		sum += i;
+	}
+\end{lstlisting}
+
+实际上，使用\lstinline{break}也可以跳出多层循环，但很少使用。
+需要先声明一个label，以指定\lstinline{break}跳转的位置，
+它的用法有点类似于\lstinline{goto}语句等。
+使用\lstinline{break}只能跳转到包含该break语句的代码块，
+譬如，你不能跳转到例子中嵌套循环之前或之后的代码行上。
+\bigskip
+
+\begin{lstlisting}[language=Java]
+	int[][][] ids = {
+					{{1,2,3}, {10,20,30}, {100,200,300}},
+					{{3,4,5}, {30,40,50}, {300,400,500}},
+					{{6,7,8}, {60,70,80}, {600,700,800}}
+	};
+
+	found: 
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+				for (int k = 0; k < 3; k++) {
+						if (ids[i][j][k] == 10) {
+								System.out.printf("ids[%d,%d,%d]\n", i, j, k);
+								break found;
+						}
+				}
+		}
+	}
+	System.out.println("bye!");
+	/**** 输出：*****
+	ids[0,1,0]
+	bye!
+	****************/
+\end{lstlisting}
+\bigskip
+
+\begin{example}
+	计算如下2个int矩阵相加的结果，矩阵使用二维数组表示。\\
+	\begin{minipage}{0.3\textwidth}
+		$$
+		A = \left[
+		\begin{matrix}
+			1 & 2 & 3 \\
+			4 & 5 & 6 \\
+			7 & 8 & 9
+			\end{matrix}
+			\right]
+		$$
 	\end{minipage}
-	
-	\noindent
-	循环语句还可以嵌套循环语句，使用\lstinline[language=Java]{break}只可跳出一层循环，但如果只有一层就执行循环后面的代码。
+	\begin{minipage}{0.3\textwidth}
+		$$
+		B = \left[
+		\begin{matrix}
+			10 & 20 & 30 \\
+			40 & 50 & 60 \\
+			70 & 80 & 90
+			\end{matrix}
+			\right]
+		$$
+	\end{minipage}
 	\bigskip
 
-	\begin{example}
-		波士顿房价数据中，存在一些无效数据(非数值，如N/A等)，要把它们剔除掉。
-		假设我们读出来都是字符串：\\
-		房间数["6.575", "6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"];\\
-		房均价["24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"];
-	\end{example}
+	\noindent \emph{示例代码：}
+	\begin{lstlisting}[language=Java]
+		int[][] A = {{1,2,3}, {4,5,6}, {7,8,9}};
+		int[][] B = {{10,20,30}, {40,50,60}, {70,80,90}};
+		int[][] C = new int[3][3];
 
-\noindent
-这里用到了String类型，它不是基本类型，底层是用char[]存放的数据。
+		for(int r = 0; r < 3; r++) {
+			for (int c=0; c < 3; c++) {
+				C[r][c] = A[r][c] + B[r][c];
+			}
+		}
+	\end{lstlisting}
+
+\end{example}
+
+\begin{example}
+	波士顿房价数据中，存在一些无效数据(非数值，如N/A等)，要把它们剔除掉。
+	假设我们读出来都是字符串：
+	房间数["6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"];
+	房均价["21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"];
+\end{example}
+
+\noindent \emph{示例代码：}
 \begin{lstlisting}[language=Java]
 	String []rooms = {
-		"6.575", "6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"
+		"6.421", "NA", "6.998", "7.147", "6.43", "6.012", "6.172", "5.631"
 	};
 	String []values = {
-		"24", "21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"
+		"21.6", "34.7", "", "36.2", "28.7", "22.9", "27.1", "16.5"
 	};
 	double []RM = new double[20];
 	double []MDEV = new double[20];
 \end{lstlisting}
 
 \noindent
-这里用到了异常处理，未正确解析为数字，就执行语句块（空的）。
+这里没有主动检测字符串是否为合法数字，而使用了Double提供的解析方法。
+如果不能正确解析为数字，parseDouble函数就会抛出异常。
+出现异常之后，我们什么都不需要做，继续下一轮解析即可。
+\bigskip
+
+\noindent \emph{示例代码：}
 \begin{lstlisting}[language=Java]
 	int pos = 0;
 
@@ -555,15 +759,21 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 	请尝试用while的2种方式遍历rooms数组。
 \end{exercise}
 
+\begin{exercise}
+	使用循环实现斐波那契数列的算法：0,1,1,2,3,5,8,13,21。
+\end{exercise}
+
 \section{判断语句}
 使用if语句可根据条件是否为真(true、false)，选择执行不同的代码。
+其中，else语句是可有可无的，写个空的\lstinline!else{}!也很常见（注意加上注释！）。
+\lstinline{if}语句之后，可以有若干个\lstinline{else if}语句，但它们必须在\lstinline{else}语句之前。
 具体的形式有以下几种：
 
 \begin{table}[!htbp]\centering
 	\lstset{frame=none, aboveskip=0mm, belowskip=0mm}
 	\begin{tabular}{|p{6.5cm}|p{6.5cm}|}
 	\hline
-	\multicolumn{2}{|c|}{条件语句}\\
+	\multicolumn{2}{|c|}{if语句}\\
 	\hline
 	\begin{lstlisting}[language=Java]
 			// 只说明成立的时候做啥
@@ -606,9 +816,7 @@ Java语言中，布尔类型只有2个值：\lstinline[language=Java]{true、fal
 	\end{tabular}
 	\caption{判断语句if-else}
 \end{table}
-	
-由上表可知else语句是可有可无的，写个空的\lstinline!else{}!也很常见（注意加上注释！）。
-\lstinline{if}语句可以有若干个\lstinline{else if}语句，但它们必须在\lstinline{else}语句之前。
+
 \bigskip
 
 \begin{example}
