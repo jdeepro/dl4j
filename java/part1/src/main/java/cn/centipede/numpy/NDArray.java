@@ -102,6 +102,10 @@ public class NDArray implements Cloneable{
      * @return (2,3)
      */
     public String shape() {
+        if (_dimens.length == 0) {
+            return "()";
+        }
+
         StringBuilder sb = new StringBuilder("(");
         sb.append(_dimens[0]);
         for (int i = 1; i < _dimens.length; i++) {
@@ -191,17 +195,57 @@ public class NDArray implements Cloneable{
         return merge(child);
     }
 
-    public NDArray at(int... index) {
-        for (int i = 0; i < index.length; i++) {
-            if (index[i] != ALL && index[i] < 0) {
-                index[i] += _dimens[i];
-            }
+    /**
+     * to support negtive index
+     * @param which
+     * @param index
+     */
+    private void positiveIndex(int which, int[] index) {
+        if (index[which] >= 0 || index[which] == ALL) {
+            return;
+        }
+        index[which] += _dimens[which];
+    }
+
+    /**
+     * to support negtive index
+     * @param which
+     * @param range
+     */
+    private int[] positiveRange(int which, int[] range) {
+        if (range == null) {
+            return range;
         }
 
+        if (range[0] == ALL) {
+            range = new int[]{0, _dimens[0]};
+        } else if (range[0] < 0) {
+            range[0] += _dimens[which];
+        }
+
+        if (range.length>1 && range[1] != ALL && range[1] < 0) {
+            range[1] += _dimens[which];
+        }
+        return range;
+    }
+
+    /**
+     * select whole rows/cols without slice
+     * support negtive index
+     * @param index select rows
+     */
+    public NDArray at(int... index) {
+        /** update negtive index to positive */
+        for (int i = 0; i < index.length; i++) {
+            positiveIndex(i, index);
+        }
+
+        /** update negtive index to positive */
         if (index.length == 1) {
             return getTopRow(index[0]);
         }
 
+        /** select all rows or one row */
         if (index[0] == ALL) {
             return getRows(Arrays.copyOfRange(index, 1, index.length));
         } else {
@@ -210,42 +254,43 @@ public class NDArray implements Cloneable{
         }
     }
 
-    public NDArray atRange(int[]... index) {
-        int count = 0;
-        for (int[] ints : index) {
-            if (ints != null) count++;
+    public NDArray atRange(int[]... range) {
+        int[][] left = Arrays.copyOfRange(range, 1, range.length);
+
+        /** this is an array! */
+        if (left.length == 0) {
+            return getTopRow(range[0][0]);
         }
 
-        if (count == 1) {
-            if (index[0].length>1) {
-                return merge(getTopRowRange(index[0][0], index[0][1]));
-            } else {
-                return getTopRow(index[0][0]);
-            }
+        /** one slice to select rows */
+        if (range.length == 1 && range[0].length > 1) {
+            return merge(getTopRowRange(range[0][0], range[0][1]));
         }
 
-        NDArray[] array = getTopRowRange(index[0][0], index[0][1]);
+        /** select a row to slice */
+        if (range[0].length == 1) {
+            return getTopRow(range[0][0]).atRange(left);
+        }
+
+        /** select rows to slice */
+        NDArray[] array = getTopRowRange(range[0][0], range[0][1]);
         NDArray[] ret = new NDArray[array.length];
         for (int i = 0; i < array.length; i++) {
-            ret[i] = array[i].atRange(Arrays.copyOfRange(index, 1, index.length));
+            ret[i] = array[i].atRange(left);
         }
+
+        /** merge ever row slice */
         return merge(ret);
     }
 
+    /**
+     * do array slice like numpy
+     * @param range
+     * @return slice array
+     */
     public NDArray slice(int[][] range) {
         for (int i = 0; i < range.length; i++) {
-            if (range[i] == null) {
-                continue;
-            }
-            if (range[i][0] == ALL) {
-                range[i] = new int[]{0, _dimens[0]};
-            } else if (range[i][0] < 0) {
-                range[i][0] += _dimens[i];
-            }
-
-            if (range[i].length>1 && range[i][1] != ALL && range[i][1] < 0) {
-                range[i][1] += _dimens[i];
-            }
+            range[i] = positiveRange(i, range[i]);
         }
         return atRange(range);
     }
@@ -264,6 +309,9 @@ public class NDArray implements Cloneable{
 
     @Override
     public String toString() {
+        if (_dimens == null || _dimens.length == 0) {
+            return Array.get(_data, _idata[0]).toString();
+        }
         return ArrayHelper.getString(_data, _dimens, _idata);
     }
 }

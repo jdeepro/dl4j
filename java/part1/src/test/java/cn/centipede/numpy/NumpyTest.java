@@ -17,6 +17,14 @@ public class NumpyTest extends TestCase {
 		int[][] range2 = {{ALL}, {-2}};
 		b = a.slice(range2);
 		assertEquals("array([2, 6, 10])\n", b.toString());
+
+		int[][] range3 = {{-2, -1}, {-2}};
+		b = a.slice(range3);
+		assertEquals("array([6])\n", b.toString());
+
+		int[][] range4 = {{-1}, {-2}};
+		b = a.slice(range4);
+		assertEquals("10", b.toString());
 	}
 
 	@Test
