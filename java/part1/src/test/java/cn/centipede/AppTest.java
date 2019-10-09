@@ -1,13 +1,17 @@
 package cn.centipede;
 
-import cn.centipede.matplot.JPlot;
-import junit.framework.Test;
+import cn.centipede.numpy.NDArrayTest;
+import cn.centipede.numpy.NumpyTest;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
+import org.junit.runner.RunWith;
 
 /**
  * Unit test for simple App.
  */
+@RunWith(Suite.class)
+@SuiteClasses({NDArrayTest.class,NumpyTest.class})
 public class AppTest extends TestCase {
     /**
      * Create the test case
@@ -16,19 +20,5 @@ public class AppTest extends TestCase {
      */
     public AppTest( String testName ) {
         super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite() {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testPlotScatter() {
-        assert(true);
     }
 }

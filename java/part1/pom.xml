@@ -11,20 +11,19 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.knowm.xchart</groupId>
       <artifactId>xchart</artifactId>
       <version>3.5.4</version>
-  </dependency>
-  <dependency>
-    <groupId>gov.nist.math</groupId>
-    <artifactId>jama</artifactId>
-    <version>1.0.3</version>
-</dependency>
-
+    </dependency>
+    <dependency>
+      <groupId>gov.nist.math</groupId>
+      <artifactId>jama</artifactId>
+      <version>1.0.3</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

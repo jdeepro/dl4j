@@ -66,7 +66,7 @@ public class Numpy extends NumpyBase{
         return new NDArray(array, top);
     }
 
-    public static NDArray math(NDArray src, Object data) {
+    public static NDArray add(NDArray src, Object data) {
         Object srcData = src.data();
         Object array;
 

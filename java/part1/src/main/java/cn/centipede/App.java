@@ -1,6 +1,6 @@
 package cn.centipede;
 
-import cn.centipede.jnum.Range;
+import cn.centipede.numpy.Range;
 import cn.centipede.matplot.Axes;
 import cn.centipede.matplot.Figure;
 import cn.centipede.matplot.JPlot;
