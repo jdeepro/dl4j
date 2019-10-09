@@ -831,7 +831,7 @@ Java提供了四种循环结构：
 \begin{lstlisting}[language=Java]
 	Random random = new Random(System.currentTimeMillis());
 	int total = 1_0000, hit = 0; // 数字可以用下划线分割
-	double x = 0, y = 0;
+	double x,y; // 使用前会被赋值，就不需要初始化
 
 	for (int i = 0; i < total; i++) {
 			x = random.nextDouble();
@@ -841,6 +841,15 @@ Java提供了四种循环结构：
 
 	System.out.println(hit*4.0/total);
 \end{lstlisting}
+
+\noindent
+上述代码，当采样的数量达到1,000,000之后，要等很久才能输出结果。
+必须要优化代码，或者通过GPU运算才能更快运算结束。
+\bigskip
+
+\begin{exercise}
+	使用循环和条件语句，实现冒泡排序算法。
+\end{exercise}
 
 \section{分支语句}
 当然\lstinline{if}语句包含很多\lstinline{else if}的时候，
@@ -934,11 +943,11 @@ switch 语句中的变量类型可以是： byte、short、int 或者 char。
 使用函数不仅可以把特定功能的代码打包在一起，还便于重用代码。
 
 \begin{definition}{函数}{func}
-	修饰符 \textvisiblespace 返回值类型 \textvisiblespace 方法名\(参数类型 参数名\) \{ \\
-  \codeident[1cm] $\dots$ \\
-  \codeident[1cm] 方法体 \\
-  \codeident[1cm] $\dots$ \\ 
-  \codeident[1cm] return 返回值; \\
+	修饰符 \textvisiblespace 返回值类型 \textvisiblespace 方法名(参数列表) \{ \\
+  \textcolor{lightgray}{\codeident[1cm]} $\dots$ \\
+  \textcolor{lightgray}{\codeident[1cm]} 方法体 \\
+  \textcolor{lightgray}{\codeident[1cm]} $\dots$ \\ 
+  \textcolor{lightgray}{\codeident[1cm]} return 返回值; \\
 	\}
 \end{definition}
 
@@ -983,14 +992,26 @@ $17 ==> 3.141672248
 \end{exercise}
 
 \section{Java对象}
-对象是对代码的一种编写方式，即使是C语言也可以使用类似的机制。
-它的好处在于把相关的代码和数据封装一起，并且可以限制外部对其数据和函数的访问。
+对象是代码的一种编写方式，即使是C语言也可以使用类似的机制。
+它的好处在于把相关的代码和数据封装一起，并且可以限制外部对其数据和方法的访问。
 同时，对象作为一个母版刻画了一个类型应该具有的属性和方法（函数在对象内称为方法）。
 
-实际上，Java语言是不允许函数独立存在的，只能放在某个对象类型里面。
-jshell比较特殊，可以快速验证代码。
-面向对象编程涉及到的理论知识非常多，本书不作过多介绍。
-继承，是面向对象的核心，可理解为一种代码复用扩展的方法。
+实际上，Java语言是不允许函数独立存在的，应当放在某个对象类型里面。
+前面章节为了快速验证代码，才使用的jshell。
+面向对象编程（OOP）涉及到的理论知识庞大复杂，本书不作过多介绍。
+继承，可理解为一种代码复用扩展的方法，是面向对象的核心。
+继承，也是一种抽象到具体的手段，子类可作为（is a）父类使用。
+由此，可引出LISP替换法则：所有使用父类的地方，都可以换成子类。
+这种灵活性，也称为多态。
+所以函数/方法尽量使用父类（基类）作为参数类型，增加代码的可扩展性。
+
+\begin{figure}[!htb]
+	\centerline{\includegraphics[scale=0.7]{part1/has-a-is-a.png}}
+\end{figure}
+
+\noindent
+[is a]和[has a]难以选择的时候，优先使用[has a]，耦合度比较低。
+\bigskip
 
 \begin{definition}{类和接口}{class}
 	\lstinline@[修饰符] interface 接口 { @ \\
@@ -1022,12 +1043,24 @@ jshell比较特殊，可以快速验证代码。
 	\end{tabular}
 \end{table}
 
-\begin{lstlisting}[language=Java]
-	public class Vector{}  // 向量
-	public class Martrix{} // 矩阵
-\end{lstlisting}
+要想熟练掌握面向对象编程，可多阅读一些关于《设计模式》的书籍。
+设计模式都是前人优秀经验的总结，是编码的最佳实践。
+这是每个优秀程序员到高级程序员的必经之路，要经常阅读。
 
 \section{定义向量}
+本书内容和代码同步编写，下述代码会经过多轮迭代优化，因此可能不是最优的。
+在定义向量类型之前，我们先复习向量的数学定义，百科的解释如下。
+
+\begin{definition}{向量}{vec}
+	在数学中，向量（也称为欧几里得向量、几何向量、矢量），指具有大小（magnitude）和方向的量。
+	书籍一般用黑体的小写英文字母（a、b、c等）来表示，手写在a、b、c等字母上加一箭头（→）表示：
+	$\vec{a}$，$\vec{b}$，$\vec{c}$。向量的矩阵表示，如下：
+	$$
+	\vec{a} = \begin{bmatrix}x\\y\\z\end{bmatrix} 
+	$$
+	支持的运算有：相加、相减、数乘、点乘和叉乘等。
+\end{definition}
+
 
 \section{定义矩阵}
 
