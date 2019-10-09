@@ -9,7 +9,7 @@ public class NDArrayTest extends TestCase {
 	public void test_create() {
 			int[] dat = {1,2,3,4,5,6,7,8};
 			NDArray a = new NDArray(dat, 2,4);
-			assertTrue(Arrays.equals((int[])a.data(), (int[])dat));
+			assertTrue(a.toString(), Arrays.equals((int[])a.data(), (int[])dat));
 	}
 
 	@Test
@@ -17,14 +17,15 @@ public class NDArrayTest extends TestCase {
 			int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
 			NDArray a = new NDArray(dat, 3,4);
 			a = a.reshape(2,6);
-			assertTrue(Arrays.equals(a.getDimens(), new int[]{2,6}));
+			assertTrue(a.toString(), Arrays.equals(a.getDimens(), new int[]{2,6}));
 	}
 
 	@Test
 	public void test_to_string() {
 		int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
 		NDArray a = new NDArray(dat, 3,4);
+		assertEquals("(3, 4)", a.shape());
 		a = a.reshape(2,6);
-		System.out.println(a);
+		assertEquals("(2, 6)", a.shape());
 	}
 }

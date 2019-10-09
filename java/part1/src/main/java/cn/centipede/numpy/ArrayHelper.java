@@ -195,7 +195,7 @@ class ArrayHelper {
         return struct(data, dimens, isDouble?double.class:int.class);
     }
 
-    private static Object struct(Object data, int[] dimens, Class dtype) {
+    private static Object struct(Object data, int[] dimens, Class<?> dtype) {
         Object array = Array.newInstance(dtype, dimens);
 
         for (int i = 0; i < dimens[0]; i++) {

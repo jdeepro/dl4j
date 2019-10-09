@@ -29,7 +29,7 @@ public class Numpy extends NumpyBase{
         return zeros(dimens, double.class);
     }
 
-    public static NDArray zeros(int[] dimens, Class dtype) {
+    public static NDArray zeros(int[] dimens, Class<?> dtype) {
         int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);
         Object array = Array.newInstance(dtype, size);
         for (int i = 0; i < size; i++) {
@@ -42,7 +42,7 @@ public class Numpy extends NumpyBase{
         return ones(dimens, double.class);
     }
 
-    public static NDArray ones(int[] dimens, Class dtype) {
+    public static NDArray ones(int[] dimens, Class<?> dtype) {
         int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);
         Object array = Array.newInstance(dtype, size);
         for (int i = 0; i < size; i++) {
@@ -57,7 +57,7 @@ public class Numpy extends NumpyBase{
      * @param dtype int/double
      * @return
      */
-    public static NDArray arange(int top, Class dtype) {
+    public static NDArray arange(int top, Class<?> dtype) {
         Object array = Array.newInstance(dtype, top);
         for (int i = 0; i < top; i++) {
             Array.set(array, i, i);
