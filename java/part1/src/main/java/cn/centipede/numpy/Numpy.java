@@ -66,6 +66,12 @@ public class Numpy extends NumpyBase{
         return new NDArray(array, top);
     }
 
+    /**
+     * TODO: Need to refactor so support more operators
+     * @param src
+     * @param data
+     * @return
+     */
     public static NDArray add(NDArray src, Object data) {
         Object srcData = src.data();
         Object array;
