@@ -20,6 +20,10 @@ public class Numpy extends NumpyBase{
 
         if (data instanceof int[]) {
             return IntStream.of(index).map(i-> (int) Array.get(data, i)).toArray();
+        } else if (data instanceof Integer) {
+            return new int[]{(int)data};
+        } else if (data instanceof Double) {
+            return new double[]{(double)data};
         } else {
             return IntStream.of(index).mapToDouble(i-> (double) Array.get(data, i)).toArray();
         }
@@ -67,13 +71,11 @@ public class Numpy extends NumpyBase{
     }
 
     /**
-     * TODO: Need to refactor so support more operators
-     * @param src
-     * @param data
-     * @return
+     * data: NDArray, number, int[][][], double[][][]
+     * genertic
+     * convenrt to int[] or double[]
      */
-    public static NDArray add(NDArray src, Object data) {
-        Object srcData = src.data();
+    private static Object dat2Array(Object data) {
         Object array;
 
         if (data instanceof NDArray) {
@@ -83,24 +85,39 @@ public class Numpy extends NumpyBase{
         } else {
             array = data instanceof Integer?new int[]{(int) data}:new double[]{(double)data};
         }
+       return array;
+    }
 
-        boolean isIntArray = srcData instanceof int[];
-        boolean isIntData = array instanceof int[];
-        int[] index = src.getDataIndex();
-        int[] dimens = src.getDimens();
+    /**
+     * support double & int
+     * @param src
+     * @param data
+     * @return
+     */
+    public static NDArray add(NDArray src, Object dat) {
+        Object datArray  = dat2Array(dat);
+        Object srcData   = getArrayData(src);
 
-        Object ret;
-        if (isIntArray && isIntData) {
-            ret = doOp((int[])srcData, index, (int[])array, Integer::sum);
-        } else if (isIntArray) {
-            ret = doOp((int[])srcData, index, (double[])array, Double::sum);
-        } else if (isIntData) {
-            ret = doOp((double[])srcData, index, (int[])array, Double::sum);
-        } else {
-            ret = doOp((double[])srcData, index, (double[])array, Double::sum);
-        }
+        ICalc iadd = (a, b)->{
+            if (a instanceof Integer && b instanceof Integer) return (int)a+(int)b;
+            else return (double)a+(double)b;
+        };
 
-        return new NDArray(ret, dimens);
+        Object ret = doOp(srcData, datArray, iadd);
+        return new NDArray(ret,  src.getDimens());
+    }
+
+    public static NDArray sub(NDArray src, Object dat) {
+        Object datArray  = dat2Array(dat);
+        Object srcData   = getArrayData(src);
+
+        ICalc iadd = (a, b)->{
+            if (a instanceof Integer && b instanceof Integer) return (int)a-(int)b;
+            else return (double)a-(double)b;
+        };
+
+        Object ret = doOp(srcData, datArray, iadd);
+        return new NDArray(ret,  src.getDimens());
     }
 
     /**

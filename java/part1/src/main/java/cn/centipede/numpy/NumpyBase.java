@@ -6,10 +6,11 @@ import cn.centipede.Config;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Random;
-import java.util.function.BiFunction;
-import java.util.function.DoubleBinaryOperator;
-import java.util.function.IntBinaryOperator;
 import java.util.stream.IntStream;
+
+interface ICalc {
+    Object calc(Object a, Object b);
+}
 
 public class NumpyBase {
     private static int dataOffset(int[] dim, int[] index) {
@@ -48,39 +49,53 @@ public class NumpyBase {
         }
     }
 
-    public static double[] doOp(int[] src, int[] index, double[] data, BiFunction<Double, Integer, Double> op) {
+    public static Object doOp(Object src, Object dat, ICalc op) {
+        boolean isSrcInt = src instanceof int[];
+        boolean isDatInt = dat instanceof int[];
+
+        if (isSrcInt && isDatInt) {
+            return doOp((int[])src, (int[])dat, op);
+        } else if (isSrcInt) {
+            return doOp((double[])src, (int[])dat, op);
+        } else if (isDatInt) {
+            return doOp((double[])dat, (int[])src, op);
+        } else {
+            return doOp((double[])dat, (double[])src, op);
+        }
+    }
+
+    public static double[] doOp(double[] src, int[] data, ICalc op) {
         int length = Array.getLength(data);
-        double[] ret = new double[index.length];
+        double[] ret = new double[src.length];
 
-        for (int i = 0; i < index.length; i++) {
-            ret[i] = op.apply(data[i%length], src[index[i]]);
+        for (int i = 0; i < src.length; i++) {
+            Double left = src[i];
+            Integer right = data[i%length];
+            ret[i] = (Double)op.calc(left, right);
         }
         return ret;
     }
 
-    public static int[] doOp(int[] src, int[] index, int[] data,  IntBinaryOperator op) {
-        int[] ret = new int[index.length];
+    public static int[] doOp(int[] src, int[] data, ICalc op) {
+        int length = Array.getLength(data);
+        int[] ret = new int[src.length];
 
-        for (int i = 0; i < index.length; i++) {
-            ret[i] = op.applyAsInt(src[index[i]], data[i%data.length]);
+        for (int i = 0; i < src.length; i++) {
+            Integer left = src[i];
+            Integer right = data[i%length];
+            ret[i] = (Integer)op.calc(left, right);
         }
         return ret;
     }
 
-    public static double[] doOp(double[] src, int[] index, int[] data,  BiFunction<Double, Integer, Double> op) {
-        double[] ret = new double[index.length];
+    public static double[] doOp(double[] src, double[] data, ICalc op) {
+        int length = Array.getLength(data);
+        double[] ret = new double[src.length];
 
-        for (int i = 0; i < index.length; i++) {
-            ret[i] = op.apply(src[index[i]], data[i%data.length]);
-        }
-        return ret;
-    }
-
-    public static double[] doOp(double[] src, int[] index, double[] array, DoubleBinaryOperator operator) {
-        double[] ret = new double[index.length];
-
-        for (int i = 0; i < index.length; i++) {
-            ret[i] = operator.applyAsDouble(src[index[i]], array[i%array.length]);
+        for (int i = 0; i < src.length; i++) {
+            Double left = src[i];
+            Double right = data[i%length];
+            ret[i] = (Double)op.calc(left, right);
         }
         return ret;
     }
