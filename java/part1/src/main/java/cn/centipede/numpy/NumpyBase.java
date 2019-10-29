@@ -8,9 +8,6 @@ import java.math.BigDecimal;
 import java.util.Random;
 import java.util.stream.IntStream;
 
-interface ICalc {
-    Object calc(Object a, Object b);
-}
 
 public class NumpyBase {
     private static int dataOffset(int[] dim, int[] index) {

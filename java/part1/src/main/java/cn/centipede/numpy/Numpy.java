@@ -98,12 +98,7 @@ public class Numpy extends NumpyBase{
         Object datArray  = dat2Array(dat);
         Object srcData   = getArrayData(src);
 
-        ICalc iadd = (a, b)->{
-            if (a instanceof Integer && b instanceof Integer) return (int)a+(int)b;
-            else return (double)a+(double)b;
-        };
-
-        Object ret = doOp(srcData, datArray, iadd);
+        Object ret = doOp(srcData, datArray, Operator::add);
         return new NDArray(ret,  src.getDimens());
     }
 
@@ -111,12 +106,7 @@ public class Numpy extends NumpyBase{
         Object datArray  = dat2Array(dat);
         Object srcData   = getArrayData(src);
 
-        ICalc iadd = (a, b)->{
-            if (a instanceof Integer && b instanceof Integer) return (int)a-(int)b;
-            else return (double)a-(double)b;
-        };
-
-        Object ret = doOp(srcData, datArray, iadd);
+        Object ret = doOp(srcData, datArray, Operator::subtract);
         return new NDArray(ret,  src.getDimens());
     }
 
