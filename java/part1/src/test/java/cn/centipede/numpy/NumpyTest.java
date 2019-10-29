@@ -84,6 +84,10 @@ public class NumpyTest extends TestCase {
 		NDArray d = Numpy.arange(12).reshape(3,4);
 		NDArray e = Numpy.dot(d, 2);
 		assertEquals(e, Numpy.add(d, d));
+
+		NDArray f = Numpy.arange(12).reshape(3,4);
+		NDArray g = Numpy.array(2);
+		assertEquals(Numpy.dot(f, 2), Numpy.dot(f, g));
 	}
 
 	@Test

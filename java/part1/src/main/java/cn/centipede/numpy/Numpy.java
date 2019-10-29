@@ -120,24 +120,29 @@ public class Numpy extends NumpyBase{
     public static NDArray dot(NDArray a, NDArray b) {
         int[] aDim = a.getDimens();
         int[] bDim = b.getDimens();
-        boolean isArray = false;
-
-        if (bDim.length == 1) {
-            isArray = true;
-            bDim = new int[]{bDim[0], 1};
-        }
-
         Object aData = a.data();
         Object bData = b.data();
-        Object cData;
 
-        if (aDim.length == 0 || aDim.length == 1) {
-            cData = multiply(aData, bData);
-            return new NDArray(cData, aDim);
+        if (aDim.length == 0) {
+            if (aData instanceof Integer)return dot(b, (int)aData);
+            else return dot(b, (double)aData);
         }
 
-        cData = dot(aData, aDim, a.getDataIndex(), bData, bDim, b.getDataIndex());
-        int[] cDim = isArray?new int[]{aDim[0]}:new int[]{aDim[0], bDim[1]};
+        if (bDim.length == 0) {
+            if (bData instanceof Integer)return dot(a, (int)bData);
+            else return dot(a, (double)bData);
+        }
+
+        if (aDim.length == 1) {
+            return new NDArray(Operator.multiply(aData, bData), aDim);
+        }
+
+        if (bDim.length == 1) {
+            return new NDArray(Operator.multiply(bData, aData), aDim);
+        }
+
+        Object cData = dot(getArrayData(a), aDim, getArrayData(b), bDim);
+        int[] cDim = new int[]{aDim[0], bDim[1]};
         return new NDArray(cData, cDim);
     }
 

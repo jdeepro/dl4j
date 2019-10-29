@@ -97,7 +97,7 @@ public class NumpyBase {
         return ret;
     }
 
-    public static Object dot(Object aData, int[] aDim, int[]aIData, Object bData, int[] bDim, int[] bIData) {
+    public static Object dot(Object aData, int[] aDim, Object bData, int[] bDim) {
         Object result;
         if (aData instanceof double[] || bData instanceof double[]) {
             result = new double[aDim[0]*bDim[1]];
@@ -109,8 +109,8 @@ public class NumpyBase {
         for (int i = 0; i < aDim[0]; i++) {
             for (int j = 0; j < bDim[1]; j++) {
                 for (int k = 0; k < aDim[1]; k++) {
-                    Object o1 = Array.get(aData, aIData[i*aDim[1]+k]);
-                    Object o2 = Array.get(bData, bIData[k*bDim[1]+j]);
+                    Object o1 = Array.get(aData, i*aDim[1]+k);
+                    Object o2 = Array.get(bData, k*bDim[1]+j);
                     if (isDouble) {
                         ((double[])result)[bDim[1]*i+j] += (double)multiply(o1, o2);
                     } else {
