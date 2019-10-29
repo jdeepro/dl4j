@@ -80,7 +80,10 @@ public class NumpyTest extends TestCase {
 			"array([[56 , 62 , 68 , 74 ]\n"+
 			"       [152, 174, 196, 218]\n"+
 			"       [248, 286, 324, 362]])\n", c.toString());
-		System.out.println(c);
+
+		NDArray d = Numpy.arange(12).reshape(3,4);
+		NDArray e = Numpy.dot(d, 2);
+		assertEquals(e, Numpy.add(d, d));
 	}
 
 	@Test

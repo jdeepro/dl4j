@@ -50,6 +50,22 @@ public class NDArray implements Cloneable{
         return _data;
     }
 
+    public int ndim() {
+        return _dimens.length;
+    }
+
+    public int[] getDimens() {
+        return _dimens;
+    }
+
+    /**
+     * index data used to share data
+     * @return index array
+     */
+    int[] getDataIndex() {
+        return _idata;
+    }
+
     public NDArray reshape(int ...dimens) {
         int size = _size, pos = -1;
 
@@ -63,14 +79,6 @@ public class NDArray implements Cloneable{
         }
         _dimens = dimens;
         return this;
-    }
-
-    public int ndim() {
-        return _dimens.length;
-    }
-
-    public int[] getDimens() {
-        return _dimens;
     }
 
     public NDArray T() {
@@ -115,21 +123,12 @@ public class NDArray implements Cloneable{
         return sb.append(")").toString();
     }
 
-    /**
-     * index data used to share data
-     * @return index array
-     */
-    int[] getDataIndex() {
-        return _idata;
-    }
-
-    private int[] getDataIndex(int parts, int index) {
+    private int[] partIndex(int parts, int index) {
         int size   = _idata.length;
         int length = size/parts;
         int start  = index * length;
         return Arrays.copyOfRange(_idata, start, start+length);
     }
-
 
     private NDArray merge(NDArray[] arrays) {
         int len = arrays.length;
@@ -158,7 +157,7 @@ public class NDArray implements Cloneable{
         if (row == ALL) {
             return this;
         }
-        int[] idata = getDataIndex(_dimens[0], row);
+        int[] idata = partIndex(_dimens[0], row);
         int[] dimens = Arrays.copyOfRange(_dimens, 1, _dimens.length);
         return new NDArray(_data, idata, dimens);
     }
@@ -313,5 +312,16 @@ public class NDArray implements Cloneable{
             return Array.get(_data, _idata[0]).toString();
         }
         return ArrayHelper.getString(_data, _dimens, _idata);
+    }
+
+    @Override
+    public boolean equals(Object dst) {
+        if (this == dst) {
+            return true;
+        }
+        if (dst instanceof NDArray) {
+            return Numpy.compare(this, (NDArray)dst);
+        }
+        return false;
     }
 }

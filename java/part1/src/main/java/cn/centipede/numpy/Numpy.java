@@ -1,6 +1,7 @@
 package cn.centipede.numpy;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
@@ -175,7 +176,6 @@ public class Numpy extends NumpyBase{
         return idataRet;
     }
 
-
     public static void set(NDArray array, Object data, int... index) {
         array.set(data, index);
     }
@@ -204,8 +204,28 @@ public class Numpy extends NumpyBase{
         return new NDArray(object[1], (int[]) object[0]);
     }
 
+    /**
+     * Matrix is special NDArray
+     */
     public static Matrix matrix(Object data) {
         NDArray array = array(data);
         return new Matrix(array);
+    }
+
+    public static boolean compare(NDArray src, NDArray dst) {
+        if (!Arrays.equals(src.getDimens(), dst.getDimens())) {
+            return false;
+        }
+        Object srcData = getArrayData(src);
+        Object dstData = getArrayData(dst);
+        if (!srcData.getClass().equals(dstData.getClass())) {
+            return false;
+        }
+
+        if (srcData instanceof int[]) {
+            return Arrays.equals((int[])srcData, (int[])dstData);
+        } else {
+            return Arrays.equals((double[])srcData, (double[])dstData);
+        }
     }
 }
