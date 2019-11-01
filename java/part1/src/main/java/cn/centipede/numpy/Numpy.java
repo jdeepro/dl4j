@@ -134,15 +134,18 @@ public class Numpy extends NumpyBase{
         }
 
         if (aDim.length == 1) {
-            return new NDArray(Operator.multiply(aData, bData), aDim);
+            aDim = new int[]{1, aDim[0]};
         }
 
+        int[] cDim;
         if (bDim.length == 1) {
-            return new NDArray(Operator.multiply(bData, aData), aDim);
+            bDim = new int[]{bDim[0], 1};
+            cDim = new int[]{aDim[0]};
+        } else {
+            cDim = new int[]{aDim[0], bDim[1]};
         }
 
         Object cData = dot(getArrayData(a), aDim, getArrayData(b), bDim);
-        int[] cDim = new int[]{aDim[0], bDim[1]};
         return new NDArray(cData, cDim);
     }
 
