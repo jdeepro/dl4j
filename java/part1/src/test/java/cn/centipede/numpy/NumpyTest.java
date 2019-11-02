@@ -9,6 +9,22 @@ import static cn.centipede.numpy.Numpy.ALL;
 public class NumpyTest extends TestCase {
 
 	@Test
+	public void test_api_at() {
+		NDArray a = Numpy.arange(12).reshape(3,4);
+		int[] expected = {4,5,6,7};
+		assertEquals(Numpy.array(expected), a.at(1));
+		assertEquals(Numpy.array(6), a.at(1,2));
+	}
+
+	@Test
+	public void test_api_atRange() {
+		NDArray a = Numpy.arange(36).reshape(4,3,3);
+		int[] expected = {8, 17};
+		int[][] range = {{0,2}, {2}, {-1+3}}; // not support negative, but slice can
+		assertEquals(Numpy.array(expected), a.atRange(range));
+	}
+
+	@Test
 	public void test_shape() {
 		int[] dat = new int[]{2,4};
 		NDArray a = Numpy.array(dat);

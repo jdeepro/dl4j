@@ -68,6 +68,10 @@ public class NDArray implements Cloneable{
         return _idata;
     }
 
+    /**
+     * support auto calc one dimen which is -1
+     * for example: 12 => 3,-1 => 3, 4
+     */
     public NDArray reshape(int ...dimens) {
         int size = _size, pos = -1;
 
@@ -153,9 +157,9 @@ public class NDArray implements Cloneable{
     }
 
     /**
-     * TODO:support deep row
+     * split ndarray to rows, and select one by row index
      * @param row
-     * @return
+     * @return sub NDArray
      */
     public NDArray getRow(int row) {
         if (row == ALL) {
@@ -169,6 +173,9 @@ public class NDArray implements Cloneable{
         return new NDArray(_data, idata, dimens);
     }
 
+    /**
+     * get rows from range(start, stop)
+     */
     public NDArray[] getRows(int start, int stop) {
         NDArray[] arrays = new NDArray[stop-start];
         for (int i = 0; i < arrays.length; i++) {
@@ -177,7 +184,10 @@ public class NDArray implements Cloneable{
         return arrays;
     }
 
-    private NDArray getRows(int[] index) {
+    /**
+     * get data by index
+     */
+    private NDArray getDataByIndex(int[] index) {
         NDArray[] arrays = new NDArray[_dimens[0]];
 
         for (int i = 0; i < _dimens[0]; i++) {
@@ -237,9 +247,9 @@ public class NDArray implements Cloneable{
     }
 
     /**
-     * select whole rows/cols without slice
+     * select whole rows/cols
      * support negtive index
-     * @param index select rows
+     * @param index select rows/cols block
      */
     public NDArray at(int... index) {
         /** update negtive index to positive */
@@ -254,13 +264,18 @@ public class NDArray implements Cloneable{
 
         /** select all rows or one row */
         if (index[0] == ALL) {
-            return getRows(Arrays.copyOfRange(index, 1, index.length));
+            return getDataByIndex(Arrays.copyOfRange(index, 1, index.length));
         } else {
             NDArray array = getRow(index[0]);
             return array.at(Arrays.copyOfRange(index, 1, index.length));
         }
     }
 
+    /**
+     * clip NDArray by range index
+     * @param range
+     * @return sub NDArray block
+     */
     public NDArray atRange(int[]... range) {
         /** this is an array! */
         if (range.length == 1) {
@@ -317,7 +332,8 @@ public class NDArray implements Cloneable{
     @Override
     public String toString() {
         if (_dimens == null || _dimens.length == 0) {
-            return Array.get(_data, _idata[0]).toString();
+            boolean isArray = _data.getClass().isArray();
+            return isArray ? Array.get(_data, _idata[0]).toString():_data.toString();
         }
         return ArrayHelper.getString(_data, _dimens, _idata);
     }
