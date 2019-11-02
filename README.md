@@ -1,52 +1,69 @@
-# deepro
+# jdeepro
 
-#### 项目介绍
+#### 项目介绍(Introduction)
 人工智能基础教程，使用Latex编写，基于Java实现。
-1. Numpy参考实现
-2. Matplot参考实现
-3. AI基础算法实现
+The basics of artificial intelligence, written in Latex, based on Java.
 
-#### 参与人员
-1. simbaba
-2. jianyang
-3. Tatsumi
-4. xiaohui
+1. Numpy参考实现 (Numpy reference impl)
+2. Matplot参考实现 (Matplot reference impl)
+3. AI基础算法实现 (AI basic algorithm impl)
 
-#### 示例代码
+#### 参与人员 Attendees
+1. simbaba 2. jianyang 3. Tatsumi 4. xiaohui
+
+#### 示例代码 Sample
 与Python相关接口非常相近，从Python迁移到Java非常容易。
 Similar to Python, you can quikly shift from Python to Java.
 
-#### jshell中的运行效果：
+#### jshell中的运行效果(running result in jshell):
 ![Matplot示例](./jshell.png)
 
 #### matplot的运行效果：
 ![Matplot示例](./jplot.png)
 
 ```java
-public static void showSubPlot() {
-    JPlot plot = new JPlot();
-    double[] x = Range.arange(0, 10, 0.1);
+JPlot plot = new JPlot();
+double[] x = Range.arange(0, 10, 0.1);
 
-    Figure figure = plot.figure();
-    Axes axes = figure.add_subplot(2, 2, 1);
-    axes.plot(x, v->v, "y=x");
+Figure figure = plot.figure();
+Axes axes = figure.add_subplot(2, 2, 1);
+axes.plot(x, v->v, "y=x");
 
-    axes = figure.add_subplot(2, 2, 2);
-    axes.plot(x, v->v*v, "y=x^2");
+axes = figure.add_subplot(2, 2, 2);
+axes.plot(x, v->v*v, "y=x^2");
 
-    axes = figure.add_subplot(2, 2, 3);
-    axes.plot(x, v->v*v*v, "y=x^3");
+axes = figure.add_subplot(2, 2, 3);
+axes.plot(x, v->v*v*v, "y=x^3");
 
-    axes = figure.add_subplot(2, 2, 4);
-    axes.plot(x, v->Math.sin(v), "y=sin(x)");
+axes = figure.add_subplot(2, 2, 4);
+axes.plot(x, v->Math.sin(v), "y=sin(x)");
 
-    plot.show();
-}
+plot.show();
 ```
 Numpy算法实现，支持Vector和Matrix，接口与Numpy基本一致。
+Easy to use, you can quickly learn how to integrate to your code.
 
 ```java
-package cn.centipede.numpy;
+@Test
+public void test_create() {
+    int[] dat = {1,2,3,4,5,6,7,8};
+    NDArray a = new NDArray(dat, 2,4);
+    assertTrue(a.toString(), Arrays.equals((int[])a.data(), (int[])dat));
+}
+
+@Test
+public void test_transpose() {
+    NDArray a = Numpy.arange(36).reshape(4,3,3);
+    int[] expected = {0, 9, 18, 27};
+    int[][] range = {{0}, {0}};
+    assertEquals(Numpy.array(expected), a.T.slice(range));
+    System.out.println(a.T);
+
+    a = Numpy.arange(12).reshape(4,3);
+    int[] expected2 = {1, 4, 7};
+    int[][] range2 = {{1}, {0,-1}}; // {{1}, {0, 3}}
+    assertEquals(Numpy.array(expected2), a.T.slice(range2));
+}
 
 @Test
 public void test_api_at() {
