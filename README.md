@@ -1,7 +1,7 @@
 # deepro
 
 #### 项目介绍
-人工智能基础教程，基于Java编写。
+人工智能基础教程，使用Latex编写，基于Java实现。
 1. Numpy参考实现
 2. Matplot参考实现
 3. AI基础算法实现
@@ -10,24 +10,19 @@
 1. simbaba
 2. jianyang
 3. Tatsumi
+4. xiaohui
 
 #### 示例代码
-接口相近，从Python迁移到Java非常容易。
+与Python相关接口非常相近，从Python迁移到Java非常容易。
+Similar to Python, you can quikly shift from Python to Java.
 
+#### jshell中的运行效果：
 ![Matplot示例](./jshell.png)
+
+#### matplot的运行效果：
 ![Matplot示例](./jplot.png)
 
 ```java
-public static void showXY() {
-    JPlot plot = new JPlot();
-
-    Figure figure = plot.figure();
-    Axes axes = figure.add_subplot(1, 1, 1);
-    double[] x = Range.arange(0, 11, 0.1);
-    axes.plot(x, x_->x_*x_, "y=x^2");
-    plot.show();
-}
-
 public static void showSubPlot() {
     JPlot plot = new JPlot();
     double[] x = Range.arange(0, 10, 0.1);
