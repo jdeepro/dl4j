@@ -123,21 +123,26 @@ public class Numpy extends NumpyBase{
         Object aData = a.data();
         Object bData = b.data();
 
+        /** a is number */
         if (aDim.length == 0) {
             if (aData instanceof Integer)return dot(b, (int)aData);
             else return dot(b, (double)aData);
         }
 
+        /** b is number */
         if (bDim.length == 0) {
             if (bData instanceof Integer)return dot(a, (int)bData);
             else return dot(a, (double)bData);
         }
 
+        /** a is array but not a vector */
         if (aDim.length == 1) {
             aDim = new int[]{1, aDim[0]};
         }
 
         int[] cDim;
+
+        /** b is array but not a vector */
         if (bDim.length == 1) {
             bDim = new int[]{bDim[0], 1};
             cDim = new int[]{aDim[0]};
@@ -145,6 +150,7 @@ public class Numpy extends NumpyBase{
             cDim = new int[]{aDim[0], bDim[1]};
         }
 
+        /** normal dot operation */
         Object cData = dot(getArrayData(a), aDim, getArrayData(b), bDim);
         return new NDArray(cData, cDim);
     }

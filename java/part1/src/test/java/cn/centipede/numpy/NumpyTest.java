@@ -7,6 +7,14 @@ import junit.framework.TestCase;
 import static cn.centipede.numpy.Numpy.ALL;
 
 public class NumpyTest extends TestCase {
+
+	@Test
+	public void test_shape() {
+		int[] dat = new int[]{2,4};
+		NDArray a = Numpy.array(dat);
+		assertEquals("(2,)", a.shape());
+	}
+
 	@Test
 	public void test_slice() {
 		NDArray a = Numpy.arange(12).reshape(3,4);
