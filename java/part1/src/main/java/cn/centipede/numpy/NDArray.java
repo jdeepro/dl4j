@@ -301,14 +301,11 @@ public class NDArray implements Cloneable{
      * @return sub NDArray block
      */
     public NDArray atRange(int[]... range) {
-        /** this is an array! */
-        if (range.length == 1) {
-            return getRow(range[0][0]);
-        }
-
         /** one slice to select rows */
-        if (range.length == 1 && range[0].length > 1) {
-            return merge(getRows(range[0][0], range[0][1]));
+        if (range.length == 1) {
+            return range[0].length > 1 ?
+                merge(getRows(range[0][0], range[0][1])):
+                getRow(range[0][0]); // this is an array!
         }
 
         int[][] left = Arrays.copyOfRange(range, 1, range.length);
