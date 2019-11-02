@@ -13,6 +13,15 @@ public class NDArrayTest extends TestCase {
 	}
 
 	@Test
+	public void test_transpose() {
+		NDArray a = Numpy.arange(36).reshape(4,3,3);
+		int[] expected = {0, 9, 18, 27};
+		int[][] range = {{0}, {0}};
+		assertEquals(Numpy.array(expected), a.T.slice(range));
+		System.out.println(a.T);
+	}
+
+	@Test
 	public void test_reshape() {
 			int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
 			NDArray a = new NDArray(dat, 3,4);

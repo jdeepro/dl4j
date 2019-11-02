@@ -15,6 +15,9 @@ public class NDArray implements Cloneable{
     private int    _size;
     private boolean _isInt;
 
+    /** Transpose */
+    public NDArray T;
+
 
     public NDArray(Object data, int... dimens) {
         _data   = data;
@@ -26,9 +29,29 @@ public class NDArray implements Cloneable{
             _idata[i] = i;
         }
         _isInt = data instanceof int[];
+
+        if (_dimens.length > 1) {
+            T = _T();
+        }
     }
 
     public NDArray(Object data, int[] idata, int... dimens) {
+        _data   = data;
+        _dimens = dimens;
+        _size   = idata.length;
+        _idata  = idata;
+        _isInt = data instanceof int[];
+
+        if (_dimens.length > 1) {
+            T = _T();
+        }
+    }
+
+    /**
+     * inner use!!
+     * for Transpose .T
+     */
+    private NDArray(int[] idata, Object data, int... dimens) {
         _data   = data;
         _dimens = dimens;
         _size   = idata.length;
@@ -84,13 +107,14 @@ public class NDArray implements Cloneable{
             dimens[pos] = size;
         }
         _dimens = dimens;
+        T = _T();
         return this;
     }
 
-    public NDArray T() {
+    public NDArray _T() {
         int[] idataR = Numpy.transpose(_idata, _dimens);
         int[] dimensR = ArrayHelper.reverse(_dimens);
-        return new NDArray(_data, idataR, dimensR);
+        return new NDArray(idataR, _data, dimensR);
     }
 
     /** common support int & double
