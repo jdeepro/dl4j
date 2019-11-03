@@ -38,11 +38,9 @@ public class NDArray implements Cloneable{
         for (int i = 0; i < _size; i++) {
             _idata[i] = i;
         }
-        _isInt = _data instanceof int[];
 
-        if (_dimens.length > 1) {
-            T = _T();
-        }
+        _isInt = _data instanceof int[];
+        T = _dimens.length > 1?_T():this;
     }
 
     public NDArray(Object data, int[] idata, int... dimens) {

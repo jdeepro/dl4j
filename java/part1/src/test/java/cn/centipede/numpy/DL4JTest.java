@@ -4,6 +4,14 @@ import org.junit.Test;
 import junit.framework.TestCase;
 
 public class DL4JTest extends TestCase {
+
+	@Test
+	public void test_dl4j_T() {
+		NDArray a = Numpy.array(new int[]{3, 4});
+		assertEquals("(2,)", a.shape());
+		assertEquals("(2,)", a.T.shape());
+	}
+
 	@Test
 	public void test_dl4j_operation() {
 		double[][] expected = {{0.0, 1.0, 2.0}, {3.0, 4.0, 5.0}};
@@ -44,8 +52,14 @@ public class DL4JTest extends TestCase {
 		NDArray x = Numpy.concatenate(x1, x2);
 		System.out.println(x.T);
 
-		NDArray v = Numpy.array(new int[]{3, 4}).V();
+		NDArray v = Numpy.array(new int[]{3, 4});
 		NDArray y = Numpy.dot(x.T, v.T);
-		System.out.println(y);
+		double[] expected1 = {16.0, 23.0, 30.0, 37.0, 44.0, 51.0, 58.0, 65.0, 72.0, 79.0};
+		assertEquals(Numpy.array(expected1), y);
+
+		v = Numpy.array(new int[]{3, 4}).V();
+		y = Numpy.dot(x.T, v.T);
+		double[][] expected2 = {{16.0}, {23.0}, {30.0}, {37.0}, {44.0}, {51.0}, {58.0}, {65.0}, {72.0}, {79.0}};
+		assertEquals(Numpy.array(expected2), y);
 	}
 }
