@@ -2,11 +2,35 @@
 
 #### 项目介绍(Introduction)
 人工智能基础教程，使用Latex编写，基于Java实现。
+
 The basics of artificial intelligence, written in Latex, based on Java.
 
+
+jdeepro is a framework of deep learning tools and libraries written specially to take advantage of the Java™ Virtual Machine (JVM), written for the Java and Scala languages.
+
+#### Our Hope
 1. Numpy参考实现 (Numpy reference impl)
 2. Matplot参考实现 (Matplot reference impl)
 3. AI基础算法实现 (AI basic algorithm impl)
+
+
+#### y = 3\*x1 + 4\*x2
+```java
+NDArray x1 = Numpy.linspace(0, 9, 10).V();
+NDArray x2 = Numpy.linspace(4, 13, 10).V();
+NDArray x = Numpy.concatenate(x1, x2);
+System.out.println(x.T);
+
+NDArray v = Numpy.array(new int[]{3, 4});
+NDArray y = Numpy.dot(x.T, v.T);
+double[] expected1 = {16.0, 23.0, 30.0, 37.0, 44.0, 51.0, 58.0, 65.0, 72.0, 79.0};
+assertEquals(Numpy.array(expected1), y);
+
+v = Numpy.array(new int[]{3, 4}).V();
+y = Numpy.dot(x.T, v.T);
+double[][] expected2 = {{16.0}, {23.0}, {30.0}, {37.0}, {44.0}, {51.0}, {58.0}, {65.0}, {72.0}, {79.0}};
+assertEquals(Numpy.array(expected2), y);
+```
 
 #### 参与人员 Attendees
 1. simbaba 2. jianyang 3. Tatsumi 4. xiaohui
