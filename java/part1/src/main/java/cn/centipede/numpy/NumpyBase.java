@@ -1,6 +1,5 @@
 package cn.centipede.numpy;
 
-
 import cn.centipede.Config;
 
 import java.lang.reflect.Array;
@@ -32,7 +31,7 @@ public class NumpyBase {
      * @param deep current dimens pos
      * @param dimens dimens array
      */
-    static void _transpose(int[] idataSrc, int[] idataDst, int[] index, int offset, int deep, int[][] dimens) {
+    static void doTranspose(int[] idataSrc, int[] idataDst, int[] index, int offset, int deep, int[][] dimens) {
         if (deep == dimens[0].length) { // do transpose
             int p1 = dataOffset(dimens[0], index);
             int p2 = dataOffset(dimens[1], ArrayHelper.reverse(index));
@@ -42,7 +41,7 @@ public class NumpyBase {
 
         for (int i = 0; i < dimens[0][deep]; i++) {
             index[offset] = i;
-            _transpose(idataSrc, idataDst, index, offset+1, deep+1, dimens);
+            doTranspose(idataSrc, idataDst, index, offset+1, deep+1, dimens);
         }
     }
 

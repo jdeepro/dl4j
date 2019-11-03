@@ -33,19 +33,25 @@ public class NumpyTest extends TestCase {
 
 	@Test
 	public void test_concatenate() {
-		NDArray a = Numpy.arange(12).reshape(4,3);
-		NDArray b = Numpy.arange(6).reshape(2,3);
+		NDArray a = Numpy.arange(6).reshape(3,2);
+		NDArray b = Numpy.arange(4).reshape(2,2);
 
 		int[][] c = {
-			{0,  1,  2},
-			{3,  4,  5},
-			{6,  7,  8},
-			{9, 10,  11}, 
-			{0,  1,  2},
-			{3,  4,  5}
+			{0, 1},
+			{2, 3},
+			{4, 5},
+			{0, 1}, 
+			{2, 3}
 		};
-
 		assertEquals(Numpy.array(c), Numpy.concatenate(a, b));
+
+		a = Numpy.arange(6).reshape(2,3);
+		int[][] d = {
+			{0, 1, 2, 0, 1},
+			{3, 4, 5, 2, 3}
+		};
+		int axis = 1;
+		assertEquals(Numpy.array(d), Numpy.concatenate(a, b, axis));
 	}
 
 	@Test

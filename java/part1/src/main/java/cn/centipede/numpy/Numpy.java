@@ -186,7 +186,7 @@ public class Numpy extends NumpyBase{
         int[] index = new int[dimens.length];
         int[] idataRet = new int[idataSrc.length];
         int[][] dimensRet = new int[][]{dimens, ArrayHelper.reverse(dimens)};
-        _transpose(idataSrc, idataRet, index, 0, 0, dimensRet);
+        doTranspose(idataSrc, idataRet, index, 0, 0, dimensRet);
         return idataRet;
     }
 
@@ -241,39 +241,34 @@ public class Numpy extends NumpyBase{
         int[] bdim = b.getDimens();
 
         int[] ndim = Arrays.copyOf(adim, adim.length);
-        ndim[0] = ndim[0] + bdim[0];
+        ndim[axis] = ndim[axis] + bdim[axis];
 
         Object aArray = getArrayData(a);
         Object bArray = getArrayData(b);
         Object cArray = null;
 
         if (axis == 0) {
-            cArray = mergeArray(aArray, a.isInt() , bArray, b.isInt());
+            cArray = ArrayHelper.mergeArray(aArray, a.isInt(), bArray, b.isInt());
+        } else {
+            cArray = mergeArray(a, b, axis);
         }
 
         return new NDArray(cArray, ndim);
     }
 
-    private static Object mergeArray(Object a, boolean aInt, Object b, boolean bInt) {
-        Object ret;
-        if (aInt && bInt) {
-            ret = Arrays.copyOf((int[])a, ((int[])a).length+((int[])b).length);
-            System.arraycopy(b, 0, ret, ((int[])a).length, ((int[])b).length);
-        } else if (aInt) {
-            ret = mergeArray((int[])a, (double[])b);
-        } else {
-            ret = mergeArray((int[])b, (double[])a);
+    /**
+     * axis != 0, a concatenate b
+     */
+    static Object mergeArray(NDArray a, NDArray b, int axis) {
+        int[] adim = a.getDimens();
+        NDArray[] rows = new NDArray[adim[0]];
+        for (int i = 0; i < adim[0]; i++) {
+            rows[i] = concatenate(a.getRow(i), b.getRow(i), axis-1);
         }
-        return ret;
-    }
 
-    private static Object mergeArray(int[] a, double[] b) {
-        double[] ret = new double[a.length + b.length];
-        for (int i = 0; i < a.length; i++) {
-            ret[i] = a[i];
-        }
-        for (int i = a.length; i < ret.length; i++) {
-            ret[i] = b[i];
+        NDArray ret = rows[0];
+        for (int i = 1; i < adim[0]; i++) {
+            ret = concatenate(ret, rows[i]);
         }
         return ret;
     }

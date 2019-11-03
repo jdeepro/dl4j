@@ -4,8 +4,52 @@ import cn.centipede.Config;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 class ArrayHelper {
+
+    static Object mergeArray(int[] a, int[] b) {
+        int[] ret = new int[a.length + b.length];
+        for (int i = 0; i < a.length; i++) {
+            ret[i] = a[i];
+        }
+        for (int i = a.length; i < ret.length; i++) {
+            ret[i] = b[i-a.length];
+        }
+        return ret;
+    }
+
+    static Object mergeArray(double[] a, double[] b) {
+        double[] ret = new double[a.length + b.length];
+        for (int i = 0; i < a.length; i++) {
+            ret[i] = a[i];
+        }
+        for (int i = a.length; i < ret.length; i++) {
+            ret[i] = b[i-a.length];
+        }
+        return ret;
+    }
+
+    /**
+     * axis = 0, do -> a append b
+     */
+    static Object mergeArray(Object a, boolean aInt, Object b, boolean bInt) {
+        Object ret;
+
+        if (aInt && bInt) {
+            ret = mergeArray((int[])a, (int[])b);
+        } else if (aInt){
+            double[] aNew = IntStream.of((int[])a).asDoubleStream().toArray();
+            ret = mergeArray(aNew, (double[])b);
+        } else if (bInt) {
+            double[] bNew = IntStream.of((int[])b).asDoubleStream().toArray();
+            ret = mergeArray((double[])a, bNew);
+        } else {
+            ret = mergeArray((double[])a, (double[])b);
+        }
+        return ret;
+    }
+
     /**
      * @param array rows string
      * @param spaces indent array

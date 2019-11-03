@@ -20,15 +20,20 @@ public class NDArray implements Cloneable{
 
 
     public NDArray(Object data, int... dimens) {
-        _data   = data;
+        if (data instanceof NDArray) {
+            _data = ((NDArray)data)._data;
+        } else {
+            _data   = data;
+        }
+
         _dimens = dimens;
-        _size   = dimens.length>0?Array.getLength(data):1;
+        _size   = dimens.length>0?Array.getLength(_data):1;
         _idata  = new int[_size];
 
         for (int i = 0; i < _size; i++) {
             _idata[i] = i;
         }
-        _isInt = data instanceof int[];
+        _isInt = _data instanceof int[];
 
         if (_dimens.length > 1) {
             T = _T();
