@@ -52,24 +52,14 @@ public class NumpyBase {
         if (isSrcInt && isDatInt) {
             return doOp((int[])src, (int[])dat, op);
         } else if (isSrcInt) {
-            return doOp((double[])src, (int[])dat, op);
+            double[] srcNew = IntStream.of((int[])src).asDoubleStream().toArray();
+            return doOp(srcNew, (double[])dat, op);
         } else if (isDatInt) {
-            return doOp((double[])dat, (int[])src, op);
+            double[] datNew = IntStream.of((int[])dat).asDoubleStream().toArray();
+            return doOp((double[])src, datNew, op);
         } else {
-            return doOp((double[])dat, (double[])src, op);
+            return doOp((double[])src, (double[])dat, op);
         }
-    }
-
-    public static double[] doOp(double[] src, int[] data, ICalc op) {
-        int length = Array.getLength(data);
-        double[] ret = new double[src.length];
-
-        for (int i = 0; i < src.length; i++) {
-            Double left = src[i];
-            Integer right = data[i%length];
-            ret[i] = (Double)op.calc(left, right);
-        }
-        return ret;
     }
 
     public static int[] doOp(int[] src, int[] data, ICalc op) {
@@ -96,25 +86,24 @@ public class NumpyBase {
         return ret;
     }
 
-    public static Object dot(Object aData, int[] aDim, Object bData, int[] bDim) {
-        Object result;
-        if (aData instanceof double[] || bData instanceof double[]) {
-            result = new double[aDim[0]*bDim[1]];
-        } else {
-            result = new int[aDim[0]*bDim[1]];
-        }
-        boolean isDouble =  result instanceof double[];
-
+    static Object dotDouble(double[] aData, int[] aDim, double[] bData, int[] bDim) {
+        double[] result = new double[aDim[0]*bDim[1]];
         for (int i = 0; i < aDim[0]; i++) {
             for (int j = 0; j < bDim[1]; j++) {
                 for (int k = 0; k < aDim[1]; k++) {
-                    Object o1 = Array.get(aData, i*aDim[1]+k);
-                    Object o2 = Array.get(bData, k*bDim[1]+j);
-                    if (isDouble) {
-                        ((double[])result)[bDim[1]*i+j] += (double)multiply(o1, o2);
-                    } else {
-                        ((int[])result)[bDim[1]*i+j] += (int)multiply(o1, o2);
-                    }
+                    result[bDim[1]*i+j] += aData[i*aDim[1]+k] * bData[k*bDim[1]+j];
+                }
+            }
+        }
+        return result;
+    }
+
+    static Object dotInt(int[] aData, int[] aDim, int[] bData, int[] bDim) {
+        int[] result = new int[aDim[0]*bDim[1]];
+        for (int i = 0; i < aDim[0]; i++) {
+            for (int j = 0; j < bDim[1]; j++) {
+                for (int k = 0; k < aDim[1]; k++) {
+                    result[bDim[1]*i+j] += aData[i*aDim[1]+k] * bData[k*bDim[1]+j];
                 }
             }
         }
@@ -126,11 +115,7 @@ public class NumpyBase {
             a = Array.get(a, 0);
             b = Array.get(b, 0);
         }
-        if (a instanceof Integer && b instanceof Integer) {
-            return (int)a*(int)b;
-        } else {
-            return (double)a*(double)b;
-        }
+        return Operator.multiply(a, b);
     }
 
     /***

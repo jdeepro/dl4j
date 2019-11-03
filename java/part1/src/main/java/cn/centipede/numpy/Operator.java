@@ -12,9 +12,12 @@ public class Operator {
     else return (double)left-(double)right;
 	}
 
+	/** force to double */
 	static Object divide(Object left, Object right) {
-		if (left instanceof Integer && right instanceof Integer) return (int)left/(int)right;
-    else return (double)left*(double)right;
+		double ret = 0;
+		if (left instanceof Integer && right instanceof Integer) ret = (double)left/(int)right;
+		else ret = (double)left/(double)right;
+		return ret;
 	}
 
 	static Object multiply(Object left, Object right) {

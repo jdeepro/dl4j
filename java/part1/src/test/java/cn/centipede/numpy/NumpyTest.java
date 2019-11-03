@@ -92,7 +92,7 @@ public class NumpyTest extends TestCase {
           "       [6 , 7 , 8 , 9 ]\n" +
 					"       [10, 11, 12, 13]])\n", b.toString());
 
-		b = Numpy.sub(b, 2);
+		b = Numpy.subtract(b, 2);
 		assertEquals("array([[0 , 1 , 2 , 3 ]\n" +
 					"       [4 , 5 , 6 , 7 ]\n" +
 					"       [8 , 9 , 10, 11]])\n", b.toString());

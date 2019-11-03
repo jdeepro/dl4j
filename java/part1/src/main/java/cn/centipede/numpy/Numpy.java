@@ -71,6 +71,18 @@ public class Numpy extends NumpyBase{
         return new NDArray(array, top);
     }
 
+    public static NDArray linspace(double start, double top, int count) {
+        double[] array = new double[count];
+        double distance = top - start;
+        double step = distance/(count-1);
+
+        for (int i = 0; i < count; i++) {
+            array[i] = start + step*i;
+        }
+
+        return new NDArray(array);
+    }
+
     /**
      * data: NDArray, number, int[][][], double[][][]
      * genertic
@@ -96,18 +108,42 @@ public class Numpy extends NumpyBase{
      * @return
      */
     public static NDArray add(NDArray src, Object dat) {
-        Object datArray  = dat2Array(dat);
         Object srcData   = getArrayData(src);
+        Object datArray  = dat2Array(dat);
 
         Object ret = doOp(srcData, datArray, Operator::add);
         return new NDArray(ret,  src.getDimens());
     }
 
-    public static NDArray sub(NDArray src, Object dat) {
-        Object datArray  = dat2Array(dat);
+    public static NDArray subtract(NDArray src, Object dat) {
         Object srcData   = getArrayData(src);
+        Object datArray  = dat2Array(dat);
 
         Object ret = doOp(srcData, datArray, Operator::subtract);
+        return new NDArray(ret,  src.getDimens());
+    }
+
+    public static NDArray multiply(NDArray src, Object dat) {
+        Object srcData   = getArrayData(src);
+        Object datArray  = dat2Array(dat);
+
+        Object ret = doOp(srcData, datArray, Operator::multiply);
+        return new NDArray(ret,  src.getDimens());
+    }
+
+    public static NDArray divide(NDArray src, Object dat) {
+        Object srcData   = getArrayData(src);
+        Object datArray  = dat2Array(dat);
+
+        if (src.isInt()) {
+            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+        }
+
+        if (datArray instanceof int[]) {
+            datArray = IntStream.of((int[])datArray).asDoubleStream().toArray();
+        }
+
+        Object ret = doOp(srcData, datArray, Operator::divide);
         return new NDArray(ret,  src.getDimens());
     }
 
@@ -150,8 +186,22 @@ public class Numpy extends NumpyBase{
             cDim = new int[]{aDim[0], bDim[1]};
         }
 
+        aData = getArrayData(a);
+        bData = getArrayData(b);
+
         /** normal dot operation */
-        Object cData = dot(getArrayData(a), aDim, getArrayData(b), bDim);
+        Object cData;
+        if (a.isInt() && b.isInt()) {
+            cData = dotInt((int[])aData, aDim, (int[])bData, bDim);
+        } else if (a.isInt()) {
+            double[] aDataNew = IntStream.of((int[])aData).asDoubleStream().toArray();
+            cData = dotDouble(aDataNew, aDim, (double[])bData, bDim);
+        } else if (b.isInt()) {
+            double[] bDataNew = IntStream.of((int[])bData).asDoubleStream().toArray();
+            cData = dotDouble((double[])aData, aDim, (double[])bDataNew, bDim);
+        } else {
+            cData = dotDouble((double[])aData, aDim, (double[])bData, bDim);
+        }
         return new NDArray(cData, cDim);
     }
 

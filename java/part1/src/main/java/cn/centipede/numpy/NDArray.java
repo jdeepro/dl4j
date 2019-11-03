@@ -23,11 +23,16 @@ public class NDArray implements Cloneable{
         if (data instanceof NDArray) {
             _data = ((NDArray)data)._data;
         } else {
-            _data   = data;
+            _data = data;
         }
 
         _dimens = dimens;
-        _size   = dimens.length>0?Array.getLength(_data):1;
+        if (dimens.length == 0 && data.getClass().isArray()) {
+            _size = Array.getLength(_data);
+        } else {
+            _size   = dimens.length>0?Array.getLength(_data):1;
+        }
+
         _idata  = new int[_size];
 
         for (int i = 0; i < _size; i++) {
@@ -116,10 +121,15 @@ public class NDArray implements Cloneable{
         return this;
     }
 
-    public NDArray _T() {
+    private NDArray _T() {
         int[] idataR = Numpy.transpose(_idata, _dimens);
         int[] dimensR = ArrayHelper.reverse(_dimens);
         return new NDArray(idataR, _data, dimensR);
+    }
+
+    public NDArray V() {
+        int[] dimen = new int[]{1, _size};
+        return new NDArray(_data, dimen);
     }
 
     /** common support int & double
@@ -341,6 +351,22 @@ public class NDArray implements Cloneable{
             range[i] = positiveRange(i, range[i]);
         }
         return atRange(range);
+    }
+
+    public NDArray add(Object dat) {
+        return Numpy.add(this, dat);
+    }
+
+    public NDArray subtract(Object dat) {
+        return Numpy.subtract(this, dat);
+    }
+
+    public NDArray multiply(Object dat) {
+        return Numpy.multiply(this, dat);
+    }
+
+    public NDArray divide(Object dat) {
+        return Numpy.divide(this, dat);
     }
 
     @Override
