@@ -55,6 +55,15 @@ public class NumpyTest extends TestCase {
 	}
 
 	@Test
+	public void test_api_sum() {
+		NDArray a = Numpy.arange(6).reshape(3,2);
+		assertEquals(15, Numpy.sumInt(a));
+
+		a = Numpy.arange(9).reshape(3,3);
+		assertEquals(36, Numpy.sumInt(a));
+	}
+
+	@Test
 	public void test_slice() {
 		NDArray a = Numpy.arange(12).reshape(3,4);
 		int[][] range1 = {{1, 3}, {-1}};

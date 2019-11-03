@@ -273,6 +273,20 @@ public class Numpy extends NumpyBase{
         return ret;
     }
 
+    public static double sum(NDArray array) {
+        Object dat = getArrayData(array);
+        if (array.isInt()) {
+            return IntStream.of((int[])dat).sum();
+        } else {
+            return DoubleStream.of((double[])dat).sum();
+        }
+    }
+
+    public static int sumInt(NDArray array) {
+        Object dat = getArrayData(array);
+        return IntStream.of((int[])dat).sum();
+    }
+
     public static boolean compare(NDArray src, NDArray dst) {
         if (!Arrays.equals(src.getDimens(), dst.getDimens())) {
             return false;
