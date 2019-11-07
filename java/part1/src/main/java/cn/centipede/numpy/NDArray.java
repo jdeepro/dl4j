@@ -367,6 +367,14 @@ public class NDArray implements Cloneable{
         return Numpy.divide(this, dat);
     }
 
+    public NDArray reciprocal() {
+        return Numpy.reciprocal(this);
+    }
+
+    public boolean same(NDArray dst, double slope) {
+        return Numpy.same(this, dst, slope);
+    }
+
     @Override
     protected NDArray clone() {
         Object data = Array.newInstance(_isInt?int.class:double.class, _size);

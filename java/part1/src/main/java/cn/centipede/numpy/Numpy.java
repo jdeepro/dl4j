@@ -147,6 +147,28 @@ public class Numpy extends NumpyBase{
         return new NDArray(ret,  src.getDimens());
     }
 
+    public static NDArray exp(NDArray src) {
+        Object srcData   = getArrayData(src);
+
+        if (src.isInt()) {
+            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+        }
+
+        Object ret = doOp(srcData, Operator::exp);
+        return new NDArray(ret,  src.getDimens());
+    }
+
+    public static NDArray reciprocal(NDArray src) {
+        Object srcData   = getArrayData(src);
+
+        if (src.isInt()) {
+            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+        }
+
+        Object ret = doOp(srcData, Operator::reciprocal);
+        return new NDArray(ret,  src.getDimens());
+    }
+
     /**
      * Now only support 1-2 dimens
      * @param a number/vector/matrix
@@ -351,6 +373,27 @@ public class Numpy extends NumpyBase{
             return Arrays.equals((int[])srcData, (int[])dstData);
         } else {
             return Arrays.equals((double[])srcData, (double[])dstData);
+        }
+    }
+
+    public static boolean same(NDArray src, NDArray dst, double slope) {
+        if (!Arrays.equals(src.getDimens(), dst.getDimens())) {
+            return false;
+        }
+        Object srcData = getArrayData(src);
+        Object dstData = getArrayData(dst);
+        if (!srcData.getClass().equals(dstData.getClass())) {
+            return false;
+        }
+
+        if (srcData instanceof int[]) {
+            int[] a = (int[])srcData, b = (int[])dstData;
+            for (int i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > slope) return false;
+            return true;
+        } else {
+            double[] a = (double[])srcData, b = (double[])dstData;
+            for (int i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > slope) return false;
+            return true;
         }
     }
 }

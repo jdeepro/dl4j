@@ -13,7 +13,7 @@ public class Operator {
 	}
 
 	/** force to double */
-	static Object divide(Object left, Object right) {
+	static Double divide(Object left, Object right) {
 		double ret = 0;
 		if (left instanceof Integer && right instanceof Integer) ret = (double)left/(int)right;
 		else ret = (double)left/(double)right;
@@ -23,5 +23,15 @@ public class Operator {
 	static Object multiply(Object left, Object right) {
 		if (left instanceof Integer && right instanceof Integer) return (int)left*(int)right;
     else return (double)left*(double)right;
+	}
+
+	static Double exp(Object z) {
+		double Z = (double)z;
+		return Math.exp(Z);
+	}
+
+	static Double reciprocal(Object z) {
+		double Z = (double)z;
+		return 1/Z;
 	}
 }

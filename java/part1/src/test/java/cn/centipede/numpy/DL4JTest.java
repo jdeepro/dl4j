@@ -62,4 +62,11 @@ public class DL4JTest extends TestCase {
 		double[][] expected2 = {{16.0}, {23.0}, {30.0}, {37.0}, {44.0}, {51.0}, {58.0}, {65.0}, {72.0}, {79.0}};
 		assertEquals(Numpy.array(expected2), y);
 	}
+
+	@Test
+	public void test_sigmoid() {
+		NDArray a = Numpy.arange(12).reshape(3,4);
+		NDArray b = Numpy.exp(a);
+		System.out.println(b);
+	}
 }

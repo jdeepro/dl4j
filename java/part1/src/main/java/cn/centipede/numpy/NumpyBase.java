@@ -5,6 +5,7 @@ import cn.centipede.Config;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.Random;
+import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 
@@ -86,6 +87,16 @@ public class NumpyBase {
         return ret;
     }
 
+    public static Object doOp(Object src, ICalcEx op) {
+        boolean isSrcInt = src instanceof int[];
+
+        if (isSrcInt) {
+            return IntStream.of((int[])src).mapToDouble(a->(double)op.calc(a)).toArray();
+        } else {
+            return DoubleStream.of((double[])src).map(a->(double)op.calc(a)).toArray();
+        }
+    }
+
     static Object dotDouble(double[] aData, int[] aDim, double[] bData, int[] bDim) {
         double[] result = new double[aDim[0]*bDim[1]];
         for (int i = 0; i < aDim[0]; i++) {
@@ -126,6 +137,12 @@ public class NumpyBase {
     public static class random {
         static Random random = new Random(System.currentTimeMillis());
 
+        /** set random seed, we can reproduce the output */
+        public static void seed(long r) {
+            random.setSeed(r);
+        }
+
+        /** generate NDArray according dimens */
         public static NDArray rand(int... dimens) {
             int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);
             double[] array = new double[size];
