@@ -77,11 +77,11 @@ public class ActivationTest extends TestCase {
 			NDArray L2_delta = Y.T.subtract(L2).multiply(sigmoid.deactive(L2));
 			NDArray L1_delta = L2_delta.dot(W.T).multiply(sigmoid.deactive(L1));
 
-			NDArray W_cost = L1.T.dot(L2_delta).multiply(learn_rate);
-			NDArray V_cost = X.T.dot(L1_delta).multiply(learn_rate);
+			NDArray W_change = L1.T.dot(L2_delta).multiply(learn_rate);
+			NDArray V_change = X.T.dot(L1_delta).multiply(learn_rate);
 
-			W = W.add(W_cost);
-			V = V.add(V_cost);
+			W = W.add(W_change);
+			V = V.add(V_change);
 
 			// Error: np.mean(np.abs(Y.T-L2)) -> decrese to 0
 			// System.out.println(np.mean(np.abs(Y.T.subtract(L2))));
