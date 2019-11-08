@@ -13,6 +13,46 @@ jdeepro is a framework of deep learning tools and libraries written specially to
 2. Matplot参考实现 (Matplot reference impl)
 3. AI基础算法实现 (AI basic algorithm impl)
 
+#### Easy to use
+You can easily change python code to java, like this:
+https://www.bilibili.com/video/av37947862?p=38
+```java
+public void test_xor() {
+    class np extends Numpy{};
+    int[][] dat_X = {{1,0,0},{1,0,1},{1,1,0},{1,1,1}};
+    NDArray X = np.array(dat_X);
+
+    int[] dat_Y = {0,1,1,0};
+    NDArray Y = np.array(dat_Y).V();
+
+    NDArray V = np.random.rand(new int[]{3,4}).multiply(2).subtract(1);
+    NDArray W = np.random.rand(new int[]{4,1}).multiply(2).subtract(1);
+
+    double learn_rate = 0.11;
+    Activation sigmoid = new Sigmoid();
+    NDArray L1 = null, L2 = null;
+
+    for (int i = 0; i < 20000; i++) {
+        L1 = sigmoid.active(np.dot(X, V));
+        L2 = sigmoid.active(np.dot(L1, W));
+
+        NDArray L2_delta = Y.T.subtract(L2).multiply(sigmoid.deactive(L2));
+        NDArray L1_delta = L2_delta.dot(W.T).multiply(sigmoid.deactive(L1));
+
+        NDArray W_cost = L1.T.dot(L2_delta).multiply(learn_rate);
+        NDArray V_cost = X.T.dot(L1_delta).multiply(learn_rate);
+
+        W = W.add(W_cost);
+        V = V.add(V_cost);
+
+        // Error: np.mean(np.abs(Y.T-L2)) -> decrese to 0
+        // System.out.println(np.mean(np.abs(Y.T.subtract(L2))));
+    }
+
+    double[] expected = {0,1,1,0};
+    assertTrue(L2.same(Numpy.array(expected).V().T, 0.1));
+}
+```
 
 #### y = 3\*x1 + 4\*x2
 ```java
