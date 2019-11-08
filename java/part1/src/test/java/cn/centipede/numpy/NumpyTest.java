@@ -127,6 +127,21 @@ public class NumpyTest extends TestCase {
 	}
 
 	@Test
+	public void test_ndarray_abs() {
+		int[][] dat = {{1,-2,3},{-1,-3,4},{-4,-3,6}};
+		NDArray a = Numpy.array(dat);
+
+		int[][] expected = {{1,2,3},{1,3,4},{4,3,6}};
+		assertEquals(Numpy.array(expected), Numpy.abs(a));
+	}
+
+	@Test
+	public void test_ndarray_mean() {
+		NDArray a = Numpy.arange(12).reshape(3, 4);
+		assertEquals(5.5, Numpy.mean(a));
+	}
+
+	@Test
 	public void test_ndarray_dot() {
 		NDArray a = Numpy.arange(12).reshape(3,4);
 		NDArray b = Numpy.arange(16).reshape(4,4);

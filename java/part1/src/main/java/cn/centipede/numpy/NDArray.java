@@ -363,6 +363,10 @@ public class NDArray implements Cloneable{
         return Numpy.multiply(this, dat);
     }
 
+    public NDArray dot(NDArray dat) {
+        return Numpy.dot(this, dat);
+    }
+
     public NDArray negative() {
         return Numpy.multiply(this, -1);
     }

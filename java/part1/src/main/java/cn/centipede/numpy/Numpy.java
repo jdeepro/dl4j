@@ -158,6 +158,27 @@ public class Numpy extends NumpyBase{
         return new NDArray(ret,  src.getDimens());
     }
 
+    public static NDArray abs(NDArray src) {
+        Object srcData   = getArrayData(src);
+
+        if (src.isInt()) {
+            srcData = IntStream.of((int[])srcData).map(n->n>=0?n:-n).toArray();
+        } else {
+            srcData = DoubleStream.of((double[])srcData).map(n->n>=0?n:-n).toArray();
+        }
+        return new NDArray(srcData,  src.getDimens());
+    }
+
+    public static double mean(NDArray src) {
+        Object srcData   = getArrayData(src);
+
+        if (src.isInt()) {
+            return IntStream.of((int[])srcData).average().getAsDouble();
+        } else {
+            return DoubleStream.of((double[])srcData).average().getAsDouble();
+        }
+    }
+
     public static NDArray reciprocal(NDArray src) {
         Object srcData   = getArrayData(src);
 
