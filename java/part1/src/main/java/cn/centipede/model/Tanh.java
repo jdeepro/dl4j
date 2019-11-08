@@ -13,7 +13,7 @@ public class Tanh implements Activation{
 	}
 
 	@Override
-	public NDArray deactive(NDArray z, NDArray delta) {
+	public NDArray deactive(NDArray z) {
 		return null;
 	}
 }

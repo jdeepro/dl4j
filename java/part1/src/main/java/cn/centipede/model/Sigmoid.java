@@ -1,6 +1,7 @@
 package cn.centipede.model;
 
 import cn.centipede.numpy.NDArray;
+import cn.centipede.numpy.Numpy;
 
 /**
  * y = 1/(1 + e^-x)  = (1 + e^-x)-1
@@ -9,11 +10,11 @@ import cn.centipede.numpy.NDArray;
 public class Sigmoid implements Activation{
 	@Override
 	public NDArray active(NDArray z) {
-		return null;
+		return Numpy.exp(z.negative()).add(1).reciprocal();
 	}
-	
+
 	@Override
-	public NDArray deactive(NDArray z, NDArray delta) {
-		return null;
+	public NDArray deactive(NDArray z) {
+		return z.multiply(z.negative().add(1));
 	}
 }
