@@ -142,6 +142,13 @@ public class NumpyBase {
             random.setSeed(r);
         }
 
+        public static NDArray uniform(double start, double end, int...dimens) {
+            int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);
+            DoubleStream ds = random.doubles(start, end);
+            double[] array = ds.limit(size).toArray();
+            return new NDArray(array, dimens);
+        }
+
         /** generate NDArray according dimens */
         public static NDArray rand(int... dimens) {
             int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);

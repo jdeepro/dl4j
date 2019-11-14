@@ -1,5 +1,6 @@
-package cn.centipede.model;
+package cn.centipede.model.activation;
 
+import cn.centipede.model.Activation;
 import cn.centipede.numpy.NDArray;
 
 public class ReLu implements Activation{

@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 
 public class Numpy extends NumpyBase{
     public static final int ALL = 999_999_999;
+    public class np extends Numpy{}
 
     public static Object getArray(NDArray array) {
         Object real = getArrayData(array);
@@ -155,6 +156,17 @@ public class Numpy extends NumpyBase{
         }
 
         Object ret = doOp(srcData, Operator::exp);
+        return new NDArray(ret,  src.getDimens());
+    }
+
+    public static NDArray log(NDArray src) {
+        Object srcData   = getArrayData(src);
+
+        if (src.isInt()) {
+            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+        }
+
+        Object ret = doOp(srcData, Operator::log);
         return new NDArray(ret,  src.getDimens());
     }
 
@@ -347,6 +359,13 @@ public class Numpy extends NumpyBase{
         }
 
         return new NDArray(cArray, ndim);
+    }
+
+    public static NDArray hstack(NDArray a, NDArray b) {
+        if (a.getDimens().length > 1) {
+            return concatenate(a, b, 1);
+        }
+        return concatenate(a, b);
     }
 
     /**

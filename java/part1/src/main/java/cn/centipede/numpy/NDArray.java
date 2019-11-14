@@ -91,6 +91,16 @@ public class NDArray implements Cloneable{
         return _dimens;
     }
 
+    public double asDouble() {
+        if (_dimens == null || _dimens.length == 0) {
+            double d = (double)_data;
+            return d;
+        } else {
+            double d = (Double)Array.get(_data, 0);
+            return d;
+        }
+    }
+
     /**
      * index data used to share data
      * @return index array

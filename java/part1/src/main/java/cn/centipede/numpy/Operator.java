@@ -30,6 +30,11 @@ public class Operator {
 		return Math.exp(Z);
 	}
 
+	static Double log(Object z) {
+		double Z = (double)z;
+		return Math.log(Z);
+	}
+
 	static Double reciprocal(Object z) {
 		double Z = (double)z;
 		return 1/Z;

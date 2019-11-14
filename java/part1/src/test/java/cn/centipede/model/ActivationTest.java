@@ -2,8 +2,9 @@ package cn.centipede.model;
 
 import org.junit.Test;
 
+import cn.centipede.model.activation.Sigmoid;
 import cn.centipede.numpy.NDArray;
-import cn.centipede.numpy.Numpy;
+import cn.centipede.numpy.Numpy.np;
 import junit.framework.TestCase;
 
 public class ActivationTest extends TestCase {
@@ -22,26 +23,26 @@ public class ActivationTest extends TestCase {
 	@Test
 	public void test_sigmoid() {
 		int[][] dat_x = {{0,0,1}, {1,1,1}, {1,0,1}, {0,1,1}};
-		NDArray x =  Numpy.array(dat_x);
+		NDArray x =  np.array(dat_x);
 
 		int[][] dat_y = {{0,1,1,0}};
-		NDArray y =  Numpy.array(dat_y).T;
+		NDArray y =  np.array(dat_y).T;
 
-		Numpy.random.seed(1);
+		np.random.seed(1);
 		int[] w_dimens = {3, 1};
-		NDArray w = Numpy.random.rand(w_dimens).multiply(2).subtract(1);
+		NDArray w = np.random.rand(w_dimens).multiply(2).subtract(1);
 		Activation sigmoid = new Sigmoid();
 
 		for (int i = 0; i < 10000; i++) {
-			NDArray z = Numpy.dot(x, w);
+			NDArray z = np.dot(x, w);
 			NDArray o = sigmoid.active(z);
 			NDArray delta = y.subtract(o).multiply(sigmoid.deactive(o));
 
-			w = w.add(Numpy.dot(x.T, delta));
+			w = w.add(np.dot(x.T, delta));
 		}
 
 		double[][] dat = {{9.6729}, {-0.20784}, {-4.62963}};
-		NDArray expected = Numpy.array(dat);
+		NDArray expected = np.array(dat);
 
 		assertTrue(expected.same(w, 0.1));
 	}
@@ -56,7 +57,6 @@ public class ActivationTest extends TestCase {
 	 */
 	@Test
 	public void test_xor() {
-		class np extends Numpy{};
 		int[][] dat_X = {{1,0,0},{1,0,1},{1,1,0},{1,1,1}};
 		NDArray X = np.array(dat_X);
 
@@ -88,6 +88,6 @@ public class ActivationTest extends TestCase {
 		}
 
 		double[] expected = {0,1,1,0};
-		assertTrue(L2.same(Numpy.array(expected).V().T, 0.1));
+		assertTrue(L2.same(np.array(expected).V().T, 0.1));
 	}
 }
