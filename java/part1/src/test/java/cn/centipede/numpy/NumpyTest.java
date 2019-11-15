@@ -166,6 +166,13 @@ public class NumpyTest extends TestCase {
 	}
 
 	@Test
+	public void test_ndarray_choice() {
+		NDArray a = Numpy.arange(24).reshape(4,6);
+		int[] choice = Numpy.random.choice(4, 4);
+		System.out.println(a.index(choice));
+	}
+
+	@Test
 	public void test_struct() {
 		NDArray a = Numpy.arange(24).reshape(2,3,4);
 		int[][][] array = (int[][][])Numpy.getArray(a);

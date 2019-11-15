@@ -149,6 +149,18 @@ public class NumpyBase {
             return new NDArray(array, dimens);
         }
 
+        /**
+         * @param top
+         * @return [0, top)
+         */
+        public static int randint(int top) {
+            return random.nextInt(top);
+        }
+
+        public static int[] choice(int top, int size) {
+            return random.ints(0, top).limit(size).toArray();
+        }
+
         /** generate NDArray according dimens */
         public static NDArray rand(int... dimens) {
             int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);

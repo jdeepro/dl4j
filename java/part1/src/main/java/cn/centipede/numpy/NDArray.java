@@ -232,6 +232,18 @@ public class NDArray implements Cloneable{
     }
 
     /**
+     * get rows from range(start, stop)
+     */
+    public NDArray index(int[] rows) {
+        NDArray[] arrays = new NDArray[rows.length];
+        for (int i = 0; i < arrays.length; i++) {
+            arrays[i] = getRow(rows[i]);
+        }
+        return rows.length>1?merge(arrays):arrays[0];
+    }
+
+
+    /**
      * get data by index
      */
     private NDArray getDataByIndex(int[] index) {

@@ -79,8 +79,45 @@ public class DL4JTest extends TestCase {
 	 * y = 2 * x1 + 3 * x2 + w
 	 */
 	@Test
-	public void test_linear_gradient() {
+	public void test_linear_sgd() {
+		GradientDescent gd = LinearImp::SGD;
+		int N = 20;
+
+		NDArray x1 = np.random.uniform(0, 5, N).reshape(N,1);
+		NDArray x2 = np.random.uniform(0, 5, N).reshape(N,1);
+		NDArray ones = np.ones(new int[]{N, 1});
+
+		NDArray y = x1.multiply(2).add(x2.multiply(3)).add(np.random.uniform(0, 0.1, N).reshape(N,1));
+		//NDArray y = x.multiply(3).reshape(N,1);
+		NDArray x = np.hstack(x1, x2);
+		x = np.hstack(x, ones);
+
+		NDArray ret = gd.gradientDescent(x, y, 0.01, 10000, 1e-3);
+		System.out.println(ret);
+	}
+
+	@Test
+	public void test_linear_bgd() {
 		GradientDescent gd = LinearImp::BGD;
+		int N = 20;
+
+		NDArray x1 = np.random.uniform(0, 5, N).reshape(N,1);
+		NDArray x2 = np.random.uniform(0, 5, N).reshape(N,1);
+		NDArray ones = np.ones(new int[]{N, 1});
+
+		NDArray y = x1.multiply(2).add(x2.multiply(3)).add(np.random.uniform(0, 0.1, N).reshape(N,1));
+		//NDArray y = x.multiply(3).reshape(N,1);
+		NDArray x = np.hstack(x1, x2);
+		x = np.hstack(x, ones);
+
+		NDArray ret = gd.gradientDescent(x, y, 0.01, 10000, 1e-3);
+		System.out.println(ret);
+	}
+
+
+	@Test
+	public void test_linear_mbgd() {
+		GradientDescent gd = LinearImp::MBGD;
 		int N = 20;
 
 		NDArray x1 = np.random.uniform(0, 5, N).reshape(N,1);
