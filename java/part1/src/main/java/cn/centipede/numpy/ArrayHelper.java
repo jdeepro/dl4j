@@ -242,6 +242,11 @@ class ArrayHelper {
     private static Object struct(Object data, int[] dimens, Class<?> dtype) {
         Object array = Array.newInstance(dtype, dimens);
 
+        if (dimens.length == 1) { // vector
+            System.arraycopy(data, 0, array, 0, dimens[0]);
+            return array;
+        }
+
         for (int i = 0; i < dimens[0]; i++) {
             _struct(Array.get(array, i), data, i*dimens[1]);
         }

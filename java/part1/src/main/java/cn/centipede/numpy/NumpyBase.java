@@ -4,6 +4,7 @@ import cn.centipede.Config;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Random;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -157,8 +158,28 @@ public class NumpyBase {
             return random.nextInt(top);
         }
 
+        /**
+         * random ints between [0, top)
+         * @param top
+         * @param size
+         * @return randome choices
+         */
         public static int[] choice(int top, int size) {
             return random.ints(0, top).limit(size).toArray();
+        }
+
+        /**
+         * shuffle number list in place
+         * @param numbers
+         */
+        public static int[] shuffle(int[] numbers) {
+            for (int i = numbers.length; i > 0; i--) {
+                int r = random.nextInt(i);
+                int temp = numbers[i - 1];
+                numbers[i - 1] = numbers[r];
+                numbers[r] = temp;
+            }
+            return numbers;
         }
 
         /** generate NDArray according dimens */

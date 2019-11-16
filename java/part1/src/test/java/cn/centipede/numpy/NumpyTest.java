@@ -3,6 +3,8 @@ package cn.centipede.numpy;
 import java.util.Arrays;
 
 import org.junit.Test;
+
+import cn.centipede.numpy.Numpy.np;
 import junit.framework.TestCase;
 import static cn.centipede.numpy.Numpy.ALL;
 
@@ -170,6 +172,18 @@ public class NumpyTest extends TestCase {
 		NDArray a = Numpy.arange(24).reshape(4,6);
 		int[] choice = Numpy.random.choice(4, 4);
 		System.out.println(a.rows(choice));
+	}
+
+	@Test
+	public void test_ndarray_shuffle() {
+		NDArray a = np.arange(24);
+		NDArray b = a.clone();
+
+		int[] input = (int[])np.getArray(a);
+		int[] choice = np.random.shuffle(input);
+
+		int[] notExpected = (int[])np.getArray(b);
+		assertFalse(Arrays.equals(notExpected, choice));
 	}
 
 	@Test
