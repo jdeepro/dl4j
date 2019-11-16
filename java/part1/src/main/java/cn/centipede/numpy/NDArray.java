@@ -138,7 +138,7 @@ public class NDArray implements Cloneable{
 
     public NDArray V() {
         int[] dimen = new int[]{1, _size};
-        return new NDArray(_data, dimen);
+        return new NDArray(_data, _idata, dimen);
     }
 
     /** common support int & double

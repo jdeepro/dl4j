@@ -76,7 +76,7 @@ public class DL4JTest extends TestCase {
 
 	/**
 	 * Linear Gradient
-	 * y = 2 * x1 + 3 * x2 + w
+	 * y = 2 * x1 + 3 * x2 + b
 	 */
 	@Test
 	public void test_linear_sgd() {
@@ -92,7 +92,8 @@ public class DL4JTest extends TestCase {
 		NDArray x = np.hstack(x1, x2);
 		x = np.hstack(x, ones);
 
-		NDArray ret = gd.gradientDescent(x, y, 0.01, 10000, 1e-3);
+		NDArray ret = gd.fit(x, y, 0.01, 100000, 1e-3);
+		System.out.println("#### test_linear_sgd: y = 2 * x1 + 3 * x2 + b ");
 		System.out.println(ret);
 	}
 
@@ -110,10 +111,10 @@ public class DL4JTest extends TestCase {
 		NDArray x = np.hstack(x1, x2);
 		x = np.hstack(x, ones);
 
-		NDArray ret = gd.gradientDescent(x, y, 0.01, 10000, 1e-3);
+		NDArray ret = gd.fit(x, y, 0.01, 10000, 1e-3);
+		System.out.println("#### test_linear_bgd: y = 2 * x1 + 3 * x2 + b ");
 		System.out.println(ret);
 	}
-
 
 	@Test
 	public void test_linear_mbgd() {
@@ -129,7 +130,8 @@ public class DL4JTest extends TestCase {
 		NDArray x = np.hstack(x1, x2);
 		x = np.hstack(x, ones);
 
-		NDArray ret = gd.gradientDescent(x, y, 0.01, 10000, 1e-3);
+		NDArray ret = gd.fit(x, y, 0.01, 10000, 1e-3);
+		System.out.println("#### test_linear_mbgd: y = 2 * x1 + 3 * x2 + b ");
 		System.out.println(ret);
 	}
 }

@@ -27,14 +27,17 @@ public class LinearImp {
 	public static NDArray SGD(NDArray x, NDArray y, double alpha, int epochs, double epsilon) {
 		int m = x.dimens()[0];
 		int n = x.dimens()[1];
-		NDArray w = np.ones(new int[]{n, 1});
+		NDArray w = np.ones(n);
+		//int[] choice = np.random.choice(m, m);
 
 		for (int i = 0; i < epochs; i++) {
-			int idex = np.random.randint(m);
-			NDArray rand = x.row(idex).V();
-			NDArray diff = np.dot(rand, w).subtract(y.row(idex));
-			NDArray gradient = np.dot(rand.T, diff);
+			int idex = i%m;//np.random.randint(m); // choice[i%m];
+			NDArray row_x = x.row(idex).V();
+			NDArray row_y = y.row(idex);
+			NDArray diff = np.dot(row_x, w).subtract(row_y);
+			NDArray gradient = np.dot(row_x.T, diff);
 			w = w.subtract(gradient.multiply(alpha));
+			//if(i%100==0)System.out.println(loss(x, y, w));
 		}
 		return w;
 	}

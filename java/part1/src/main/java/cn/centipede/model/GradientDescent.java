@@ -12,7 +12,7 @@ import cn.centipede.numpy.NDArray;
  */
 public interface GradientDescent {
 
-	NDArray gradientDescent(NDArray x, NDArray y, double alpha, int epochs, double epsilon);
+	NDArray fit(NDArray x, NDArray y, double alpha, int epochs, double epsilon);
 
 	/**
 	 * epochs = 10000, epsilon = 1e-4
@@ -21,7 +21,7 @@ public interface GradientDescent {
 	 * @param alpha
 	 * @return weights
 	 */
-	default NDArray gradientDescent(NDArray x, NDArray y, double alpha) {
-		return gradientDescent(x, y, alpha, 10000, 1e-4);
+	default NDArray fit(NDArray x, NDArray y, double alpha) {
+		return fit(x, y, alpha, 10000, 1e-4);
 	}
 }
