@@ -12,8 +12,8 @@ public class NumpyTest extends TestCase {
 	public void test_api_at() {
 		NDArray a = Numpy.arange(12).reshape(3,4);
 		int[] expected = {4,5,6,7};
-		assertEquals(Numpy.array(expected), a.at(1));
-		assertEquals(Numpy.array(6), a.at(1,2));
+		assertEquals(Numpy.array(expected), a.index(1));
+		assertEquals(Numpy.array(6), a.index(1,2));
 	}
 
 	@Test
@@ -21,7 +21,7 @@ public class NumpyTest extends TestCase {
 		NDArray a = Numpy.arange(36).reshape(4,3,3);
 		int[] expected = {8, 17};
 		int[][] range = {{0,2}, {2}, {-1+3}}; // not support negative, but slice can
-		assertEquals(Numpy.array(expected), a.atRange(range));
+		assertEquals(Numpy.array(expected), a.slice(range));
 	}
 
 	@Test
@@ -169,7 +169,7 @@ public class NumpyTest extends TestCase {
 	public void test_ndarray_choice() {
 		NDArray a = Numpy.arange(24).reshape(4,6);
 		int[] choice = Numpy.random.choice(4, 4);
-		System.out.println(a.index(choice));
+		System.out.println(a.rows(choice));
 	}
 
 	@Test

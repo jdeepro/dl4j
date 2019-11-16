@@ -8,12 +8,12 @@ public class LinearImp {
 	public static double loss(NDArray x, NDArray y, NDArray w) {
 		NDArray diff = x.dot(w).subtract(y);
 		double cost = np.dot(diff.T, diff).asDouble();
-		return cost/(x.getDimens()[0]*2);
+		return cost/(x.dimens()[0]*2);
 	}
 
 	public static NDArray BGD(NDArray x, NDArray y, double alpha, int epochs, double epsilon) {
-		int m = x.getDimens()[0];
-		int n = x.getDimens()[1];
+		int m = x.dimens()[0];
+		int n = x.dimens()[1];
 		NDArray w = np.ones(n);
 
 		for (int i = 0; i < epochs; i++) {
@@ -25,14 +25,14 @@ public class LinearImp {
 	}
 
 	public static NDArray SGD(NDArray x, NDArray y, double alpha, int epochs, double epsilon) {
-		int m = x.getDimens()[0];
-		int n = x.getDimens()[1];
+		int m = x.dimens()[0];
+		int n = x.dimens()[1];
 		NDArray w = np.ones(new int[]{n, 1});
 
 		for (int i = 0; i < epochs; i++) {
 			int idex = np.random.randint(m);
-			NDArray rand = x.at(idex).V();
-			NDArray diff = np.dot(rand, w).subtract(y.at(idex));
+			NDArray rand = x.row(idex).V();
+			NDArray diff = np.dot(rand, w).subtract(y.row(idex));
 			NDArray gradient = np.dot(rand.T, diff);
 			w = w.subtract(gradient.multiply(alpha));
 		}
@@ -40,15 +40,16 @@ public class LinearImp {
 	}
 
 	public static NDArray MBGD(NDArray x, NDArray y, double alpha, int epochs, double epsilon) {
-		int m = x.getDimens()[0];
-		int n = x.getDimens()[1];
+		int m = x.dimens()[0];
+		int n = x.dimens()[1];
 		NDArray w = np.ones(n);
+
 		int batch_size = 5;
 
 		for (int i = 0; i < epochs; i++) {
 			int[] idex = np.random.choice(m, batch_size);
-			NDArray rand = x.index(idex);
-			NDArray diff = np.dot(rand, w).subtract(y.index(idex));
+			NDArray rand = x.rows(idex);
+			NDArray diff = np.dot(rand, w).subtract(y.rows(idex));
 			NDArray gradient = np.dot(rand.T, diff).divide(batch_size);
 			w = w.subtract(gradient.multiply(alpha));
 		}

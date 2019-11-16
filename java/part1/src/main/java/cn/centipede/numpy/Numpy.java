@@ -12,13 +12,13 @@ public class Numpy extends NumpyBase{
 
     public static Object getArray(NDArray array) {
         Object real = getArrayData(array);
-        int[] dim = array.getDimens();
+        int[] dim = array.dimens();
         return ArrayHelper.struct(real, dim);
     }
 
     public static Object getArrayData(NDArray array) {
         Object data = array.data();
-        int[] index = array.getDataIndex();
+        int[] index = array.dataIndex();
 
         if (data instanceof int[]) {
             return IntStream.of(index).map(i-> (int) Array.get(data, i)).toArray();
@@ -113,7 +113,7 @@ public class Numpy extends NumpyBase{
         Object datArray  = dat2Array(dat);
 
         Object ret = doOp(srcData, datArray, Operator::add);
-        return new NDArray(ret,  src.getDimens());
+        return new NDArray(ret,  src.dimens());
     }
 
     public static NDArray subtract(NDArray src, Object dat) {
@@ -121,7 +121,7 @@ public class Numpy extends NumpyBase{
         Object datArray  = dat2Array(dat);
 
         Object ret = doOp(srcData, datArray, Operator::subtract);
-        return new NDArray(ret,  src.getDimens());
+        return new NDArray(ret,  src.dimens());
     }
 
     public static NDArray multiply(NDArray src, Object dat) {
@@ -129,7 +129,7 @@ public class Numpy extends NumpyBase{
         Object datArray  = dat2Array(dat);
 
         Object ret = doOp(srcData, datArray, Operator::multiply);
-        return new NDArray(ret,  src.getDimens());
+        return new NDArray(ret,  src.dimens());
     }
 
     public static NDArray divide(NDArray src, Object dat) {
@@ -145,7 +145,7 @@ public class Numpy extends NumpyBase{
         }
 
         Object ret = doOp(srcData, datArray, Operator::divide);
-        return new NDArray(ret,  src.getDimens());
+        return new NDArray(ret,  src.dimens());
     }
 
     public static NDArray exp(NDArray src) {
@@ -156,7 +156,7 @@ public class Numpy extends NumpyBase{
         }
 
         Object ret = doOp(srcData, Operator::exp);
-        return new NDArray(ret,  src.getDimens());
+        return new NDArray(ret,  src.dimens());
     }
 
     public static NDArray log(NDArray src) {
@@ -167,7 +167,7 @@ public class Numpy extends NumpyBase{
         }
 
         Object ret = doOp(srcData, Operator::log);
-        return new NDArray(ret,  src.getDimens());
+        return new NDArray(ret,  src.dimens());
     }
 
     public static NDArray abs(NDArray src) {
@@ -178,7 +178,7 @@ public class Numpy extends NumpyBase{
         } else {
             srcData = DoubleStream.of((double[])srcData).map(n->n>=0?n:-n).toArray();
         }
-        return new NDArray(srcData,  src.getDimens());
+        return new NDArray(srcData,  src.dimens());
     }
 
     public static double mean(NDArray src) {
@@ -199,7 +199,7 @@ public class Numpy extends NumpyBase{
         }
 
         Object ret = doOp(srcData, Operator::reciprocal);
-        return new NDArray(ret,  src.getDimens());
+        return new NDArray(ret,  src.dimens());
     }
 
     /**
@@ -209,10 +209,8 @@ public class Numpy extends NumpyBase{
      * @return NDArray
      */
     public static NDArray dot(NDArray a, NDArray b) {
-        int[] aDim = a.getDimens();
-        int[] bDim = b.getDimens();
-        Object aData = a.data();
-        Object bData = b.data();
+        int[] aDim = a.dimens(), bDim = b.dimens();
+        Object aData = a.data(), bData = b.data();
 
         /** a is number */
         if (aDim.length == 0) {
@@ -267,7 +265,7 @@ public class Numpy extends NumpyBase{
         } else {
             data = DoubleStream.of((double[]) data).map(n->n*b).toArray();
         }
-        return Numpy.array(data, a.getDimens());
+        return Numpy.array(data, a.dimens());
     }
 
     public static NDArray dot(NDArray a, double b) {
@@ -277,7 +275,7 @@ public class Numpy extends NumpyBase{
         } else {
             data = DoubleStream.of((double[]) data).map(n->n*b).toArray();
         }
-        return Numpy.array(data, a.getDimens());
+        return Numpy.array(data, a.dimens());
     }
 
     /**
@@ -342,8 +340,8 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray concatenate(NDArray a, NDArray b, int axis) {
-        int[] adim = a.getDimens();
-        int[] bdim = b.getDimens();
+        int[] adim = a.dimens();
+        int[] bdim = b.dimens();
 
         int[] ndim = Arrays.copyOf(adim, adim.length);
         ndim[axis] = ndim[axis] + bdim[axis];
@@ -362,20 +360,17 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray hstack(NDArray a, NDArray b) {
-        if (a.getDimens().length > 1) {
-            return concatenate(a, b, 1);
-        }
-        return concatenate(a, b);
+        return concatenate(a, b, a.dimens().length>1?1:0);
     }
 
     /**
      * axis != 0, a concatenate b
      */
     static Object mergeArray(NDArray a, NDArray b, int axis) {
-        int[] adim = a.getDimens();
+        int[] adim = a.dimens();
         NDArray[] rows = new NDArray[adim[0]];
         for (int i = 0; i < adim[0]; i++) {
-            rows[i] = concatenate(a.getRow(i), b.getRow(i), axis-1);
+            rows[i] = concatenate(a.row(i), b.row(i), axis-1);
         }
 
         NDArray ret = rows[0];
@@ -400,7 +395,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static boolean compare(NDArray src, NDArray dst) {
-        if (!Arrays.equals(src.getDimens(), dst.getDimens())) {
+        if (!Arrays.equals(src.dimens(), dst.dimens())) {
             return false;
         }
         Object srcData = getArrayData(src);
@@ -417,7 +412,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static boolean same(NDArray src, NDArray dst, double slope) {
-        if (!Arrays.equals(src.getDimens(), dst.getDimens())) {
+        if (!Arrays.equals(src.dimens(), dst.dimens())) {
             return false;
         }
         Object srcData = getArrayData(src);

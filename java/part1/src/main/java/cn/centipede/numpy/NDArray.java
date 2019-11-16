@@ -7,7 +7,12 @@ import java.util.stream.IntStream;
 
 import static cn.centipede.numpy.Numpy.ALL;
 
-
+/**
+ * try to simulate numpy NDArray
+ * a little tricky, oops...
+ * I hope everything goes well!
+ * dl4j@2019/11
+ */
 public class NDArray implements Cloneable{
     private Object _data;
     private int[]  _idata;
@@ -68,11 +73,7 @@ public class NDArray implements Cloneable{
     }
 
     public NDArray(NDArray array) {
-        this(array.data(), array.getDataIndex(), array.dimens());
-    }
-
-    private int[] dimens() {
-        return _dimens;
+        this(array.data(), array.dataIndex(), array.dimens());
     }
 
     public boolean isInt() {
@@ -87,7 +88,7 @@ public class NDArray implements Cloneable{
         return _dimens.length;
     }
 
-    public int[] getDimens() {
+    public int[] dimens() {
         return _dimens;
     }
 
@@ -105,7 +106,7 @@ public class NDArray implements Cloneable{
      * index data used to share data
      * @return index array
      */
-    int[] getDataIndex() {
+    int[] dataIndex() {
         return _idata;
     }
 
@@ -148,10 +149,10 @@ public class NDArray implements Cloneable{
      */
     public void set(Object data, int... index) {
         if (index.length > 1) {
-            NDArray row = getRow(index[0]);
+            NDArray row = row(index[0]);
             row.set(data, Arrays.copyOfRange(index, 1, index.length));
         } else {
-            int[] idata = getRow(index[0]).getDataIndex();
+            int[] idata = row(index[0]).dataIndex();
             for (int indx : idata) {
                 Array.set(_data, indx, data);
             }
@@ -187,16 +188,16 @@ public class NDArray implements Cloneable{
      */
     private NDArray merge(NDArray[] arrays) {
         int len = arrays.length;
-        int step = arrays[0].getDataIndex().length;
+        int step = arrays[0].dataIndex().length;
         int[] idata = new int[step*len];
 
         /** merge idata */
         for (int i = 0; i < arrays.length; i++) {
             NDArray array = arrays[i];
-            System.arraycopy(array.getDataIndex(), 0, idata, i*step, step);
+            System.arraycopy(array.dataIndex(), 0, idata, i*step, step);
         }
 
-        int[] subDimens = arrays[0].getDimens();
+        int[] subDimens = arrays[0].dimens();
         int[] dimens = new int[subDimens.length+1];
         dimens[0] = arrays.length;
         System.arraycopy(subDimens, 0, dimens, 1, subDimens.length);
@@ -208,7 +209,7 @@ public class NDArray implements Cloneable{
      * @param row
      * @return sub NDArray
      */
-    public NDArray getRow(int row) {
+    public NDArray row(int row) {
         if (row == ALL) {
             return this;
         }
@@ -223,10 +224,10 @@ public class NDArray implements Cloneable{
     /**
      * get rows from range(start, stop)
      */
-    public NDArray[] getRows(int start, int stop) {
+    public NDArray[] rows(int start, int stop) {
         NDArray[] arrays = new NDArray[stop-start];
         for (int i = 0; i < arrays.length; i++) {
-            arrays[i] = getRow(i+start);
+            arrays[i] = row(i+start);
         }
         return arrays;
     }
@@ -234,24 +235,23 @@ public class NDArray implements Cloneable{
     /**
      * get rows from range(start, stop)
      */
-    public NDArray index(int[] rows) {
+    public NDArray rows(int[] rows) {
         NDArray[] arrays = new NDArray[rows.length];
         for (int i = 0; i < arrays.length; i++) {
-            arrays[i] = getRow(rows[i]);
+            arrays[i] = row(rows[i]);
         }
         return rows.length>1?merge(arrays):arrays[0];
     }
 
-
     /**
      * get data by index
      */
-    private NDArray getDataByIndex(int[] index) {
+    private NDArray _index(int[] index) {
         NDArray[] arrays = new NDArray[_dimens[0]];
 
         for (int i = 0; i < _dimens[0]; i++) {
-            NDArray array = getRow(i);
-            arrays[i] = index[0]==ALL?array:array.at(index[0]);
+            NDArray array = row(i);
+            arrays[i] = index[0]==ALL?array:array.index(index[0]);
         }
 
         if (index.length == 1) {
@@ -263,71 +263,43 @@ public class NDArray implements Cloneable{
 
         for (int i = 0; i < arrays.length; i++) {
             if (index[0] == ALL) {
-                child[i] = arrays[i].at(index);
+                child[i] = arrays[i].index(index);
             } else {
-                child[i] = arrays[i].at(subIndex);
+                child[i] = arrays[i].index(subIndex);
             }
         }
         return merge(child);
     }
 
     /**
-     * to support negtive index
-     * @param which
-     * @param index
-     */
-    private void positiveIndex(int which, int[] index) {
-        if (index[which] >= 0 || index[which] == ALL) {
-            return;
-        }
-        index[which] += _dimens[which];
-    }
-
-    /**
-     * to support negtive index
-     * @param which
-     * @param range
-     */
-    private int[] positiveRange(int which, int[] range) {
-        if (range == null) {
-            return range;
-        }
-
-        if (range[0] == ALL) {
-            range = new int[]{0, _dimens[0]};
-        } else if (range[0] < 0) {
-            range[0] += _dimens[which];
-        }
-
-        if (range.length>1 && range[1] != ALL && range[1] < 0) {
-            range[1] += _dimens[which];
-        }
-        return range;
-    }
-
-    /**
-     * select whole rows/cols
+     * get date from NDArray, like
+     * index = a[2][3][4]
+     * select whole rows/cols deeply
      * support negtive index
      * @param index select rows/cols block
      */
-    public NDArray at(int... index) {
+    public NDArray index(int... index) {
         /** update negtive index to positive */
         for (int i = 0; i < index.length; i++) {
-            positiveIndex(i, index);
+            if (index[i] >= 0 || index[i] == ALL) {
+                continue;
+            }
+            index[i] += _dimens[i];
         }
 
         /** only one row */
         if (index.length == 1) {
-            return getRow(index[0]);
+            return row(index[0]);
         }
 
-        /** select all rows or one row */
+        /** rows sub row */
         if (index[0] == ALL) {
-            return getDataByIndex(Arrays.copyOfRange(index, 1, index.length));
-        } else {
-            NDArray array = getRow(index[0]);
-            return array.at(Arrays.copyOfRange(index, 1, index.length));
+            return _index(Arrays.copyOfRange(index, 1, index.length));
         }
+
+        /** one sub array */
+        NDArray array = row(index[0]);
+        return array.index(Arrays.copyOfRange(index, 1, index.length));
     }
 
     /**
@@ -335,26 +307,26 @@ public class NDArray implements Cloneable{
      * @param range
      * @return sub NDArray block
      */
-    public NDArray atRange(int[]... range) {
+    private NDArray _slice(int[][] range) {
         /** one slice to select rows */
         if (range.length == 1) {
             return range[0].length > 1 ?
-                merge(getRows(range[0][0], range[0][1])):
-                getRow(range[0][0]); // this is an array!
+                merge(rows(range[0][0], range[0][1])) : row(range[0][0]); // this is an array!
         }
 
         int[][] left = Arrays.copyOfRange(range, 1, range.length);
 
         /** select a row to slice */
         if (range[0].length == 1) {
-            return getRow(range[0][0]).atRange(left);
+            return row(range[0][0])._slice(left);
         }
 
         /** select rows to slice */
-        NDArray[] array = getRows(range[0][0], range[0][1]);
+        NDArray[] array = rows(range[0][0], range[0][1]);
         NDArray[] ret = new NDArray[array.length];
+
         for (int i = 0; i < array.length; i++) {
-            ret[i] = array[i].atRange(left);
+            ret[i] = array[i]._slice(left);
         }
 
         /** merge all row slices */
@@ -363,14 +335,25 @@ public class NDArray implements Cloneable{
 
     /**
      * do array slice like numpy
+     * [3:5], [-2] etc...
+     * int[][] range = {{1,4}, {2}, {2,5}};
      * @param range
      * @return slice array
      */
     public NDArray slice(int[][] range) {
         for (int i = 0; i < range.length; i++) {
-            range[i] = positiveRange(i, range[i]);
+            if (range[i][0] == ALL) {
+                range[i] = new int[]{0, _dimens[0]};
+                continue;
+            }
+            if (range[i][0] < 0) {
+                range[i][0] += _dimens[i];
+            }
+            if (range[i].length > 1 && range[i][1] < 0) {
+                range[i][1] += _dimens[i];
+            }
         }
-        return atRange(range);
+        return _slice(range);
     }
 
     public NDArray add(Object dat) {

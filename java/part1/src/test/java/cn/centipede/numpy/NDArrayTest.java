@@ -31,7 +31,7 @@ public class NDArrayTest extends TestCase {
 			int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
 			NDArray a = new NDArray(dat, 3,4);
 			a = a.reshape(2,6);
-			assertTrue(a.toString(), Arrays.equals(a.getDimens(), new int[]{2,6}));
+			assertTrue(a.toString(), Arrays.equals(a.dimens(), new int[]{2,6}));
 	}
 
 	@Test
