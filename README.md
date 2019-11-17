@@ -8,10 +8,46 @@ The basics of artificial intelligence, written in Latex, based on Java.
 
 jdeepro is a framework of deep learning tools and libraries written specially to take advantage of the Java™ Virtual Machine (JVM), written for the Java and Scala languages.
 
+
+### 警告：刚好能够工作（Just work as expected.）
+:) :) :)
+Welcome to have a try!
+
 #### Our Hope
 1. Numpy参考实现 (Numpy reference impl)
 2. Matplot参考实现 (Matplot reference impl)
 3. AI基础算法实现 (AI basic algorithm impl)
+
+#### 2019/11/17 梯度下降 （gradient descend）
+![SGD](./sgd-sample.png)
+
+``` java
+GradientDescent gd = LinearImp::SGD;
+int N = 20;
+
+NDArray x = np.random.uniform(0, 5, N).reshape(N,1);
+NDArray ones = np.ones(new int[]{N, 1});
+
+NDArray y = x.multiply(3).add(np.random.uniform(0, 3, N).reshape(N,1));
+x = np.hstack(x, ones);
+
+NDArray ret = gd.fit(x, y, 0.01, 1000, 1e-3);
+System.out.println("#### test_linear_sgd: y = 2 * x + b ");
+System.out.println(ret);
+
+JPlot plot = new JPlot();
+double [][]X = (double[][])np.getArray(x.T);
+double [][]Y = (double[][])np.getArray(y.T);
+double [] W = (double[])np.getArray(ret);
+
+String caption = String.format("y=%f*x+%f", W[0], W[1]);
+
+plot.figure();
+plot.scatter(X[0], Y[0], "X-Y");
+plot.plot(X[0], a->W[0]*a+W[1], caption);
+
+plot.show();
+```
 
 #### Easy to use
 You can easily change python code to java, like this:
