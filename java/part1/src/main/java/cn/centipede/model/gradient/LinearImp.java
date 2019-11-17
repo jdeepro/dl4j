@@ -31,7 +31,7 @@ public class LinearImp {
 		//int[] choice = np.random.choice(m, m);
 
 		for (int i = 0; i < epochs; i++) {
-			int idex = i%m;//np.random.randint(m); // choice[i%m];
+			int idex = np.random.randint(m); // choice[i%m];
 			NDArray row_x = x.row(idex).V();
 			NDArray row_y = y.row(idex);
 			NDArray diff = np.dot(row_x, w).subtract(row_y);

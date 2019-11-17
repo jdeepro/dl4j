@@ -27,7 +27,7 @@ public class Scatter extends ChartBase{
 
 		styler.setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Scatter)
 			.setChartTitleVisible(false)
-			.setLegendPosition(LegendPosition.InsideSW);
+			.setLegendPosition(LegendPosition.InsideNW);
 	}
 
 	@Override

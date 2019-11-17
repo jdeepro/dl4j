@@ -1,9 +1,13 @@
 package cn.centipede;
 
+import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Range;
+import cn.centipede.numpy.Numpy.np;
 import cn.centipede.matplot.Axes;
 import cn.centipede.matplot.Figure;
 import cn.centipede.matplot.JPlot;
+import cn.centipede.model.GradientDescent;
+import cn.centipede.model.gradient.LinearImp;
 
 public class App {
 	public static void showScatter() {
@@ -46,7 +50,36 @@ public class App {
 		plot.show();
 	}
 
+	public static void showSgd() {
+		GradientDescent gd = LinearImp::SGD;
+		int N = 20;
+
+		NDArray x = np.random.uniform(0, 5, N).reshape(N,1);
+		NDArray ones = np.ones(new int[]{N, 1});
+
+		NDArray y = x.multiply(3).add(np.random.uniform(0, 3, N).reshape(N,1));
+		x = np.hstack(x, ones);
+
+		NDArray ret = gd.fit(x, y, 0.01, 1000, 1e-3);
+		System.out.println("#### test_linear_sgd: y = 2 * x + b ");
+		System.out.println(ret);
+
+		JPlot plot = new JPlot();
+		double [][]X = (double[][])np.getArray(x.T);
+		double [][]Y = (double[][])np.getArray(y.T);
+		double [] W = (double[])np.getArray(ret);
+
+		String caption = String.format("y=%f*x+%f", W[0], W[1]);
+
+		plot.figure();
+		plot.scatter(X[0], Y[0], "X-Y");
+		plot.plot(X[0], a->W[0]*a+W[1], caption);
+
+		plot.show();
+	}
+
 	public static void main(String[] args) {
-		showSubPlot();
+		showSgd();
+		//showSubPlot();
 	}
 }
