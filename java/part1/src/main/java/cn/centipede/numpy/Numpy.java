@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 public class Numpy extends NumpyBase{
     public static final int ALL = 999_999_999;
     public class np extends Numpy{}
+    public class random extends Random{}
 
     public static Object getArray(NDArray array) {
         Object real = getArrayData(array);
@@ -181,6 +182,10 @@ public class Numpy extends NumpyBase{
         return new NDArray(srcData,  src.dimens());
     }
 
+    /**
+     * @param src
+     * @return average of dat array
+     */
     public static double mean(NDArray src) {
         Object srcData   = getArrayData(src);
 
@@ -191,6 +196,10 @@ public class Numpy extends NumpyBase{
         }
     }
 
+    /**
+     * @param src
+     * @return 1/src
+     */
     public static NDArray reciprocal(NDArray src) {
         Object srcData   = getArrayData(src);
 
