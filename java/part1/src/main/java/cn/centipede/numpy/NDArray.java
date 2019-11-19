@@ -343,13 +343,19 @@ public class NDArray implements Cloneable{
     public NDArray slice(int[][] range) {
         for (int i = 0; i < range.length; i++) {
             if (range[i][0] == ALL) {
-                range[i] = new int[]{0, _dimens[0]};
+                range[i] = new int[]{0, _dimens[i]};
                 continue;
-            }
-            if (range[i][0] < 0) {
+            } else if (range[i][0] < 0) {
                 range[i][0] += _dimens[i];
             }
-            if (range[i].length > 1 && range[i][1] < 0) {
+            if (range[i].length < 2) {
+                continue;
+            }
+            if (range[i][1] == ALL) {
+                range[i][1] = _dimens[i];
+                continue;
+            }
+            if (range[i][1] < 0) {
                 range[i][1] += _dimens[i];
             }
         }

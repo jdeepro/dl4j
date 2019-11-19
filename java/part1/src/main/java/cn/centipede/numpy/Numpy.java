@@ -1,9 +1,13 @@
 package cn.centipede.numpy;
 
+import java.io.IOException;
 import java.lang.reflect.Array;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 public class Numpy extends NumpyBase{
@@ -439,5 +443,24 @@ public class Numpy extends NumpyBase{
             for (int i = 0; i < a.length; i++) if (Math.abs(a[i] - b[i]) > slope) return false;
             return true;
         }
+    }
+
+    private static double parseDouble(String dat) {
+        try {return Double.parseDouble(dat);
+        } catch(NumberFormatException e){}
+        return 0;
+    }
+
+    public static NDArray loadtxt(String fname, final String delimiter) {
+        try (Stream<String> lines = Files.lines(Paths.get(fname))) {
+            double[][] array = lines.skip(1)
+                .map(s -> s.split(delimiter))
+                .map(s->Arrays.stream(s).mapToDouble(Numpy::parseDouble).toArray())
+                .toArray(double[][]::new);
+            return np.array(array);
+        } catch(IOException e) {
+            System.err.println(e);
+        }
+        return null;
     }
 }

@@ -197,5 +197,14 @@ public class NumpyTest extends TestCase {
 		};
 		
 		assertEquals("3 dimens int[][][] array", Arrays.deepToString(array), Arrays.deepToString(real));
-	}
+    }
+
+    @Test
+    public void test_read_csv() {
+        NDArray boston = np.loadtxt(getClass().getResource("boston.csv").getPath(), ",");
+        double[][] dat = {{4.98, 24.0}, {9.14, 21.6}, {4.03, 34.7}};
+        NDArray expected = np.array(dat);
+        NDArray actual = boston.slice(new int[][]{{0,3}, {-2, ALL}});
+        assertEquals(expected, actual);
+    }
 }
