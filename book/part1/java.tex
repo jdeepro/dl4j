@@ -1053,13 +1053,88 @@ $17 ==> 3.141672248
 
 \begin{definition}{向量}{vec}
 	在数学中，向量（也称为欧几里得向量、几何向量、矢量），指具有大小（magnitude）和方向的量。
-	书籍一般用黑体的小写英文字母（a、b、c等）来表示，手写在a、b、c等字母上加一箭头（→）表示：
+	书籍一般用黑体的小写英文字母（a、b、c等）来表示，手写在a、b、c等字母上加一箭头（$\rightarrow$）表示：
 	$\vec{a}$，$\vec{b}$，$\vec{c}$。向量的矩阵表示，如下：
 	$$
 	\vec{a} = \begin{bmatrix}x\\y\\z\end{bmatrix} 
 	$$
 	支持的运算有：相加、相减、数乘、点乘和叉乘等。
 \end{definition}
+
+\noindent
+根据上述定义，使用Java数组就能满足要求。可定义Vector类型如下：
+\begin{lstlisting}[language=Java]
+public class Vector {
+    private double[] array;
+
+    public Vector(double[] array) {
+        this.array = array;
+    }
+
+    public Vector add(double[] v) {}
+    public Vector add(Vector v) {}
+
+    public Vector subtract(double[] v) {}
+    public Vector subtract(Vector v) {}
+
+    public Vector multiply(double[] v) {}
+    public Vector multiply(Vector v) {}
+
+    public Vector divide(double[] v) {}
+    public Vector divide(Vector v) {}
+
+    public double dot(Vector v) {}
+    public Vector cross(Vector v) {}
+}
+\end{lstlisting}
+
+\noindent
+我们不逐一列出所有的函数实现，仅提供add的代码供参考。
+虽然数学定义不允许Vector与标量直接运算，参考Numpy可以提供这种便利，实现数据的broadcast功能
+\footnote{标量是0阶张量(一个数)，1*1的；向量是一阶张量，是1*n的；张量可以给出所有坐标间的关系,是n*n的。}。
+譬如：$[1,2,3] + 10 $或者$[1,2,3] + [10] $，可得结果为$[11,12,13]$。
+我们希望Vector代码，能获得期望的输出
+
+\begin{lstlisting}[language=Java]
+Vector a = new Vector(new double[]{1,2,3});
+a = a.add(2);
+System.out.println(a); // Vector(3.0,4.0,5.0)
+
+Vector b = new Vector(new double[]{10});
+System.out.println(a.add(b)); // Vector(13.0,14.0,15.0)
+
+double[] c = {100, 1000, 10000};
+System.out.println(a.add(c)); // Vector(113.0,1014.0,10015.0)
+\end{lstlisting}
+
+\noindent
+值得注意的地方有2处：add可传入数组或者单个数字作为参数，使用$\dots$不定参类型；
+输出是被格式化的字符串，需要重写toString。相应的代码如下：
+
+\begin{lstlisting}[language=Java]
+public Vector add(double... v) {
+    for (int i = 0; i < array.length; i++) {
+        array[i] += v[i%v.length];
+    }
+    return this;
+}
+public Vector add(Vector v) {
+    for (int i = 0; i < array.length; i++) {
+        array[i] += v.array[i%v.array.length];
+    }
+    return this;
+}
+
+@Override
+public String toString() {
+    String str = DoubleStream.of(array)
+            .mapToObj(Double::toString)
+            .collect(Collectors.joining(",", "Vector(", ")"));
+    return str;
+}
+\end{lstlisting}
+
+\note{本示例代码，为保持简洁，没有做错误检查。}
 
 
 \section{定义矩阵}
