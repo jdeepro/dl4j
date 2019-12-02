@@ -1182,10 +1182,114 @@ public String toString() {
 
 \noindent
 此外，使用二维数组定义的矩阵，其下标也可以等价转换为一维数组。
-实际上，通常使用一维数组定义矩阵。
-总的来说，使用一维数组存储数据，而维度信息单独存放。
+实际上，使用一维数组定义矩阵要更好一些，毕竟这样可以保证所有的数据存放连续的一段内存上。
+因此，维度信息就要单独存放。
+基于这个设计，可定义一个NDArray(多维数组)来统一表示张量。
+但是要注意Vector和Matrix之间的区别，如[1, 2, 3, 4]和[[1, 2, 3, 4]]差别。
+Vector是一维的，而Matrix至少有二个维度。
+
+\begin{figure}[!htb]
+\begin{center}
+\begin{tikzpicture}
+\umlclass{NDArray}{
+    dat: double[] \\
+    shape: int[]
+}{
+    add(o : NDArray) : NDArray \\
+    sub(o : NDArray) : NDArray \\
+    dot(o : NDArray) : NDArray
+}
+\end{tikzpicture}
+\end{center}
+\end{figure}
+
+\noindent
+如此，使用Java定义NDArray的参考代码如下：
+
+\begin{lstlisting}[language=Java]
+// np委托实现了相应的算法
+public class NDArray implements Cloneable{
+    private double[] _data;
+    private int[]  _dimens;
+
+    public NDArray add(NDArray o) {
+        return np.add(this, o);
+    }
+
+    public NDArray subtract(NDArray o) {
+        return np.subtract(this, o);
+    }
+
+    public NDArray dot(NDArray o) {
+        return np.dot(this, o);
+    }
+}
+\end{lstlisting}
+
+\noindent
+上述代码，仅支持NDArray类型的入参，不能把数组作为入参有些不便利。
+为了支持数组，可以再重载每个操作，如\lstinline{NDArray add(double[] o)}。
+创建一个新类型，重写\lstinline{toString}也非常重要。
 
 \section{导数运算}
+机器学习常用的激活函数有：ReLU、Sigmoid和tanh。
+在深度神经网络中，需要前向和反向传播过程中，涉及到这几个函数的active和deactive运算。
+
+\begin{figure}[!htbp]
+    \centering
+    \begin{minipage}{0.33\textwidth}
+    \begin{tikzpicture}[scale=0.5]
+      \draw[very thin,color=gray] (-4,-2) grid (4,2);
+      \draw[->] (-4,0) -- (4,0) node[right] {$x$};
+      \draw[->] (0,-2) -- (0,2) node[above] {$f(x)$};
+        \draw[color=red, domain=-4:4] plot (\x,{1/(1+e^-\x)});
+        \node at (0, -3) {Sigmoid: $\frac{1}{1+e^{-x}}$};
+    \end{tikzpicture}
+    \end{minipage}%
+    \begin{minipage}{0.33\textwidth}
+    \begin{tikzpicture}[scale=0.5]
+      \draw[very thin,color=gray] (-4,-2) grid (4,2);
+      \draw[->] (-4,0) -- (4,0) node[right] {$x$};
+      \draw[->] (0,-2) -- (0,2) node[above] {$f(x)$};
+        \draw[color=red, domain=-4:4] plot (\x,{(e^\x-e^-\x)/(e^\x+e^-\x)});
+        \node at (0, -3) {Tanh: $\frac{e^x-e^-x}{e^x+e^-x}$};
+    \end{tikzpicture}
+    \end{minipage}%
+    \begin{minipage}{0.33\textwidth}
+        \vspace{0.55cm}
+        \begin{tikzpicture}[scale=0.5]
+            \draw[very thin,color=gray] (-4,-2) grid (4,2);
+            \draw[->] (-4,0) -- (4,0) node[right] {$x$};
+            \draw[->] (0,-2) -- (0,2) node[above] {$f(x)$};
+            \draw[color=red, domain=-4:0] plot (\x,0);
+            \draw[color=red, domain=0:2] plot (\x,\x);
+        \node at (0, -3.2) {ReLu: 
+                $\begin{cases} 
+                    x&\text{x>=0}\\0&\text{x<0}
+                \end{cases}$};
+        \end{tikzpicture}
+    \end{minipage}%
+\end{figure}
+
+\noindent
+这里以Sigmoid为例，提供参考实现：
+\begin{lstlisting}[language=Java, mathescape]
+/**
+* $y = 1/(1 + e^{-x})$
+* $dy/dx = y(1-y)$
+*/
+public class Sigmoid implements Activation{
+    @Override
+    public NDArray active(NDArray z) {
+        return np.exp(z.negative()).add(1).reciprocal();
+    }
+
+    @Override
+    public NDArray deactive(NDArray z) {
+        return z.multiply(z.negative().add(1));
+    }
+}
+\end{lstlisting}
 
 \section{梯度下降}
 
