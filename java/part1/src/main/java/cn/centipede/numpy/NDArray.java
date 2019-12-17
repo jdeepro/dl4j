@@ -111,10 +111,25 @@ public class NDArray implements Cloneable{
     }
 
     /**
+     * Add support [newaxis, :], [:, newaxis]
      * support auto calc one dimen which is -1
      * for example: 12 => 3,-1 => 3, 4
      */
     public NDArray reshape(int ...dimens) {
+        if (dimens[0] == ALL) {
+            _dimens = Arrays.copyOf(_dimens, _dimens.length+1);
+            _dimens[_dimens.length-1] = 1;
+            return this;
+        }
+
+        if (dimens[1] == ALL) {
+            int[] axis = new int[_dimens.length+1];
+            System.arraycopy(_dimens, 0, axis, 1, _dimens.length);
+            _dimens = axis;
+            _dimens[0] = 1;
+            return this;
+        }
+
         int size = _size, pos = -1;
 
         for (int i = 0; i < dimens.length; i++) {
@@ -217,7 +232,14 @@ public class NDArray implements Cloneable{
         int length   = _idata.length/_dimens[0];
         int start    = row * length;
         int[] idata  = Arrays.copyOfRange(_idata, start, start+length);
-        int[] dimens = Arrays.copyOfRange(_dimens, 1, _dimens.length);
+
+        int[] dimens;
+        if (_dimens.length == 2) {
+            //dimens = Arrays.copyOf(_dimens, _dimens.length);
+            dimens = new int[]{_dimens[1]};//1;
+        } else {
+            dimens = Arrays.copyOfRange(_dimens, 1, _dimens.length);
+        }
         return new NDArray(_data, idata, dimens);
     }
 

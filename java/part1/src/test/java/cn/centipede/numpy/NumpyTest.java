@@ -12,62 +12,116 @@ public class NumpyTest extends TestCase {
 
     @Test
     public void test_api_at() {
-        NDArray a = Numpy.arange(12).reshape(3,4);
+        NDArray a = np.arange(12).reshape(3,4);
         int[] expected = {4,5,6,7};
-        assertEquals(Numpy.array(expected), a.index(1));
-        assertEquals(Numpy.array(6), a.index(1,2));
+        assertEquals(np.array(expected), a.index(1));
+        assertEquals(np.array(6), a.index(1,2));
     }
 
     @Test
     public void test_api_atRange() {
-        NDArray a = Numpy.arange(36).reshape(4,3,3);
+        NDArray a = np.arange(36).reshape(4,3,3);
         int[] expected = {8, 17};
         int[][] range = {{0,2}, {2}, {-1+3}}; // not support negative, but slice can
-        assertEquals(Numpy.array(expected), a.slice(range));
+        assertEquals(np.array(expected), a.slice(range));
     }
 
     @Test
     public void test_shape() {
         int[] dat = new int[]{2,4};
-        NDArray a = Numpy.array(dat);
+        NDArray a = np.array(dat);
         assertEquals("(2,)", a.shape());
     }
 
     @Test
-    public void test_concatenate() {
-        NDArray a = Numpy.arange(6).reshape(3,2);
-        NDArray b = Numpy.arange(4).reshape(2,2);
+    public void test_api_row() {
+        NDArray a = np.array(new int[][]{{1,2,3}});
+        assertEquals("(3,)", a.row(0).shape());
+    }
 
-        int[][] c = {
-            {0, 1},
-            {2, 3},
-            {4, 5},
-            {0, 1}, 
-            {2, 3}
-        };
-        assertEquals(Numpy.array(c), Numpy.concatenate(a, b));
+    @Test
+    public void test_api_concatenate() {
+        NDArray a = np.array(new int[]{1,2,3});
+        NDArray b = np.array(new int[]{2,3,4});
+        NDArray e = np.array(new int[]{1, 2, 3, 2, 3, 4});
+        assertEquals(e, np.concatenate(a, b, 0));
 
-        a = Numpy.arange(6).reshape(2,3);
-        int[][] d = {
-            {0, 1, 2, 0, 1},
-            {3, 4, 5, 2, 3}
-        };
+        a = np.array(new int[][]{{1,2,3}});
+        b = np.array(new int[][]{{2,3,4}});
+        e = np.array(new int[][]{{1, 2, 3}, {2, 3, 4}});
+        assertEquals(e, np.concatenate(a, b, 0));
+
+        // a = a[np.newaxis,:], b = b[np.newaxis,:]
+        a = np.array(new int[][]{{1,2,3}});
+        b = np.array(new int[][]{{2,3,4}});
+        assertEquals(np.array(new int[][]{{1, 2, 3, 2, 3, 4}}), np.concatenate(a, b, 1));
+
+        a = np.arange(6).reshape(3,2);
+        b = np.arange(4).reshape(2,2);
+        int[][] c = {{0, 1}, {2, 3}, {4, 5}, {0, 1}, {2, 3}};
+        assertEquals(np.array(c), np.concatenate(a, b));
+
+        a = np.arange(6).reshape(2,3);
+        int[][] d = {{0, 1, 2, 0, 1}, {3, 4, 5, 2, 3}};
         int axis = 1;
-        assertEquals(Numpy.array(d), Numpy.concatenate(a, b, axis));
+        assertEquals(np.array(d), np.concatenate(a, b, axis));
+    }
+
+    @Test
+    public void test_array_newaxis() {
+        NDArray a = np.array(new int[]{3, 4, 5});
+        NDArray b = np.array(new int[][]{{3, 4, 5}});
+        assertEquals(b, a.reshape(np.newaxis, ALL));
+
+        a = np.array(new int[]{3, 4, 5});
+        b = np.array(new int[][]{{3}, {4}, {5}});
+        assertEquals(b, a.reshape(ALL, np.newaxis));
+    }
+
+    @Test
+    public void test_api_stack() {
+        double[] R={0.2, 0.4, 0.6, 0.9, 0.3};
+        double[] G={0.4, 0.1, 0.5, 0.7, 0.8};
+        NDArray r = np.array(R);
+        NDArray g = np.array(G);
+        NDArray e = np.array(new double[]{
+            0.2, 0.4, 0.6, 0.9, 0.3, 0.4, 0.1, 0.5, 0.7, 0.8});
+        assertEquals(e, np.hstack(r, g));
+
+        e = np.array(new double[][]{
+            {0.2, 0.4}, {0.4, 0.1}, {0.6, 0.5}, {0.9, 0.7}, {0.3, 0.8}});
+        r.reshape(ALL, np.newaxis);
+        g.reshape(ALL, np.newaxis);
+        assertEquals(e, np.hstack(r.T, g.T));
+
+        double[][] D={{0.2, 0.4, 0.7}, {0.4, 0.1, 0.8}, {0.6, 0.5, 0.2}, {0.9, 0.7, 0.3}, {0.3, 0.8, 0.4}};
+        double[][] E={{0.2, 0.4, 0.6, 0.9, 0.3}, {0.4, 0.1, 0.5, 0.7, 0.8}, {0.7, 0.8, 0.2, 0.3, 0.4}};
+
+        r = np.array(R);
+        g = np.array(G);
+        NDArray b = np.array(new double[]{0.7, 0.8, 0.2, 0.3, 0.4});
+        NDArray[] c = {r, g, b};
+        assertEquals(np.array(E), np.stack(c, 0));
+
+        r = np.array(R);
+        g = np.array(G);
+        b = np.array(new double[]{0.7, 0.8, 0.2, 0.3, 0.4});
+        c = new NDArray[]{r, g, b};
+        assertEquals(np.array(D), np.stack(c, 1));
     }
 
     @Test
     public void test_api_sum() {
-        NDArray a = Numpy.arange(6).reshape(3,2);
-        assertEquals(15, Numpy.sumInt(a));
+        NDArray a = np.arange(6).reshape(3,2);
+        assertEquals(15, np.sumInt(a));
 
-        a = Numpy.arange(9).reshape(3,3);
-        assertEquals(36, Numpy.sumInt(a));
+        a = np.arange(9).reshape(3,3);
+        assertEquals(36, np.sumInt(a));
     }
 
     @Test
     public void test_slice() {
-        NDArray a = Numpy.arange(12).reshape(3,4);
+        NDArray a = np.arange(12).reshape(3,4);
         int[][] range1 = {{1, 3}, {-1}};
         NDArray b = a.slice(range1);
         assertEquals("array([7, 11])\n", b.toString());
@@ -87,20 +141,20 @@ public class NumpyTest extends TestCase {
 
     @Test
     public void test_broadcast() {
-        NDArray a = Numpy.arange(12).reshape(3,4);
-        NDArray b = Numpy.add(a, 2);
+        NDArray a = np.arange(12).reshape(3,4);
+        NDArray b = np.add(a, 2);
 
         assertEquals("array([[2 , 3 , 4 , 5 ]\n" +
                     "       [6 , 7 , 8 , 9 ]\n" +
                     "       [10, 11, 12, 13]])\n", b.toString());
 
-        b = Numpy.subtract(b, 2);
+        b = np.subtract(b, 2);
         assertEquals("array([[0 , 1 , 2 , 3 ]\n" +
                     "       [4 , 5 , 6 , 7 ]\n" +
                     "       [8 , 9 , 10, 11]])\n", b.toString());
 
         int[] dat = {10, 20, 30, 40};
-        NDArray c = Numpy.add(a, dat);
+        NDArray c = np.add(a, dat);
 
         assertEquals("array([[10, 21, 32, 43]\n" +
                     "       [14, 25, 36, 47]\n" +
@@ -109,67 +163,67 @@ public class NumpyTest extends TestCase {
 
     @Test
     public void test_arange() {
-        NDArray a = Numpy.arange(12).reshape(3,4);
+        NDArray a = np.arange(12).reshape(3,4);
         assertEquals("(3, 4)", a.shape());
     }
 
     @Test
     public void test_random() {
-        NDArray a = Numpy.random.rand(4,4);
+        NDArray a = np.random.rand(4,4);
         System.out.println(a);
         assertEquals("(4, 4)", a.shape());
     }
 
     @Test
     public void test_ndarray_add() {
-        NDArray a = Numpy.ones(3,4);
-        NDArray b = Numpy.zeros(3,4);
-        NDArray c = Numpy.add(a, b);
+        NDArray a = np.ones(3,4);
+        NDArray b = np.zeros(3,4);
+        NDArray c = np.add(a, b);
         System.out.println(c);
     }
 
     @Test
     public void test_ndarray_abs() {
         int[][] dat = {{1,-2,3},{-1,-3,4},{-4,-3,6}};
-        NDArray a = Numpy.array(dat);
+        NDArray a = np.array(dat);
 
         int[][] expected = {{1,2,3},{1,3,4},{4,3,6}};
-        assertEquals(Numpy.array(expected), Numpy.abs(a));
+        assertEquals(np.array(expected), np.abs(a));
     }
 
     @Test
     public void test_ndarray_mean() {
-        NDArray a = Numpy.arange(12).reshape(3, 4);
-        assertEquals(5.5, Numpy.mean(a));
+        NDArray a = np.arange(12).reshape(3, 4);
+        assertEquals(5.5, np.mean(a));
     }
 
     @Test
     public void test_ndarray_dot() {
-        NDArray a = Numpy.arange(12).reshape(3,4);
-        NDArray b = Numpy.arange(16).reshape(4,4);
-        NDArray c = Numpy.dot(a, b);
+        NDArray a = np.arange(12).reshape(3,4);
+        NDArray b = np.arange(16).reshape(4,4);
+        NDArray c = np.dot(a, b);
 
         assertEquals("array([[56 , 62 , 68 , 74 ]\n"+
                     "       [152, 174, 196, 218]\n"+
                     "       [248, 286, 324, 362]])\n", c.toString());
 
-        NDArray d = Numpy.arange(12).reshape(3,4);
-        NDArray e = Numpy.dot(d, 2);
-        assertEquals(e, Numpy.add(d, d));
+        NDArray d = np.arange(12).reshape(3,4);
+        NDArray e = np.dot(d, 2);
+        assertEquals(e, np.add(d, d));
 
-        d = Numpy.arange(12).reshape(3,4);
-        e = Numpy.array(2);
-        assertEquals(Numpy.dot(d, 2), Numpy.dot(d, e));
+        d = np.arange(12).reshape(3,4);
+        e = np.array(2);
+        assertEquals(np.dot(d, 2), np.dot(d, e));
 
-        d = Numpy.arange(12).reshape(3, 4);
-        e = Numpy.array(new int[]{1, 2, 3, 4});
-        assertEquals(Numpy.array(new int[]{20, 60, 100}), Numpy.dot(d, e));
+        d = np.arange(12).reshape(3, 4);
+        e = np.array(new int[]{1, 2, 3, 4});
+        assertEquals(np.array(new int[]{20, 60, 100}), np.dot(d, e));
     }
 
     @Test
     public void test_ndarray_choice() {
-        NDArray a = Numpy.arange(24).reshape(4,6);
-        int[] choice = Numpy.random.choice(4, 4);
+        NDArray a = np.arange(24).reshape(4,6);
+        int[] choice = np.random.choice(4, 4);
         System.out.println(a.rows(choice));
     }
 
@@ -187,8 +241,8 @@ public class NumpyTest extends TestCase {
 
     @Test
     public void test_struct() {
-        NDArray a = Numpy.arange(24).reshape(2,3,4);
-        int[][][] array = (int[][][])Numpy.getArray(a);
+        NDArray a = np.arange(24).reshape(2,3,4);
+        int[][][] array = (int[][][])np.getArray(a);
 
         int[][][] real = new int[][][]{
             {{0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11}}, 

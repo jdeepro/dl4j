@@ -12,15 +12,28 @@ import java.util.stream.Stream;
 
 public class Numpy extends NumpyBase{
     public static final int ALL = 999_999_999;
+    public static final int newaxis = -1; // np.newaxis
+
+    // tricky impl as python numpy
     public class np extends Numpy{}
     public class random extends Random{}
 
+    /**
+     * Get a real array from NDArray
+     * NDArray uses a data buffer not a muti-dim array
+     */
     public static Object getArray(NDArray array) {
         Object real = getArrayData(array);
         int[] dim = array.dimens();
         return ArrayHelper.struct(real, dim);
     }
 
+    /**
+     * NDArray maybe a sparse array with idata
+     * share data with other var
+     * @param array
+     * @return standalone data
+     */
     public static Object getArrayData(NDArray array) {
         Object data = array.data();
         int[] index = array.dataIndex();
@@ -343,7 +356,7 @@ public class Numpy extends NumpyBase{
     }
 
     /**
-     * Now only support axis = 0!!
+     * Now only support axis = 0, two operands !!
      * @param a - 1xn
      * @param b - 1xn
      * @return merge a & b to be a 2xn
@@ -353,23 +366,40 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray concatenate(NDArray a, NDArray b, int axis) {
+        if (axis != 0) {
+            return mergeArray(a, b, axis);
+        }
+
         int[] adim = a.dimens();
         int[] bdim = b.dimens();
 
-        int[] ndim = Arrays.copyOf(adim, adim.length);
-        ndim[axis] = ndim[axis] + bdim[axis];
+        int[] ndim;
+        if (adim.length == 1) {
+            ndim = new int[]{adim[0]+bdim[0]};
+        } else {
+            ndim = Arrays.copyOf(adim, adim.length);
+            ndim[0] = adim[0] + bdim[0];
+        }
 
         Object aArray = getArrayData(a);
         Object bArray = getArrayData(b);
         Object cArray = null;
+        cArray = ArrayHelper.mergeArray(aArray, a.isInt(), bArray, b.isInt());
+        return new NDArray(cArray, ndim);
+    }
 
+    public static NDArray stack(NDArray[] arrays, int axis) {
         if (axis == 0) {
-            cArray = ArrayHelper.mergeArray(aArray, a.isInt(), bArray, b.isInt());
+            Stream.of(arrays).forEach(it->it.reshape(np.newaxis, ALL));
         } else {
-            cArray = mergeArray(a, b, axis);
+            Stream.of(arrays).forEach(it->it.reshape(ALL, np.newaxis));
         }
 
-        return new NDArray(cArray, ndim);
+        NDArray ret = arrays[0];
+        for (int i = 1; i < arrays.length; i++) {
+            ret = concatenate(ret, arrays[i], axis);
+        }
+        return ret;
     }
 
     public static NDArray hstack(NDArray a, NDArray b) {
@@ -379,7 +409,7 @@ public class Numpy extends NumpyBase{
     /**
      * axis != 0, a concatenate b
      */
-    static Object mergeArray(NDArray a, NDArray b, int axis) {
+    static NDArray mergeArray(NDArray a, NDArray b, int axis) {
         int[] adim = a.dimens();
         NDArray[] rows = new NDArray[adim[0]];
         for (int i = 0; i < adim[0]; i++) {
@@ -388,7 +418,13 @@ public class Numpy extends NumpyBase{
 
         NDArray ret = rows[0];
         for (int i = 1; i < adim[0]; i++) {
+            if (i==1)ret.reshape(np.newaxis, ALL);
+            rows[i].reshape(np.newaxis, ALL);
             ret = concatenate(ret, rows[i]);
+        }
+
+        if (adim[0] == 1 && axis > 0) {
+            ret.reshape(np.newaxis, ALL);
         }
         return ret;
     }
