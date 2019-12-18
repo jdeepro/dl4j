@@ -78,8 +78,22 @@ public class App {
         plot.show();
     }
 
+    public static void showNormalDistribution() {
+        NDArray a = np.random.standard_normal(1000);
+        JPlot plot = new JPlot();
+        plot.figure();
+
+        double[] x = new double[1000];
+        for (int i = 0; i < 1000; i++) x[i]=i;
+
+        double[] y = (double[])np.getArray(a);
+        plot.scatter(x, y, "X-Y");
+        plot.show();
+    }
+
     public static void main(String[] args) {
         showSgd();
         //showSubPlot();
+        //showNormalDistribution();
     }
 }

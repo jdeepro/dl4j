@@ -25,6 +25,23 @@ public class Random {
         return new NDArray(array, dimens);
     }
 
+    public static NDArray standard_normal(int... dimens) {
+        int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);
+        DoubleStream ds = DoubleStream.generate(random::nextGaussian);
+        double[] array = ds.limit(size).toArray();
+        return new NDArray(array, dimens);
+    }
+
+    /**
+     * N[0,1] - N(m, r^2) => x= ry+m
+     */
+    public static NDArray standard_normal(double start, double end, int... dimens) {
+        int size = IntStream.of(dimens).reduce(1, (a, b) -> a * b);
+        DoubleStream ds = DoubleStream.generate(()->Math.sqrt(start)*random.nextGaussian()+end);
+        double[] array = ds.limit(size).toArray();
+        return new NDArray(array, dimens);
+    }
+
     /**
      * @param top
      * @return [0, top)
