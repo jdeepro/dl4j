@@ -416,6 +416,12 @@ public class Numpy extends NumpyBase{
         return concatenate(a, b, a.dimens().length>1?1:0);
     }
 
+    public static NDArray vstack(NDArray a, NDArray b) {
+        NDArray ret = concatenate(a, b, 0);
+        int[] dimens = a.dimens();
+        return dimens.length>1?ret:ret.reshape(2, dimens[0]);
+    }
+
     /**
      * axis != 0, a concatenate b
      */
