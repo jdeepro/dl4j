@@ -220,7 +220,7 @@ public class NDArray implements Cloneable{
     }
 
     /**
-     * split ndarray to rows, and select one by row index
+     * Split the NDArray to rows, and select one with index
      * @param row
      * @return sub NDArray
      */
@@ -294,7 +294,7 @@ public class NDArray implements Cloneable{
     }
 
     /**
-     * get date from NDArray, like
+     * Get data from the NDArray, eg:
      * index = a[2][3][4]
      * select whole rows/cols deeply
      * support negtive index

@@ -19,6 +19,21 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
+    public void test_api_row() {
+        NDArray a = np.array(new int[][]{{1,2,3}});
+        assertEquals("(3,)", a.row(0).shape());
+
+        a = np.arange(12).reshape(3,4);
+        int[] expected = {4,5,6,7};
+        assertEquals(np.array(expected), a.row(1));
+
+        a = np.arange(12).reshape(3,4);
+        NDArray b = a.clone();
+        a.reshape(np.newaxis, ALL);
+        assertEquals(b, a.row(0));
+    }
+
+    @Test
     public void test_api_atRange() {
         NDArray a = np.arange(36).reshape(4,3,3);
         int[] expected = {8, 17};
@@ -31,12 +46,6 @@ public class NumpyTest extends TestCase {
         int[] dat = new int[]{2,4};
         NDArray a = np.array(dat);
         assertEquals("(2,)", a.shape());
-    }
-
-    @Test
-    public void test_api_row() {
-        NDArray a = np.array(new int[][]{{1,2,3}});
-        assertEquals("(3,)", a.row(0).shape());
     }
 
     @Test
