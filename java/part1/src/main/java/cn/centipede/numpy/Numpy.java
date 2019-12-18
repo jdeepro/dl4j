@@ -417,10 +417,10 @@ public class Numpy extends NumpyBase{
         }
 
         NDArray ret = rows[0];
-        for (int i = 1; i < adim[0]; i++) {
-            if (i==1)ret.reshape(np.newaxis, ALL);
-            rows[i].reshape(np.newaxis, ALL);
-            ret = concatenate(ret, rows[i]);
+
+        if (adim[0] > 1) {
+            Stream.of(rows).forEach(it->it.reshape(np.newaxis, ALL));
+            ret = Stream.of(rows).reduce(Numpy::concatenate).get();
         }
 
         if (adim[0] == 1 && axis > 0) {
