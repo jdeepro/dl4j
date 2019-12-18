@@ -10,7 +10,7 @@ public class LogicalImp {
     public static double loss(NDArray x, NDArray y, NDArray w) {
     int m = x.dimens()[0];
     Activation sigmoid = new Sigmoid();
-    NDArray h = sigmoid.active(np.dot(x, w));
+    NDArray h = sigmoid.forward(np.dot(x, w));
 
     // np.sum(yMat.T * np.log(hypothesis) + (1 - yMat).T * np.log(1 - hypothesis))
     // yMat.T * np.log(hypothesis)

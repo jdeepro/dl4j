@@ -5,12 +5,12 @@ import cn.centipede.numpy.NDArray;
 
 public class ReLu implements Activation{
     @Override
-    public NDArray active(NDArray z) {
+    public NDArray forward(NDArray z) {
         return null;
     }
 
     @Override
-    public NDArray deactive(NDArray z) {
+    public NDArray backward(NDArray z) {
         return null;
     }
 }

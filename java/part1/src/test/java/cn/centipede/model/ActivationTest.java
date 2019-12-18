@@ -35,8 +35,8 @@ public class ActivationTest extends TestCase {
 
         for (int i = 0; i < 10000; i++) {
             NDArray z = np.dot(x, w);
-            NDArray o = sigmoid.active(z);
-            NDArray delta = y.subtract(o).multiply(sigmoid.deactive(o));
+            NDArray o = sigmoid.forward(z);
+            NDArray delta = y.subtract(o).multiply(sigmoid.backward(o));
 
             w = w.add(np.dot(x.T, delta));
         }
@@ -71,11 +71,11 @@ public class ActivationTest extends TestCase {
         NDArray L1 = null, L2 = null;
 
         for (int i = 0; i < 20000; i++) {
-            L1 = sigmoid.active(np.dot(X, V));
-            L2 = sigmoid.active(np.dot(L1, W));
+            L1 = sigmoid.forward(np.dot(X, V));
+            L2 = sigmoid.forward(np.dot(L1, W));
 
-            NDArray L2_delta = Y.T.subtract(L2).multiply(sigmoid.deactive(L2));
-            NDArray L1_delta = L2_delta.dot(W.T).multiply(sigmoid.deactive(L1));
+            NDArray L2_delta = Y.T.subtract(L2).multiply(sigmoid.backward(L2));
+            NDArray L1_delta = L2_delta.dot(W.T).multiply(sigmoid.backward(L1));
 
             NDArray W_change = L1.T.dot(L2_delta).multiply(learn_rate);
             NDArray V_change = X.T.dot(L1_delta).multiply(learn_rate);

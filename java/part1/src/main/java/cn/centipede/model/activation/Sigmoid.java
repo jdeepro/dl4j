@@ -10,12 +10,12 @@ import cn.centipede.numpy.Numpy;
  */
 public class Sigmoid implements Activation{
     @Override
-    public NDArray active(NDArray z) {
+    public NDArray forward(NDArray z) {
         return Numpy.exp(z.negative()).add(1).reciprocal();
     }
 
     @Override
-    public NDArray deactive(NDArray z) {
+    public NDArray backward(NDArray z) {
         return z.multiply(z.negative().add(1));
     }
 }
