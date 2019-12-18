@@ -389,9 +389,8 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray stack(NDArray[] arrays, int axis) {
-        if (axis == 0) {
-            Stream.of(arrays).forEach(it->it.reshape(np.newaxis, ALL));
-        } else {
+        int[] dimens_o = arrays[0].dimens();
+        if (dimens_o.length == 1 && axis == 1) {
             Stream.of(arrays).forEach(it->it.reshape(ALL, np.newaxis));
         }
 
@@ -399,6 +398,17 @@ public class Numpy extends NumpyBase{
         for (int i = 1; i < arrays.length; i++) {
             ret = concatenate(ret, arrays[i], axis);
         }
+
+        int[] dimens_d = new int[dimens_o.length+1];
+        for (int i = 0; i < axis; i++) {
+            dimens_d[i] = dimens_o[i];
+        }
+
+        dimens_d[axis]=arrays.length;
+        for (int i = axis; i < dimens_o.length; i++) {
+            dimens_d[i+1] = dimens_o[i];
+        }
+        ret.reshape(dimens_d);
         return ret;
     }
 
