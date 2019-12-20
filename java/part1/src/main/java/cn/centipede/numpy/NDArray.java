@@ -447,4 +447,9 @@ public class NDArray implements Cloneable{
         }
         return false;
     }
+
+	public void dump() {
+        System.out.println();
+        System.out.println(this);
+	}
 }
