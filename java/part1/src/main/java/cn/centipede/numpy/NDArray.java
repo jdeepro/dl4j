@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import cn.centipede.numpy.Numpy.np;
+
 import static cn.centipede.numpy.Numpy.ALL;
 
 /**
@@ -84,6 +86,10 @@ public class NDArray implements Cloneable{
         return _data;
     }
 
+    public int size() {
+        return _size;
+    }
+
     public int ndim() {
         return _dimens.length;
     }
@@ -116,13 +122,19 @@ public class NDArray implements Cloneable{
      * for example: 12 => 3,-1 => 3, 4
      */
     public NDArray reshape(int ...dimens) {
+        //[:, newaxis]
         if (dimens[0] == ALL) {
             _dimens = Arrays.copyOf(_dimens, _dimens.length+1);
             _dimens[_dimens.length-1] = 1;
             return this;
         }
-
-        if (dimens[1] == ALL) {
+        // dimens[0]==-1
+        else if (dimens.length == 1) {
+            _dimens = new int[]{_dimens.length};
+            return this;
+        }
+        //[newaxis, :]
+        else if (dimens[1] == ALL) {
             int[] axis = new int[_dimens.length+1];
             System.arraycopy(_dimens, 0, axis, 1, _dimens.length);
             _dimens = axis;
@@ -163,14 +175,19 @@ public class NDArray implements Cloneable{
      * @param index int[]
      */
     public void set(Object data, int... index) {
+        NDArray row = row(index[0]);
         if (index.length > 1) {
-            NDArray row = row(index[0]);
             row.set(data, Arrays.copyOfRange(index, 1, index.length));
+        }
+
+        int[] idata = row.dataIndex();
+        if (data instanceof NDArray) {
+            NDArray array = (NDArray)data;
+            int i = 0;
+            data = np.getArrayData(array);
+            for (int indx : idata) Array.set(_data, indx, Array.get(data, i++));
         } else {
-            int[] idata = row(index[0]).dataIndex();
-            for (int indx : idata) {
-                Array.set(_data, indx, data);
-            }
+            for (int indx : idata) Array.set(_data, indx, data);
         }
     }
 
@@ -450,6 +467,8 @@ public class NDArray implements Cloneable{
 
 	public void dump() {
         System.out.println();
+        System.out.println("shape=" + shape());
+        System.out.println("array=");
         System.out.println(this);
 	}
 }

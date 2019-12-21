@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 
 public class Numpy extends NumpyBase{
-    public static final int ALL = 999_999_999;
-    public static final int newaxis = -1; // np.newaxis
+    public static final int ALL = -999_999_999;
+    public static final int newaxis = -999_999_998; // np.newaxis
 
     // tricky impl as python numpy
     public class np extends Numpy{}
@@ -373,6 +373,10 @@ public class Numpy extends NumpyBase{
         int[] adim = a.dimens();
         int[] bdim = b.dimens();
 
+        if (adim.length > 1 && bdim.length == 1) {
+            bdim = new int[]{1, bdim[0]};
+        }
+
         int[] ndim;
         if (adim.length == 1) {
             ndim = new int[]{adim[0]+bdim[0]};
@@ -383,9 +387,12 @@ public class Numpy extends NumpyBase{
 
         Object aArray = getArrayData(a);
         Object bArray = getArrayData(b);
-        Object cArray = null;
-        cArray = ArrayHelper.mergeArray(aArray, a.isInt(), bArray, b.isInt());
+        Object cArray = ArrayHelper.mergeArray(aArray, a.isInt(), bArray, b.isInt());
         return new NDArray(cArray, ndim);
+    }
+
+    public static NDArray stack(int axis, NDArray... arrays) {
+        return stack(arrays, axis);
     }
 
     public static NDArray stack(NDArray[] arrays, int axis) {
@@ -423,7 +430,8 @@ public class Numpy extends NumpyBase{
     }
 
     /**
-     * axis != 0, a concatenate b
+     * WANING: axis != 0, a concatenate b
+     * internal use only.
      */
     static NDArray mergeArray(NDArray a, NDArray b, int axis) {
         int[] adim = a.dimens();
@@ -513,6 +521,77 @@ public class Numpy extends NumpyBase{
         } catch(IOException e) {
             System.err.println(e);
         }
+        return null;
+    }
+
+    private static Object padData(NDArray array, int left, int right) {
+        int len = array.size();
+        Object data;
+        if (array.isInt()) {
+            data = new int[left+len+right];
+        } else {
+            data = new double[left+len+right];
+        }
+        System.arraycopy(np.getArrayData(array), 0, data, left, len);
+        return data;
+    }
+
+    private static NDArray _pad(NDArray array, int[] pads) {
+        int left = pads[0], right = pads[1];
+        int[] dimens = array.dimens();
+
+        if (dimens.length == 1) {
+            Object data = padData(array, left, right);
+            return np.array(data, dimens[0]+left+right);
+        }
+
+        int cell_size = array.row(0).size();
+        int[] ldimens = Arrays.copyOf(dimens, dimens.length);
+        int[] rdimens = Arrays.copyOf(dimens, dimens.length);
+
+        ldimens[0] = left;
+        rdimens[0] = right;
+        NDArray zeroLeft = np.zeros(new int[]{cell_size*left}, int.class).reshape(ldimens);
+        NDArray zeroRight = np.zeros(new int[]{cell_size*right}, int.class).reshape(rdimens);
+
+        array = np.vstack(zeroLeft, array);
+        array = np.vstack(array, zeroRight);
+
+        pads = Arrays.copyOf(pads, pads.length-2);
+        NDArray first = _pad(array.row(0), pads);
+        for (int i = 1; i < array.dimens()[0]; i++) {
+            NDArray row = array.row(i);
+            row = _pad(row, pads);
+            first = vstack(first, row);
+        }
+        return first;
+    }
+
+    public static NDArray pad(NDArray array, int[] pads) {
+        int[] dimens = array.dimens();
+        int[] pads_ = Arrays.copyOfRange(pads, 0, dimens.length * 2);
+        if (pads.length == 1) {
+            pads_[1] = pads_[0];
+        }
+
+        for (int i = 2; i < pads_.length; i+=2) {
+            pads_[i] = pads_[0];
+            pads_[i+1] = pads_[1];
+        }
+
+        NDArray ret = _pad(array, pads_);
+        for (int i=0; i < dimens.length; i++) {
+            dimens[i] += pads_[i*2];
+            dimens[i] += pads_[i*2+1];
+        }
+        return ret.reshape(dimens);
+    }
+
+    public static NDArray swapaxes() {
+        return null;
+    }
+
+    public static NDArray rot90() {
         return null;
     }
 }

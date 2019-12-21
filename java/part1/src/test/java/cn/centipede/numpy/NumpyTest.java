@@ -49,6 +49,21 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
+    public void test_api_pad() {
+        int[] pad = new int[]{1,2};
+        NDArray a = np.array(new int[]{1,2,3,4});
+        NDArray b = np.array(new int[]{0,1,2,3,4,0,0});
+
+        pad = new int[]{1,2};
+        a = np.array(new int[][]{{1,2,3,4}});
+        b = np.array(new int[][]{{0,0,0,0,0,0,0},{0,1,2,3,4,0,0},{0,0,0,0,0,0,0},{0,0,0,0,0,0,0}});
+        assertEquals(b, np.pad(a, pad));
+
+        a = np.arange(16).reshape(2,2,2,2);
+        np.pad(a, new int[]{2}).dump();
+    }
+
+    @Test
     public void test_api_concatenate() {
         NDArray a = np.array(new int[]{1,2,3});
         NDArray b = np.array(new int[]{2,3,4});
