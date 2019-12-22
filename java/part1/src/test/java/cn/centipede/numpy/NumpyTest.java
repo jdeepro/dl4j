@@ -60,7 +60,31 @@ public class NumpyTest extends TestCase {
         assertEquals(b, np.pad(a, pad));
 
         a = np.arange(16).reshape(2,2,2,2);
-        np.pad(a, new int[]{2}).dump();
+        assertEquals("(6, 6, 6, 6)", np.pad(a, new int[]{2}).shape());
+
+        NDArray arr3D = np.array(new int[][][]{{{1, 1, 2, 2, 3, 4}, {1, 1, 2, 2, 3, 4}, {1, 1, 2, 2, 3, 4}},
+        {{0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5}},
+        {{1, 1, 2, 2, 3, 4}, {1, 1, 2, 2, 3, 4}, {1, 1, 2, 2, 3, 4}}});
+
+        np.pad(arr3D, new int[][]{{0, 0}, {1, 1}, {2, 2}}).dump();;
+    }
+
+    @Test
+    public void test_api_swapaxes() {
+        NDArray a = np.arange(24).reshape(2,3,4);
+        NDArray actual = a.slice(new int[][]{{ALL}, {ALL}, {0}});
+        actual.T.dump();
+    }
+
+    @Test
+    public void test_api_rot90() {
+        NDArray a = np.arange(6).reshape(6,1);
+        np.rot90(a).dump();
+        assertEquals(np.arange(6).reshape(1,6), np.rot90(a));
+
+        int[][][] expect = {{{3,4,5}},{{0,1,2}}};
+        a = np.arange(6).reshape(1,2,3);
+        assertEquals(np.array(expect), np.rot90(a));
     }
 
     @Test
@@ -103,6 +127,23 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
+    public void test_api_vstack() {
+        NDArray a = np.arange(8).reshape(2,4);
+        NDArray actual = np.vstack(a, np.array(new int[]{ 8,  9,  10, 11}));
+        NDArray expect = np.arange(12).reshape(3,4);
+        assertEquals(expect, actual);
+
+        NDArray r = np.array(new double[]{0.2, 0.4, 0.6, 0.9, 0.3});
+        NDArray g = np.array(new double[]{0.4, 0.1, 0.5, 0.7, 0.8});
+        NDArray e = np.array(new double[]{
+            0.2, 0.4, 0.6, 0.9, 0.3, 0.4, 0.1, 0.5, 0.7, 0.8});
+
+        e = np.array(new double[][]{
+            {0.2, 0.4, 0.6, 0.9, 0.3}, {0.4, 0.1, 0.5, 0.7, 0.8}});
+        assertEquals(e, np.vstack(r, g));
+    }
+
+    @Test
     public void test_api_stack() {
         double[] R={0.2, 0.4, 0.6, 0.9, 0.3};
         double[] G={0.4, 0.1, 0.5, 0.7, 0.8};
@@ -111,10 +152,6 @@ public class NumpyTest extends TestCase {
         NDArray e = np.array(new double[]{
             0.2, 0.4, 0.6, 0.9, 0.3, 0.4, 0.1, 0.5, 0.7, 0.8});
         assertEquals(e, np.hstack(r, g));
-
-        e = np.array(new double[][]{
-            {0.2, 0.4, 0.6, 0.9, 0.3}, {0.4, 0.1, 0.5, 0.7, 0.8}});
-        assertEquals(e, np.vstack(r, g));
 
         e = np.array(new double[][]{
             {0.2, 0.4}, {0.4, 0.1}, {0.6, 0.5}, {0.9, 0.7}, {0.3, 0.8}});

@@ -546,25 +546,46 @@ public class Numpy extends NumpyBase{
         }
 
         int cell_size = array.row(0).size();
-        int[] ldimens = Arrays.copyOf(dimens, dimens.length);
-        int[] rdimens = Arrays.copyOf(dimens, dimens.length);
+        int[] pad_dimens = Arrays.copyOf(dimens, dimens.length);
 
-        ldimens[0] = left;
-        rdimens[0] = right;
-        NDArray zeroLeft = np.zeros(new int[]{cell_size*left}, int.class).reshape(ldimens);
-        NDArray zeroRight = np.zeros(new int[]{cell_size*right}, int.class).reshape(rdimens);
+        if (left != 0) {
+            pad_dimens[0] = left;
+            NDArray zeroLeft = np.zeros(new int[]{cell_size*left}, int.class).reshape(pad_dimens);
+            array = np.vstack(zeroLeft, array);
+        }
 
-        array = np.vstack(zeroLeft, array);
-        array = np.vstack(array, zeroRight);
+        if (right != 0) {
+            pad_dimens[0] = right;
+            NDArray zeroRight = np.zeros(new int[]{cell_size*right}, int.class).reshape(pad_dimens);
+            array = np.vstack(array, zeroRight);
+        }
 
-        pads = Arrays.copyOf(pads, pads.length-2);
+        pads = Arrays.copyOfRange(pads, 2, pads.length);
         NDArray first = _pad(array.row(0), pads);
+
         for (int i = 1; i < array.dimens()[0]; i++) {
             NDArray row = array.row(i);
             row = _pad(row, pads);
             first = vstack(first, row);
         }
         return first;
+    }
+
+    public static NDArray pad(NDArray array, int[][] pads) {
+        int[] pads_ = new int[pads.length*2];
+        for (int i = 0; i < pads.length; i++) {
+            pads_[i*2] = pads[i][0];
+            pads_[i*2+1] = pads[i][1];
+        }
+
+        int[] dimens = array.dimens();
+        NDArray ret = _pad(array, pads_);
+
+        for (int i=0; i < dimens.length; i++) {
+            dimens[i] += pads_[i*2];
+            dimens[i] += pads_[i*2+1];
+        }
+        return ret.reshape(dimens);
     }
 
     public static NDArray pad(NDArray array, int[] pads) {
@@ -587,11 +608,51 @@ public class Numpy extends NumpyBase{
         return ret.reshape(dimens);
     }
 
-    public static NDArray swapaxes() {
-        return null;
+    public static NDArray swapaxes(NDArray a, int[] swap) {
+        int[] dimens = a.dimens();
+        int[][] range = new int[2][];
+        range[0] = new int[]{ALL};
+        range[1] = new int[1];
+
+        NDArray ret = a.slice(range);
+        for (int i = 1; i < dimens[1]; i++) {
+            range[1][0] = i;
+            ret = np.concatenate(a.slice(range), ret);
+        }
+
+        if (a.dimens().length == 2) {
+            return ret.reshape(dimens[1], dimens[0]);
+        }
+
+        int temp = dimens[0];
+        dimens[0] = dimens[1];
+        dimens[1] = temp;
+        ret.reshape(dimens);
+
+        return ret;
     }
 
-    public static NDArray rot90() {
-        return null;
+    public static NDArray rot90(NDArray a) {
+        int[] dimens = a.dimens();
+        int[][] range = new int[2][];
+        range[0] = new int[]{ALL};
+        range[1] = new int[1];
+
+        NDArray ret = a.slice(range);
+        for (int i = 1; i < dimens[1]; i++) {
+            range[1][0] = i;
+            ret = np.concatenate(a.slice(range), ret);
+        }
+
+        if (a.dimens().length == 2) {
+            return ret.reshape(dimens[1], dimens[0]);
+        }
+
+        int temp = dimens[0];
+        dimens[0] = dimens[1];
+        dimens[1] = temp;
+        ret.reshape(dimens);
+
+        return ret;
     }
 }
