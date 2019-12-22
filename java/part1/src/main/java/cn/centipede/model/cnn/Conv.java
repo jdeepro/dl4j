@@ -1,4 +1,4 @@
-package cn.centipede.model.ccn;
+package cn.centipede.model.cnn;
 
 import java.util.ArrayList;
 
@@ -41,7 +41,7 @@ public class Conv {
     public NDArray forward(NDArray x) {
         this.x = x;
         if (this.pad != 0) {
-            // this.x = np.pad(self.x, ((0,0),(self.pad,self.pad),(self.pad,self.pad),(0,0)), 'constant')
+            //this.x = np.pad(self.x, ((0,0),(self.pad,self.pad),(self.pad,self.pad),(0,0)), 'constant')
         }
 
         int[] xshape = x.dimens();

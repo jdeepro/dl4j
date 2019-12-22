@@ -1,4 +1,4 @@
-package cn.centipede.model.ccn;
+package cn.centipede.model.cnn;
 
 import cn.centipede.numpy.NDArray;
 

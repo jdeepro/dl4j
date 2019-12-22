@@ -1,4 +1,4 @@
-package cn.centipede.model.ccn;
+package cn.centipede.model.cnn;
 
 import cn.centipede.model.data.MNIST;
 import cn.centipede.numpy.NDArray;
@@ -13,7 +13,7 @@ import cn.centipede.numpy.NDArray;
  * @author simbaba
  * @version 0.0
  */
-public class CCN {
+public class CNN {
     public NDArray train() {return null;}
     public NDArray fit() {return null;}
 
