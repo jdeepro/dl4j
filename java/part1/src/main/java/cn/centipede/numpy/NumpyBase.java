@@ -6,7 +6,7 @@ import java.util.stream.IntStream;
 
 
 public class NumpyBase {
-    private static int dataOffset(int[] dim, int[] index) {
+    protected static int dataOffset(int[] dim, int[] index) {
         int len = dim.length;
         int s = 1, pos = 0;
 

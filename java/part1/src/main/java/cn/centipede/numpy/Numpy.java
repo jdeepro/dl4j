@@ -608,28 +608,55 @@ public class Numpy extends NumpyBase{
         return ret.reshape(dimens);
     }
 
-    public static NDArray swapaxes(NDArray a, int[] swap) {
+    public static boolean next_dimen(int[] dimens, int[] iter) {
+        boolean flag = true;
+        int i=iter.length-1;
+
+        while (i >= 0) {
+            if (flag) iter[i]++;
+            flag = iter[i] >= dimens[i];
+            if (!flag) break;
+            iter[i--] = 0;
+        }
+        return i >= 0;
+    }
+
+    private static void doSwap(int[] data, int[] data_dst, int[] dimens, int[] iter, int axis1, int axis2) {
+        int[] dimens_dst = Arrays.copyOf(iter, iter.length);
+        int a1 = dataOffset(dimens, iter);
+
+        int t = dimens_dst[axis1];
+        dimens_dst[axis1] = dimens_dst[axis2];
+        dimens_dst[axis2] = t;
+
+        int[] dimens2 = Arrays.copyOf(dimens, dimens.length);
+        t = dimens2[axis1];
+        dimens2[axis1] = dimens2[axis2];
+        dimens2[axis2] = t;
+        int a2 = dataOffset(dimens2, dimens_dst);
+
+        data_dst[a2] = data[a1];
+    }
+
+    public static NDArray swapaxes(NDArray a, int axis1, int axis2) {
+        if (axis1 == 0 && axis2 == 1) {
+            return a.T;
+        }
+
         int[] dimens = a.dimens();
-        int[][] range = new int[2][];
-        range[0] = new int[]{ALL};
-        range[1] = new int[1];
+        int[] iter = new int[dimens.length];
+        int[] data = (int[])getArrayData(a);
+        int[] data_dst = new int[data.length];
 
-        NDArray ret = a.slice(range);
-        for (int i = 1; i < dimens[1]; i++) {
-            range[1][0] = i;
-            ret = np.concatenate(a.slice(range), ret);
-        }
+        do {
+            doSwap(data, data_dst, dimens, iter, axis1, axis2);
+        } while(next_dimen(dimens, iter));
 
-        if (a.dimens().length == 2) {
-            return ret.reshape(dimens[1], dimens[0]);
-        }
+        int t = dimens[axis1];
+        dimens[axis1] = dimens[axis2];
+        dimens[axis2] = t;
 
-        int temp = dimens[0];
-        dimens[0] = dimens[1];
-        dimens[1] = temp;
-        ret.reshape(dimens);
-
-        return ret;
+        return np.array(data_dst, dimens);
     }
 
     public static NDArray rot90(NDArray a) {

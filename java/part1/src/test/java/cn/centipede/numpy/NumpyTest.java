@@ -1,6 +1,7 @@
 package cn.centipede.numpy;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 import org.junit.Test;
 
@@ -34,7 +35,7 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
-    public void test_api_atRange() {
+    public void test_api_slice() {
         NDArray a = np.arange(36).reshape(4,3,3);
         int[] expected = {8, 17};
         int[][] range = {{0,2}, {2}, {-1+3}}; // not support negative, but slice can
@@ -70,10 +71,21 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
+    public void test_next_dimen() {
+        int[] dimens = {2,4,3};
+        int[] iter = new int[3];
+
+        do {
+            IntStream.of(iter).forEach(System.out::print);
+            System.out.println();
+        } while (np.next_dimen(dimens, iter));
+    }
+
+    @Test
     public void test_api_swapaxes() {
-        NDArray a = np.arange(24).reshape(2,3,4);
-        NDArray actual = a.slice(new int[][]{{ALL}, {ALL}, {0}});
-        actual.T.dump();
+        NDArray a = np.arange(24).reshape(1,2,3,4);
+        NDArray actual = np.swapaxes(a, 1, 3);
+        assertEquals(np.array(new int[]{0, 12}), actual.index(0,0,0));
     }
 
     @Test
