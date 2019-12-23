@@ -89,6 +89,12 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
+    public void test_api_flipud() {
+        NDArray a = np.arange(12).reshape(3,4);
+        assertEquals(np.array(new int[]{0,1,2,3}), np.flipud(a).row(2));
+    }
+
+    @Test
     public void test_api_rot90() {
         NDArray a = np.arange(6).reshape(6,1);
         np.rot90(a).dump();
@@ -97,6 +103,11 @@ public class NumpyTest extends TestCase {
         int[][][] expect = {{{3,4,5}},{{0,1,2}}};
         a = np.arange(6).reshape(1,2,3);
         assertEquals(np.array(expect), np.rot90(a));
+
+        a = np.arange(12).reshape(2,2,3);
+        NDArray actual = np.rot90(a, 1, new int[]{0,2});
+        int[][][] expected = {{{2,8},{5,11}},{{1,7},{4,10}},{{0,6},{3,9}}};
+        assertEquals(np.array(expected), actual);
     }
 
     @Test

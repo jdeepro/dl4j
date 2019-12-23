@@ -41,7 +41,8 @@ public class Conv {
     public NDArray forward(NDArray x) {
         this.x = x;
         if (this.pad != 0) {
-            //this.x = np.pad(self.x, ((0,0),(self.pad,self.pad),(self.pad,self.pad),(0,0)), 'constant')
+            int[][] pads = {{0,0},{this.pad,this.pad},{this.pad,this.pad},{0,0}};
+            this.x = np.pad(this.x,pads);
         }
 
         int[] xshape = x.dimens();
@@ -80,26 +81,27 @@ public class Conv {
         }
 
         this.k_gradient.divide(bx);
-        //this.b_gradient.add(np.sum(delta_col, axis=(0, 1)));
+        this.b_gradient.add(np.sum(delta_col, new int[]{0, 1}));
         this.b_gradient.divide(bx);
 
         // delta_backward
         NDArray delta_backward = np.zeros(this.x.dimens());
-        //NDArray k_180 = np.rot90(this.k, 2, (0,1));
-        //NDArray k_180 = k_180.swapaxes(2, 3);
-        //NDArray k_180_col = k_180.reshape(-1, ck);
+        NDArray k_180 = np.rot90(this.k, 2, new int[]{0,1});
+        k_180 = null;//k_180.swapaxes(2, 3);
+        NDArray k_180_col = k_180.reshape(-1, ck);
 
         NDArray pad_delta;
         if (hd-hk+1 != hx) {
             pad = (hx-hd+hk-1) / 2;
-            //pad_delta = np.pad(delta, ((0,0),(pad,pad),(pad,pad),(0,0)), 'constant')
+            int[][] pads = {{0,0},{this.pad,this.pad},{this.pad,this.pad},{0,0}};
+            pad_delta = np.pad(delta, pads);
         } else {
             pad_delta = delta;
         }
 
         for (int i = 0; i < bx; i++) {
-            //pad_delta_col = img2col(pad_delta[i], wk, self.stride);
-            //delta_backward[i] = np.dot(pad_delta_col, k_180_col).reshape(wx,hx,ck);
+            NDArray pad_delta_col = img2col(pad_delta.row(i), wk, this.stride);
+            delta_backward.set(np.dot(pad_delta_col, k_180_col).reshape(wx,hx,ck), i);
         }
 
         this.k.subtract(this.k_gradient.multiply(learning_rate));

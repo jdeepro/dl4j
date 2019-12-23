@@ -684,6 +684,31 @@ public class Numpy extends NumpyBase{
         return np.array(data_dst, dimens);
     }
 
+    public static NDArray flipud(NDArray a) {
+        int[] dimens = a.dimens();
+        NDArray ret = a.row(dimens[0]-1);
+        for (int i = dimens[0]-2; i >= 0; i--) {
+            ret = concatenate(ret, a.row(i));
+        }
+        return ret.reshape(dimens);
+    }
+
+    public static NDArray rot90(NDArray a, int times, int[] axies) {
+        NDArray ret = swapaxes(a, axies[0], axies[1]);
+        return flipud(ret);
+    }
+
+    public static NDArray rot90(NDArray a, int times) {
+        if (times < 0) {
+            times += 4;
+        }
+        NDArray ret = a;
+        while (times-->0) {
+            ret=rot90(ret);
+        }
+        return ret;
+    }
+
     public static NDArray rot90(NDArray a) {
         int[] dimens = a.dimens();
         int[][] range = new int[2][];
