@@ -462,6 +462,31 @@ public class Numpy extends NumpyBase{
         }
     }
 
+    public static NDArray sum(NDArray array, int axis) {
+        int[] index = new int[++axis];
+        for (int i = 0; i < axis-1; i++) {
+            index[i] = ALL;
+        }
+
+        int[] dimens = array.dimens();
+
+        NDArray ret = array.index(index);
+        for (int i = 1; i < dimens[axis-1]; i++) {
+            index[axis-1] = i;
+            ret=ret.add(array.index(index));
+        }
+        return ret;
+    }
+
+    public static NDArray sum(NDArray array, int[] axies) {
+        Arrays.sort(axies);
+
+        for (int i = axies.length-1; i >= 0; i--) {
+            array = sum(array, axies[i]);
+        }
+        return array;
+    }
+
     public static int sumInt(NDArray array) {
         Object dat = getArrayData(array);
         return IntStream.of((int[])dat).sum();

@@ -194,6 +194,12 @@ public class NumpyTest extends TestCase {
 
         a = np.arange(9).reshape(3,3);
         assertEquals(36, np.sumInt(a));
+
+        a = np.arange(12).reshape(2,3,2);
+        int[][] expect = {{1, 5, 9}, {13, 17, 21}};
+        assertEquals(np.array(expect), np.sum(a, 2));
+
+        assertEquals(np.array(new int[]{15, 51}), np.sum(a, new int[]{1,2}));
     }
 
     @Test
