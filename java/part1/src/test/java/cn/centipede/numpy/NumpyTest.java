@@ -50,6 +50,16 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
+    public void test_api_repeat() {
+        NDArray a = np.arange(6).reshape(3,2);
+        np.repeat(a, 3).dump();
+
+        a = np.arange(24).reshape(2,2,3,2);
+        NDArray expected = np.repeat(a, new int[]{0,2}, 1).index(0,0);
+        assertEquals(np.array(new int[][]{{6,7},{8,9},{10,11}}), expected);
+    }
+
+    @Test
     public void test_api_pad() {
         int[] pad = new int[]{1,2};
         NDArray a = np.array(new int[]{1,2,3,4});
@@ -75,10 +85,12 @@ public class NumpyTest extends TestCase {
         int[] dimens = {2,4,3};
         int[] iter = new int[3];
 
-        do {
-            IntStream.of(iter).forEach(System.out::print);
-            System.out.println();
-        } while (np.next_dimen(dimens, iter));
+        int index = 5; // 000,001,002,010,011,012,020
+        while (index-->0) {
+            np.next_dimen(dimens, iter);
+        }
+        String actual = Arrays.toString(iter);
+        assertEquals("[0, 1, 2]", actual);
     }
 
     @Test

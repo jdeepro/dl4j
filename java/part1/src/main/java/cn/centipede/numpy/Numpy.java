@@ -728,8 +728,56 @@ public class Numpy extends NumpyBase{
         int temp = dimens[0];
         dimens[0] = dimens[1];
         dimens[1] = temp;
-        ret.reshape(dimens);
 
-        return ret;
+        return ret.reshape(dimens);
+    }
+
+    public static NDArray repeat(NDArray a, int repeats) {
+        return repeat(a, new int[]{repeats}, 1, a.size()*repeats);
+    }
+
+    public static NDArray repeat(NDArray a, int repeats, int axis) {
+        return repeat(a, new int[]{repeats}, axis);
+    }
+
+    private static NDArray repeat(NDArray a, int[] repeats, int block, int size) {
+        int[] data = new int[size];
+        int[] src = (int[])getArrayData(a);
+        int count = a.size()/block;
+        int offset = 0;
+
+        for (int i = 0; i < count; i++) {
+            for (int j = 0; j < repeats[i%repeats.length]; j++) {
+                System.arraycopy(src, i*block, data, offset, block);
+                offset += block;
+            }
+        }
+        return array(data);
+    }
+
+    public static NDArray repeat(NDArray a, int[] repeats, int axis) {
+        int[] dimens = a.dimens();
+        int[] size = new int[dimens.length];
+
+        int index = dimens.length-1;
+        size[index] = 1;
+
+        while (--index >= 0) {
+            size[index] = size[index+1]*dimens[index+1];
+        }
+
+        if (repeats.length == 1) {
+            dimens[axis] = dimens[axis]+repeats[0];
+        } else {
+            dimens[axis] = IntStream.of(repeats).sum();
+        }
+
+        int length = 1;
+        for (int i = 0; i < dimens.length; i++) {
+            length *= dimens[i];
+        }
+
+        NDArray ret =repeat(a, repeats, size[axis], length);
+        return ret.reshape(dimens);
     }
 }

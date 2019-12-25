@@ -87,7 +87,7 @@ public class Conv {
         // delta_backward
         NDArray delta_backward = np.zeros(this.x.dimens());
         NDArray k_180 = np.rot90(this.k, 2, new int[]{0,1});
-        k_180 = null;//k_180.swapaxes(2, 3);
+        k_180 = np.swapaxes(k_180, 2, 3);
         NDArray k_180_col = k_180.reshape(-1, ck);
 
         NDArray pad_delta;
