@@ -68,11 +68,11 @@ public class Conv {
 
     public NDArray backward(NDArray delta, double learning_rate) {
         int[] xshape = this.x.dimens(); // batch,14,14,inchannel
-        int bx = xshape[0], wx = xshape[1], hx = xshape[2], cx = xshape[3];
+        int bx = xshape[0], wx = xshape[1], hx = xshape[2];
         int[] kshape = this.k.dimens(); // 5,5,inChannel,outChannel
-        int wk = kshape[0], hk = kshape[1], ck = kshape[2], nk = kshape[3];
+        int wk = kshape[0], hk = kshape[1], ck = kshape[2];
         int[] dshape = delta.dimens();  // batch,10,10,outChannel
-        int bd = dshape[0], wd = dshape[1], hd = dshape[2], cd = dshape[3];
+        int bd = dshape[0], hd = dshape[2], cd = dshape[3];
 
         // self.k_gradient,self.b_gradient
         NDArray delta_col = delta.reshape(bd, -1, cd);

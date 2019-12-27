@@ -1,7 +1,6 @@
 package cn.centipede.numpy;
 
 import java.util.Arrays;
-import java.util.stream.IntStream;
 
 import org.junit.Test;
 
@@ -17,6 +16,13 @@ public class NumpyTest extends TestCase {
         int[] expected = {4,5,6,7};
         assertEquals(np.array(expected), a.index(1));
         assertEquals(np.array(6), a.index(1,2));
+    }
+
+    @Test
+    public void test_api_set() {
+        NDArray a = np.arange(24).reshape(2,3,4);
+        a.set(new int[]{100,200,300, 400}, 1, 1);
+        assertEquals(np.array(new int[]{100,200,300, 400}), a.index(1,1));
     }
 
     @Test
@@ -223,6 +229,19 @@ public class NumpyTest extends TestCase {
         assertEquals(np.array(expect), np.sum(a, 2));
 
         assertEquals(np.array(new int[]{15, 51}), np.sum(a, new int[]{1,2}));
+    }
+
+    @Test
+    public void test_api_max() {
+        NDArray a = np.arange(6).reshape(2,3);
+        assertEquals(np.array(new int[]{3,4,5}), np.max(a, 0));
+        assertEquals(np.array(new int[]{2,5}), np.max(a, 1));
+
+        assertEquals(np.array(new int[]{1,1,1}), np.argmax(a, 0));
+        assertEquals(np.array(new int[]{2,2}), np.argmax(a, 1));
+
+        a = np.random.rand(2,3);
+        np.max(a, 0).dump();
     }
 
     @Test

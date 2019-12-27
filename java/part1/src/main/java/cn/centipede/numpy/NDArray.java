@@ -98,13 +98,21 @@ public class NDArray implements Cloneable{
         return _dimens;
     }
 
+    public int asInt() {
+        if (_dimens == null || _dimens.length == 0) {
+            int d = (int)_data;
+            return d;
+        } else {
+            return ((int[])_data)[0];
+        }
+    }
+
     public double asDouble() {
         if (_dimens == null || _dimens.length == 0) {
             double d = (double)_data;
             return d;
         } else {
-            double d = (Double)Array.get(_data, 0);
-            return d;
+            return ((double[])_data)[0];
         }
     }
 
@@ -174,10 +182,11 @@ public class NDArray implements Cloneable{
      * @param data number
      * @param index int[]
      */
-    public void set(Object data, int... index) {
+    public NDArray set(Object data, int... index) {
         NDArray row = row(index[0]);
         if (index.length > 1) {
             row.set(data, Arrays.copyOfRange(index, 1, index.length));
+            return this;
         }
 
         int[] idata = row.dataIndex();
@@ -187,8 +196,14 @@ public class NDArray implements Cloneable{
             data = np.getArrayData(array);
             for (int indx : idata) Array.set(_data, indx, Array.get(data, i++));
         } else {
-            for (int indx : idata) Array.set(_data, indx, data);
+            if (data.getClass().isArray()) {
+                int i = 0;
+                for (int indx : idata) Array.set(_data, indx, Array.get(data, i++));
+            } else {
+                for (int indx : idata) Array.set(_data, indx, data);
+            }
         }
+        return this;
     }
 
     /**

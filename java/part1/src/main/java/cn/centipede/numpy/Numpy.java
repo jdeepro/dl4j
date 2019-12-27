@@ -780,4 +780,117 @@ public class Numpy extends NumpyBase{
         NDArray ret =repeat(a, repeats, size[axis], length);
         return ret.reshape(dimens);
     }
+
+    private static int argmaxInt(NDArray a) {
+        Object dat = getArrayData(a);
+        int index = 0;
+        int temp = ((int[])dat)[0];
+
+        for (int i = 1; i < ((int[])dat).length; i++) {
+            if (temp < ((int[])dat)[i]) {
+                index = i;
+                temp = ((int[])dat)[i];
+            }
+        }
+        return index;
+    }
+
+    private static int argmaxDouble(NDArray a) {
+        Object dat = getArrayData(a);
+        int index = 0;
+        double temp = ((double[])dat)[0];
+
+        for (int i = 1; i < ((double[])dat).length; i++) {
+            if (temp < ((double[])dat)[i]) {
+                index = i;
+                temp = ((double[])dat)[i];
+            }
+        }
+        return index;
+    }
+
+    public static Object max(NDArray a) {
+        Object dat = getArrayData(a);
+        if (a.isInt()) {
+            return IntStream.of((int[])dat).max().getAsInt();
+        }
+        return DoubleStream.of((double[])dat).max().getAsDouble();
+    }
+
+    public static int argmax(NDArray a) {
+        return a.isInt()?argmaxInt(a):argmaxDouble(a);
+    }
+
+    private static NDArray max(NDArray a, int axis, boolean argmax) {
+        int[] dimens = a.dimens();
+        int retSize = 1;
+
+        for (int i = 0; i < dimens.length; i++) {
+            if (i == axis) continue;
+            retSize *= dimens[i];
+        }
+
+        int[] retDimens = new int[dimens.length-1];
+        for (int i = 0, j = 0; i < dimens.length; i++) {
+            if (i == axis) continue;
+            retDimens[j++] = dimens[i];
+        }
+
+        int[] dimensEx = new int[dimens.length+1];
+        System.arraycopy(dimens, 0, dimensEx, 1, dimens.length);
+        dimensEx[0] = 1;
+
+        int rows = dimensEx[axis+1];
+        int blocks = 1;
+        for (int i = 0; i <= axis; i++) {
+            blocks *= dimensEx[i];
+        }
+
+        int bsize = 1;
+        for (int i = axis+2; i < dimensEx.length; i++) {
+            bsize *= dimensEx[i];
+        }
+
+        Object retData = a.isInt()||argmax ? new int[retSize]:new double[retSize];
+        Object data = getArrayData(a);
+
+        for (int b = 0; b < blocks; b++) {
+            int retOffset = b*bsize;
+            int blockOffset = retOffset*rows;
+            System.arraycopy(data, blockOffset, retData, b*bsize, bsize);
+
+            for (int i = 1; i < rows; i++) {
+                int rowOffset = blockOffset+i*bsize;
+                if (a.isInt()) {
+                    for (int j = 0; j < bsize; j++) {
+                        int retj = retOffset+j;
+                        int rowj = rowOffset+j;
+                        if (((int[])retData)[retj] < ((int[])data)[rowj]) {
+                            ((int[])retData)[retj] = argmax?i:((int[])data)[rowj];
+                        }
+                    }
+                } else {
+                    for (int j = 0; j < bsize; j++) {
+                        int retj = retOffset+j;
+                        int rowj = rowOffset+j;
+                        if (((double[])retData)[retj] < ((double[])data)[rowj]) {
+                            if (argmax) ((int[])retData)[retj] = i;
+                            else ((double[])retData)[retj] = ((double[])data)[rowj];
+                        }
+                    }
+                }
+            }
+        }
+
+        NDArray ret = np.array(retData);
+        return retDimens.length>1?ret.reshape(retDimens):ret;
+    }
+
+    public static NDArray max(NDArray a, int axis) {
+        return max(a, axis, false);
+    }
+
+    public static NDArray argmax(NDArray a, int axis) {
+        return max(a, axis, true);
+    }
 }
