@@ -6,14 +6,14 @@ import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
 
 public class Conv {
-    private NDArray x;
-    private int pad = 0;
-    private int stride = 0;
-    private NDArray k;
-    private NDArray b;
-    private NDArray k_gradient;
-    private NDArray b_gradient;
-    private ArrayList<NDArray> image_col;
+    NDArray x;
+    int pad = 0;
+    int stride = 0;
+    NDArray k;
+    NDArray b;
+    NDArray k_gradient;
+    NDArray b_gradient;
+    ArrayList<NDArray> image_col;
 
     public Conv(int[] kshape, int stride, int pad) {
         init(kshape, stride, pad);
@@ -109,7 +109,7 @@ public class Conv {
         return delta_backward;
     }
 
-    static NDArray img2col(NDArray x, int ksize, int stride) {
+    public static NDArray img2col(NDArray x, int ksize, int stride) {
         int[] shape = x.dimens();
         int wx = shape[0], cx = shape[2];
         int feature_w = (wx - ksize) / stride + 1;

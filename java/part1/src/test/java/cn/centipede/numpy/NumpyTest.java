@@ -20,9 +20,19 @@ public class NumpyTest extends TestCase {
 
     @Test
     public void test_api_set() {
-        NDArray a = np.arange(24).reshape(2,3,4);
+        NDArray a = np.arange(24).reshape(2, 3, 4);
         a.set(new int[]{100,200,300, 400}, 1, 1);
         assertEquals(np.array(new int[]{100,200,300, 400}), a.index(1,1));
+    }
+
+    @Test
+    public void test_api_asInt() {
+        NDArray a = np.arange(12).reshape(3, 4);
+        NDArray b = a.index(0, 3);
+        assertEquals(3, b.asInt());
+
+        NDArray c = np.array(4);
+        assertEquals(4, c.asInt());
     }
 
     @Test
@@ -53,6 +63,20 @@ public class NumpyTest extends TestCase {
         int[] dat = new int[]{2,4};
         NDArray a = np.array(dat);
         assertEquals("(2,)", a.shape());
+    }
+
+    @Test
+    public void test_api_maximum() {
+        NDArray a = np.arange(12).reshape(3,4);
+        assertEquals(np.array(new int[]{5,5,5,5}), np.maximum(a, 5).row(0));
+    }
+
+    @Test
+    public void test_api_checkset() {
+        NDArray a = np.arange(6).reshape(3,2);
+        NDArray b = np.array(new int[][]{{3,43},{43,9},{1,8}});
+        NDArray actual = np.checkset(a, b, (int n)->n<10, 2);
+        assertEquals(np.array(new int[][]{{2,1},{2,2},{2,2}}), actual);
     }
 
     @Test

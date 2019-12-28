@@ -5,6 +5,8 @@ import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.function.DoublePredicate;
+import java.util.function.IntPredicate;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -892,5 +894,50 @@ public class Numpy extends NumpyBase{
 
     public static NDArray argmax(NDArray a, int axis) {
         return max(a, axis, true);
+    }
+
+    public static NDArray maximum(NDArray a, int v){
+        int[] idata = a.dataIndex();
+        int[] data = (int[])a.data();
+
+        for (int i = 0; i < a.size(); i++) {
+            if (data[idata[i]] < v) data[idata[i]] = v;
+        }
+        return a;
+    }
+
+    public static NDArray maximum(NDArray a, double v){
+        int[] idata = a.dataIndex();
+        double[] data = (double[])a.data();
+
+        for (int i = 0; i < a.size(); i++) {
+            if (data[idata[i]] < v) data[idata[i]] = v;
+        }
+        return a;
+    }
+
+    public static NDArray checkset(NDArray a, NDArray x, DoublePredicate check, double value) {
+        int[] iadata = a.dataIndex();
+        int[] ixdata = x.dataIndex();
+
+        double[] adata = (double[])a.data();
+        double[] xdata = (double[])x.data();
+
+        for (int i = 0; i < a.size(); i++) {
+            if (check.test(xdata[ixdata[i]])) adata[iadata[i]] = value;
+        }
+        return a;
+    }
+    public static NDArray checkset(NDArray a, NDArray x, IntPredicate check, int value) {
+        int[] iadata = a.dataIndex();
+        int[] ixdata = x.dataIndex();
+
+        int[] adata = (int[])a.data();
+        int[] xdata = (int[])x.data();
+
+        for (int i = 0; i < a.size(); i++) {
+            if (check.test(xdata[ixdata[i]])) adata[iadata[i]] = value;
+        }
+        return a;
     }
 }

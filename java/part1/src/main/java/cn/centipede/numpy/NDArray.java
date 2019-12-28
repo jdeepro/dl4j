@@ -100,8 +100,11 @@ public class NDArray implements Cloneable{
 
     public int asInt() {
         if (_dimens == null || _dimens.length == 0) {
-            int d = (int)_data;
-            return d;
+            if (_data.getClass().isArray()) {
+                return ((int[])_data)[_idata[0]];
+            } else {
+                return (int)_data;
+            }
         } else {
             return ((int[])_data)[0];
         }
