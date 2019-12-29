@@ -19,6 +19,7 @@ public class CnnTest extends TestCase {
         CNN cnn = new CNN();
         cnn.loadNpz();
 
+        np.random.seed(System.currentTimeMillis());
         int rand = np.random.randint(10000);
 
         NDArray label = mnist[1].row(rand);
@@ -27,8 +28,7 @@ public class CnnTest extends TestCase {
         int actual = cnn.predict(X);
 
         X.reshape(28,28).dump();
-        System.out.println("predict="+actual);
-
+        System.out.printf("rand=%d, label=%d, predict=", rand, label.asInt(), actual);
         assertEquals(label.asInt(), actual);
     }
 
