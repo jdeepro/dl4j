@@ -28,7 +28,7 @@ public class CnnTest extends TestCase {
         int actual = cnn.predict(X);
 
         X.reshape(28,28).dump();
-        System.out.printf("rand=%d, label=%d, predict=", rand, label.asInt(), actual);
+        System.out.printf("rand=%d, label=%d, predict=%d\n", rand, label.asInt(), actual);
         assertEquals(label.asInt(), actual);
     }
 
