@@ -24,16 +24,6 @@
       <artifactId>jama</artifactId>
       <version>1.0.3</version>
     </dependency>
-    <dependency>
-      <groupId>org.jetbrains.bio</groupId>
-      <artifactId>npy</artifactId>
-      <version>0.3.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-stdlib</artifactId>
-      <version>1.3.61</version>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -45,25 +35,6 @@
             <source>1.8</source>
             <target>1.8</target>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.jetbrains.kotlin</groupId>
-        <artifactId>kotlin-maven-plugin</artifactId>
-        <version>1.3.61</version>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>process-sources</phase>
-            <goals>
-              <goal>compile</goal>
-            </goals>
-            <configuration>
-              <sourceDirs>
-                <source>src/main/kotlin</source>
-              </sourceDirs>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
   </plugins>
 </build>

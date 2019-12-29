@@ -3,13 +3,9 @@ package cn.centipede.model.cnn;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
-import java.util.List;
-
-import org.jetbrains.bio.npy.NpzEntry;
-import org.jetbrains.bio.npy.NpzFile;
-import org.jetbrains.bio.npy.NpzFile.Reader;
 
 import cn.centipede.model.data.MNIST;
+import cn.centipede.npz.NpzFile;
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
 
@@ -38,22 +34,13 @@ public class CNN {
 
     public void loadNpz() throws URISyntaxException {
         URL npzURL = CNN.class.getResource("/mnist.npz");
-        Reader reader = NpzFile.read(Paths.get(npzURL.toURI()));
-        List<NpzEntry> npz = reader.introspect();
-        NDArray[] cnnArgs = new NDArray[npz.size()];
-
-        for (int i = 0; i < npz.size(); i++) {
-             Object data = reader.get(npz.get(i).getName(), Integer.MAX_VALUE).getData();
-             cnnArgs[i] = np.array(data, npz.get(i).getShape());
-         }
-        reader.close();
-
-        conv1.k = cnnArgs[0];
-        conv1.b = cnnArgs[1];
-        conv2.k = cnnArgs[2];
-        conv2.b = cnnArgs[3];
-        nn.W = cnnArgs[4];
-        nn.b = cnnArgs[5];
+        NpzFile npz = new NpzFile(Paths.get(npzURL.toURI()));
+        conv1.k = npz.get("k1");
+        conv1.b = npz.get("b1");
+        conv2.k = npz.get("k2");
+        conv2.b = npz.get("b2");
+        nn.W = npz.get("w3");
+        nn.b = npz.get("b3");
     }
 
     public int predict(NDArray X) {
