@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 public class CnnTest extends TestCase {
 
     @Test
-    public void test_recongize_mnist() throws URISyntaxException {
+    public void test_recongize_mnist() {
         NDArray[] mnist = MNIST.numpy(false); // train=false
 
         CNN cnn = new CNN();

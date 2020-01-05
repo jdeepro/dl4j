@@ -31,9 +31,17 @@ public class CNN {
     private Softmax softmax = new Softmax();
 
 
-    public void loadNpz() throws URISyntaxException {
+    /** let's any exception just go! */
+    public void loadNpz() {
         URL npzURL = CNN.class.getResource("/mnist.npz");
-        NpzFile npz = new NpzFile(Paths.get(npzURL.toURI()));
+        NpzFile npz;
+
+        try {
+            npz = new NpzFile(Paths.get(npzURL.toURI()));
+        } catch (URISyntaxException e) {
+           throw new RuntimeException(e.getMessage());
+        }
+
         conv1.k = npz.get("k1");
         conv1.b = npz.get("b1");
         conv2.k = npz.get("k2");
