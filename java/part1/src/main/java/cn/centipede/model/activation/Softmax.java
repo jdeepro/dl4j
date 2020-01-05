@@ -1,4 +1,4 @@
-package cn.centipede.model.cnn;
+package cn.centipede.model.activation;
 
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;

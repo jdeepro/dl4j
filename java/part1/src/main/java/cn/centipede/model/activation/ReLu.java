@@ -1,16 +1,19 @@
 package cn.centipede.model.activation;
 
-import cn.centipede.model.Activation;
 import cn.centipede.numpy.NDArray;
+import cn.centipede.numpy.Numpy.np;
 
-public class ReLu implements Activation{
-    @Override
-    public NDArray forward(NDArray z) {
-        return null;
+public class Relu {
+    private NDArray x;
+
+    public NDArray forward(NDArray x) {
+        this.x = x;
+        return np.maximum(x, 0.);
     }
 
-    @Override
-    public NDArray backward(NDArray z) {
-        return null;
+    public NDArray backward(NDArray delta) {
+        //delta[self.x<0] = 0;
+        np.checkset(delta, x, (n)->(double)n<0, 0.);
+        return delta;
     }
 }

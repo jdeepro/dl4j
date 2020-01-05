@@ -222,7 +222,7 @@ public class NumpyTest extends TestCase {
             {0.2, 0.4}, {0.4, 0.1}, {0.6, 0.5}, {0.9, 0.7}, {0.3, 0.8}});
         r.reshape(ALL, np.newaxis);
         g.reshape(ALL, np.newaxis);
-        assertEquals(e, np.hstack(r.T, g.T));
+        assertEquals(e, np.hstack(r, g));
 
         double[][] D={{0.2, 0.4, 0.7}, {0.4, 0.1, 0.8}, {0.6, 0.5, 0.2}, {0.9, 0.7, 0.3}, {0.3, 0.8, 0.4}};
         double[][] E={{0.2, 0.4, 0.6, 0.9, 0.3}, {0.4, 0.1, 0.5, 0.7, 0.8}, {0.7, 0.8, 0.2, 0.3, 0.4}};

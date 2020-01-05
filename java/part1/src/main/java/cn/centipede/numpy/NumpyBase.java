@@ -1,11 +1,15 @@
 package cn.centipede.numpy;
 
 import java.lang.reflect.Array;
-import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 
 public class NumpyBase {
+
+    /**
+     * Get the offset of the index
+     * NDArray use a one-dimens array
+     */
     protected static int dataOffset(int[] dim, int[] index) {
         int len = dim.length;
         int s = 1, pos = 0;
@@ -17,6 +21,55 @@ public class NumpyBase {
 
         pos += index[len-1];
         return pos;
+    }
+
+    /**
+     * data: NDArray, number, int[][][], double[][][]
+     * genertic
+     * convenrt to int[] or double[]
+     */
+    static Object flattenDat(Object data) {
+        Object array;
+
+        if (data instanceof NDArray) {
+            array = getArrayData((NDArray) data);
+        } else if (data.getClass().isArray()) {
+            array = ArrayHelper.flatten(data)[1];
+        } else {
+            array = data instanceof Integer?new int[]{(int) data}:new double[]{(double)data};
+        }
+       return array;
+    }
+
+    /**
+     * Get a real array from NDArray
+     * NDArray uses a data buffer not a muti-dim array
+     */
+    public static Object getArray(NDArray array) {
+        Object real = getArrayData(array);
+        int[] dim = array.dimens();
+        return ArrayHelper.struct(real, dim);
+    }
+
+    /**
+     * NDArray maybe a sparse array with idata
+     * share data with other var
+     * @param array
+     * @return standalone data
+     */
+    public static Object getArrayData(NDArray array) {
+        Object data = array.data();
+        int[] index = array.dataIndex();
+
+        if (data instanceof int[]) {
+            return IntStream.of(index).map(i-> (int) Array.get(data, i)).toArray();
+        } else if (data instanceof Integer) {
+            return new int[]{(int)data};
+        } else if (data instanceof Double) {
+            return new double[]{(double)data};
+        } else {
+            return IntStream.of(index).mapToDouble(i-> (double) Array.get(data, i)).toArray();
+        }
     }
 
     /**
@@ -42,87 +95,5 @@ public class NumpyBase {
         }
     }
 
-    public static Object doOp(Object src, Object dat, ICalc op) {
-        boolean isSrcInt = src instanceof int[];
-        boolean isDatInt = dat instanceof int[];
-
-        if (isSrcInt && isDatInt) {
-            return doOp((int[])src, (int[])dat, op);
-        } else if (isSrcInt) {
-            double[] srcNew = IntStream.of((int[])src).asDoubleStream().toArray();
-            return doOp(srcNew, (double[])dat, op);
-        } else if (isDatInt) {
-            double[] datNew = IntStream.of((int[])dat).asDoubleStream().toArray();
-            return doOp((double[])src, datNew, op);
-        } else {
-            return doOp((double[])src, (double[])dat, op);
-        }
-    }
-
-    public static int[] doOp(int[] src, int[] data, ICalc op) {
-        int length = Array.getLength(data);
-        int[] ret = new int[src.length];
-
-        for (int i = 0; i < src.length; i++) {
-            Integer left = src[i];
-            Integer right = data[i%length];
-            ret[i] = (Integer)op.calc(left, right);
-        }
-        return ret;
-    }
-
-    public static double[] doOp(double[] src, double[] data, ICalc op) {
-        int length = Array.getLength(data);
-        double[] ret = new double[src.length];
-
-        for (int i = 0; i < src.length; i++) {
-            Double left = src[i];
-            Double right = data[i%length];
-            ret[i] = (Double)op.calc(left, right);
-        }
-        return ret;
-    }
-
-    public static Object doOp(Object src, ICalcEx op) {
-        boolean isSrcInt = src instanceof int[];
-
-        if (isSrcInt) {
-            return IntStream.of((int[])src).mapToDouble(a->(double)op.calc(a)).toArray();
-        } else {
-            return DoubleStream.of((double[])src).map(a->(double)op.calc(a)).toArray();
-        }
-    }
-
-    static Object dotDouble(double[] aData, int[] aDim, double[] bData, int[] bDim) {
-        double[] result = new double[aDim[0]*bDim[1]];
-        for (int i = 0; i < aDim[0]; i++) {
-            for (int j = 0; j < bDim[1]; j++) {
-                for (int k = 0; k < aDim[1]; k++) {
-                    result[bDim[1]*i+j] += aData[i*aDim[1]+k] * bData[k*bDim[1]+j];
-                }
-            }
-        }
-        return result;
-    }
-
-    static Object dotInt(int[] aData, int[] aDim, int[] bData, int[] bDim) {
-        int[] result = new int[aDim[0]*bDim[1]];
-        for (int i = 0; i < aDim[0]; i++) {
-            for (int j = 0; j < bDim[1]; j++) {
-                for (int k = 0; k < aDim[1]; k++) {
-                    result[bDim[1]*i+j] += aData[i*aDim[1]+k] * bData[k*bDim[1]+j];
-                }
-            }
-        }
-        return result;
-    }
-
-    static Object multiply(Object a, Object b) {
-        if (a.getClass().isArray()) {
-            a = Array.get(a, 0);
-            b = Array.get(b, 0);
-        }
-        return Operator.multiply(a, b);
-    }
 }
 

@@ -7,7 +7,7 @@ public class LinearImp {
 
     public static double loss(NDArray x, NDArray y, NDArray w) {
         NDArray diff = x.dot(w).subtract(y);
-        double cost = np.dot(diff.T, diff).asDouble();
+        double cost = np.dot(diff.T(), diff).asDouble();
         return cost/(x.dimens()[0]*2);
     }
 
@@ -18,7 +18,7 @@ public class LinearImp {
 
         for (int i = 0; i < epochs; i++) {
             NDArray diff = np.dot(x, w).subtract(y);
-            NDArray gradient = (np.dot(x.T, diff)).divide(m);
+            NDArray gradient = (np.dot(x.T(), diff)).divide(m);
             w = w.subtract(gradient.multiply(alpha));
         }
         return w;
@@ -35,7 +35,7 @@ public class LinearImp {
             NDArray row_x = x.row(idex).V();
             NDArray row_y = y.row(idex);
             NDArray diff = np.dot(row_x, w).subtract(row_y);
-            NDArray gradient = np.dot(row_x.T, diff);
+            NDArray gradient = np.dot(row_x.T(), diff);
             w = w.subtract(gradient.multiply(alpha));
             //if(i%100==0)System.out.println(loss(x, y, w));
         }
@@ -53,7 +53,7 @@ public class LinearImp {
             int[] idex = np.random.choice(m, batch_size);
             NDArray rand = x.rows(idex);
             NDArray diff = np.dot(rand, w).subtract(y.rows(idex));
-            NDArray gradient = np.dot(rand.T, diff).divide(batch_size);
+            NDArray gradient = np.dot(rand.T(), diff).divide(batch_size);
             w = w.subtract(gradient.multiply(alpha));
         }
         return w;

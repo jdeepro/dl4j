@@ -31,9 +31,9 @@ public class Linear {
     public NDArray backward(NDArray x, NDArray delta, double learning_rate) {
         // 梯度计算
         int batch_size = this.x.dimens()[0];
-        this.W_gradient = np.dot(this.x.T, delta).divide(batch_size); // bxin bxout
+        this.W_gradient = np.dot(this.x.T(), delta).divide(batch_size); // bxin bxout
         this.b_gradient = np.sum(delta, 0).divide(batch_size);
-        NDArray delta_backward = np.dot(delta, this.W.T); // bxout inxout
+        NDArray delta_backward = np.dot(delta, this.W.T()); // bxout inxout
 
         // 反向传播
         this.W = this.W.subtract(W_gradient.multiply(learning_rate));

@@ -26,7 +26,7 @@ public class ActivationTest extends TestCase {
         NDArray x =  np.array(dat_x);
 
         int[][] dat_y = {{0,1,1,0}};
-        NDArray y =  np.array(dat_y).T;
+        NDArray y =  np.array(dat_y).T();
 
         np.random.seed(1);
         int[] w_dimens = {3, 1};
@@ -38,7 +38,7 @@ public class ActivationTest extends TestCase {
             NDArray o = sigmoid.forward(z);
             NDArray delta = y.subtract(o).multiply(sigmoid.backward(o));
 
-            w = w.add(np.dot(x.T, delta));
+            w = w.add(np.dot(x.T(), delta));
         }
 
         double[][] dat = {{9.6729}, {-0.20784}, {-4.62963}};
@@ -74,11 +74,11 @@ public class ActivationTest extends TestCase {
             L1 = sigmoid.forward(np.dot(X, V));
             L2 = sigmoid.forward(np.dot(L1, W));
 
-            NDArray L2_delta = Y.T.subtract(L2).multiply(sigmoid.backward(L2));
-            NDArray L1_delta = L2_delta.dot(W.T).multiply(sigmoid.backward(L1));
+            NDArray L2_delta = Y.T().subtract(L2).multiply(sigmoid.backward(L2));
+            NDArray L1_delta = L2_delta.dot(W.T()).multiply(sigmoid.backward(L1));
 
-            NDArray W_change = L1.T.dot(L2_delta).multiply(learn_rate);
-            NDArray V_change = X.T.dot(L1_delta).multiply(learn_rate);
+            NDArray W_change = L1.T().dot(L2_delta).multiply(learn_rate);
+            NDArray V_change = X.T().dot(L1_delta).multiply(learn_rate);
 
             W = W.add(W_change);
             V = V.add(V_change);
@@ -88,6 +88,6 @@ public class ActivationTest extends TestCase {
         }
 
         double[] expected = {0,1,1,0};
-        assertTrue(L2.same(np.array(expected).V().T, 0.1));
+        assertTrue(L2.same(np.array(expected).V().T(), 0.1));
     }
 }

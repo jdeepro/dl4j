@@ -65,8 +65,8 @@ public class App {
         System.out.println(ret);
 
         JPlot plot = new JPlot();
-        double [][]X = (double[][])np.getArray(x.T);
-        double [][]Y = (double[][])np.getArray(y.T);
+        double [][]X = (double[][])np.getArray(x.T());
+        double [][]Y = (double[][])np.getArray(y.T());
         double [] W = (double[])np.getArray(ret);
 
         String caption = String.format("y=%f*x+%f", W[0], W[1]);

@@ -14,8 +14,8 @@ public class LogicalImp {
 
     // np.sum(yMat.T * np.log(hypothesis) + (1 - yMat).T * np.log(1 - hypothesis))
     // yMat.T * np.log(hypothesis)
-    NDArray left = y.T.dot(np.log(h));
-    NDArray right = (y.negative().add(1)).T.multiply(np.log(h.negative().add(1)));
+    NDArray left = y.T().dot(np.log(h));
+    NDArray right = (y.negative().add(1)).T().multiply(np.log(h.negative().add(1)));
     NDArray ret = left.add(right);
 
     double cost = (-1.0 / m) * np.sum(ret);

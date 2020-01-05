@@ -4,6 +4,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
+import cn.centipede.model.activation.Relu;
+import cn.centipede.model.activation.Softmax;
 import cn.centipede.model.data.MNIST;
 import cn.centipede.npz.NpzFile;
 import cn.centipede.numpy.NDArray;
@@ -41,6 +43,7 @@ public class CNN {
         conv2.b = npz.get("b2");
         nn.W = npz.get("w3");
         nn.b = npz.get("b3");
+        npz.close();
     }
 
     public int predict(NDArray X) {

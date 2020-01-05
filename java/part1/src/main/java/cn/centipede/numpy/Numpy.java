@@ -20,37 +20,6 @@ public class Numpy extends NumpyBase{
     public class np extends Numpy{}
     public class random extends Random{}
 
-    /**
-     * Get a real array from NDArray
-     * NDArray uses a data buffer not a muti-dim array
-     */
-    public static Object getArray(NDArray array) {
-        Object real = getArrayData(array);
-        int[] dim = array.dimens();
-        return ArrayHelper.struct(real, dim);
-    }
-
-    /**
-     * NDArray maybe a sparse array with idata
-     * share data with other var
-     * @param array
-     * @return standalone data
-     */
-    public static Object getArrayData(NDArray array) {
-        Object data = array.data();
-        int[] index = array.dataIndex();
-
-        if (data instanceof int[]) {
-            return IntStream.of(index).map(i-> (int) Array.get(data, i)).toArray();
-        } else if (data instanceof Integer) {
-            return new int[]{(int)data};
-        } else if (data instanceof Double) {
-            return new double[]{(double)data};
-        } else {
-            return IntStream.of(index).mapToDouble(i-> (double) Array.get(data, i)).toArray();
-        }
-    }
-
     public static NDArray zeros(int... dimens) {
         return zeros(dimens, double.class);
     }
@@ -104,94 +73,66 @@ public class Numpy extends NumpyBase{
         return new NDArray(array);
     }
 
-    /**
-     * data: NDArray, number, int[][][], double[][][]
-     * genertic
-     * convenrt to int[] or double[]
-     */
-    private static Object dat2Array(Object data) {
-        Object array;
-
-        if (data instanceof NDArray) {
-            array = getArrayData((NDArray) data);
-        } else if (data.getClass().isArray()) {
-            array = ArrayHelper.flatten(data)[1];
-        } else {
-            array = data instanceof Integer?new int[]{(int) data}:new double[]{(double)data};
-        }
-       return array;
+    public static NDArray binaryOp(NDArray src, Object dat, String op) {
+        Object srcData = getArrayData(src);
+        Object datArray = flattenDat(dat);
+        Object ret = Operator.binaryOp(srcData, datArray, op);
+        return new NDArray(ret, src.dimens());
     }
 
-    /**
-     * support double & int
-     * @param src
-     * @param data
-     * @return
-     */
     public static NDArray add(NDArray src, Object dat) {
-        Object srcData   = getArrayData(src);
-        Object datArray  = dat2Array(dat);
-
-        Object ret = doOp(srcData, datArray, Operator::add);
-        return new NDArray(ret,  src.dimens());
+        return binaryOp(src, dat, "+");
     }
 
     public static NDArray subtract(NDArray src, Object dat) {
-        Object srcData   = getArrayData(src);
-        Object datArray  = dat2Array(dat);
-
-        Object ret = doOp(srcData, datArray, Operator::subtract);
-        return new NDArray(ret,  src.dimens());
+        return binaryOp(src, dat, "-");
     }
 
     public static NDArray multiply(NDArray src, Object dat) {
-        Object srcData   = getArrayData(src);
-        Object datArray  = dat2Array(dat);
-
-        Object ret = doOp(srcData, datArray, Operator::multiply);
-        return new NDArray(ret,  src.dimens());
+        return binaryOp(src, dat, "*");
     }
 
     public static NDArray divide(NDArray src, Object dat) {
-        Object srcData   = getArrayData(src);
-        Object datArray  = dat2Array(dat);
+        return binaryOp(src, dat, "/");
+    }
+
+    public static NDArray negate(NDArray src) {
+        Object srcData = getArrayData(src);
 
         if (src.isInt()) {
-            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+            srcData = IntStream.of((int[])srcData).map(n->-n).toArray();
+        } else {
+            srcData = DoubleStream.of((double[])srcData).map(n->-n).toArray();
         }
 
-        if (datArray instanceof int[]) {
-            datArray = IntStream.of((int[])datArray).asDoubleStream().toArray();
-        }
-
-        Object ret = doOp(srcData, datArray, Operator::divide);
-        return new NDArray(ret,  src.dimens());
+        return new NDArray(srcData,  src.dimens());
     }
 
     public static NDArray exp(NDArray src) {
-        Object srcData   = getArrayData(src);
+        Object srcData = getArrayData(src);
 
         if (src.isInt()) {
-            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+            srcData = IntStream.of((int[])srcData).mapToDouble(n->Math.exp(n)).toArray();
+        } else {
+            srcData = DoubleStream.of((double[])srcData).map(n->Math.exp(n)).toArray();
         }
 
-        Object ret = doOp(srcData, Operator::exp);
-        return new NDArray(ret,  src.dimens());
+        return new NDArray(srcData,  src.dimens());
     }
 
     public static NDArray log(NDArray src) {
-        Object srcData   = getArrayData(src);
+        Object srcData = getArrayData(src);
 
         if (src.isInt()) {
-            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+            srcData = IntStream.of((int[])srcData).mapToDouble(n->Math.log(n)).toArray();
+        } else {
+            srcData = DoubleStream.of((double[])srcData).map(n->Math.log(n)).toArray();
         }
-
-        Object ret = doOp(srcData, Operator::log);
-        return new NDArray(ret,  src.dimens());
+        return new NDArray(srcData,  src.dimens());
     }
 
     public static NDArray abs(NDArray src) {
-        Object srcData   = getArrayData(src);
+        Object srcData = getArrayData(src);
 
         if (src.isInt()) {
             srcData = IntStream.of((int[])srcData).map(n->n>=0?n:-n).toArray();
@@ -202,7 +143,6 @@ public class Numpy extends NumpyBase{
     }
 
     /**
-     * @param src
      * @return average of dat array
      */
     public static double mean(NDArray src) {
@@ -216,18 +156,17 @@ public class Numpy extends NumpyBase{
     }
 
     /**
-     * @param src
      * @return 1/src
      */
     public static NDArray reciprocal(NDArray src) {
-        Object srcData   = getArrayData(src);
+        Object srcData = getArrayData(src);
 
         if (src.isInt()) {
-            srcData = IntStream.of((int[])srcData).asDoubleStream().toArray();
+            srcData = IntStream.of((int[])srcData).mapToDouble(n->1/n).toArray();
+        } else {
+            srcData = DoubleStream.of((double[])srcData).map(n->1/n).toArray();
         }
-
-        Object ret = doOp(srcData, Operator::reciprocal);
-        return new NDArray(ret,  src.dimens());
+        return new NDArray(srcData,  src.dimens());
     }
 
     /**
@@ -271,18 +210,7 @@ public class Numpy extends NumpyBase{
         bData = getArrayData(b);
 
         /** normal dot operation */
-        Object cData;
-        if (a.isInt() && b.isInt()) {
-            cData = dotInt((int[])aData, aDim, (int[])bData, bDim);
-        } else if (a.isInt()) {
-            double[] aDataNew = IntStream.of((int[])aData).asDoubleStream().toArray();
-            cData = dotDouble(aDataNew, aDim, (double[])bData, bDim);
-        } else if (b.isInt()) {
-            double[] bDataNew = IntStream.of((int[])bData).asDoubleStream().toArray();
-            cData = dotDouble((double[])aData, aDim, (double[])bDataNew, bDim);
-        } else {
-            cData = dotDouble((double[])aData, aDim, (double[])bData, bDim);
-        }
+        Object cData = Operator.dot(aData, aDim, bData, bDim);
         return new NDArray(cData, cDim);
     }
 
@@ -667,7 +595,7 @@ public class Numpy extends NumpyBase{
 
     public static NDArray swapaxes(NDArray a, int axis1, int axis2) {
         if (axis1 == 0 && axis2 == 1) {
-            return a.T;
+            return a.T();
         }
 
         int[] dimens = a.dimens();

@@ -77,7 +77,7 @@ public class Conv {
         // self.k_gradient,self.b_gradient
         NDArray delta_col = delta.reshape(bd, -1, cd);
         for (int i = 0; i < bx; i++) {
-            this.k_gradient.add(np.dot(this.image_col.get(i).T, delta_col.row(i)).reshape(this.k.dimens()));
+            this.k_gradient.add(np.dot(this.image_col.get(i).T(), delta_col.row(i)).reshape(this.k.dimens()));
         }
 
         this.k_gradient.divide(bx);
