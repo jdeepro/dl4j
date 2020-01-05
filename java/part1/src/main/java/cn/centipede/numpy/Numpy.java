@@ -404,10 +404,10 @@ public class Numpy extends NumpyBase{
 
         int[] dimens = array.dimens();
 
-        NDArray ret = array.index(index);
+        NDArray ret = array.get(index);
         for (int i = 1; i < dimens[axis-1]; i++) {
             index[axis-1] = i;
-            ret=ret.add(array.index(index));
+            ret=ret.add(array.get(index));
         }
         return ret;
     }
@@ -649,10 +649,10 @@ public class Numpy extends NumpyBase{
         range[0] = new int[]{ALL};
         range[1] = new int[1];
 
-        NDArray ret = a.slice(range);
+        NDArray ret = a.get(range);
         for (int i = 1; i < dimens[1]; i++) {
             range[1][0] = i;
-            ret = np.concatenate(a.slice(range), ret);
+            ret = np.concatenate(a.get(range), ret);
         }
 
         if (a.dimens().length == 2) {

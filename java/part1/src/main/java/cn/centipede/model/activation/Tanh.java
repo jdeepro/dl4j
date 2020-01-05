@@ -5,7 +5,7 @@ import cn.centipede.numpy.Numpy.np;
 
 /**
  *  y = (e^x - e^-x)/(e^x + e^-x)
- *  dy/dx = 1 - y2 
+ *  dy/dx = 1 - y^2
  */
 public class Tanh implements Activation{
     private NDArray x;

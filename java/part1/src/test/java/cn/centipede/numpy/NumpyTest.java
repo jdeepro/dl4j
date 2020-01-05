@@ -14,21 +14,21 @@ public class NumpyTest extends TestCase {
     public void test_api_at() {
         NDArray a = np.arange(12).reshape(3,4);
         int[] expected = {4,5,6,7};
-        assertEquals(np.array(expected), a.index(1));
-        assertEquals(np.array(6), a.index(1,2));
+        assertEquals(np.array(expected), a.get(1));
+        assertEquals(np.array(6), a.get(1,2));
     }
 
     @Test
     public void test_api_set() {
         NDArray a = np.arange(24).reshape(2, 3, 4);
         a.set(new int[]{100,200,300, 400}, 1, 1);
-        assertEquals(np.array(new int[]{100,200,300, 400}), a.index(1,1));
+        assertEquals(np.array(new int[]{100,200,300, 400}), a.get(1,1));
     }
 
     @Test
     public void test_api_asInt() {
         NDArray a = np.arange(12).reshape(3, 4);
-        NDArray b = a.index(0, 3);
+        NDArray b = a.get(0, 3);
         assertEquals(3, b.asInt());
 
         NDArray c = np.array(4);
@@ -51,11 +51,11 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
-    public void test_api_slice() {
+    public void test_api_get() {
         NDArray a = np.arange(36).reshape(4,3,3);
         int[] expected = {8, 17};
-        int[][] range = {{0,2}, {2}, {-1+3}}; // not support negative, but slice can
-        assertEquals(np.array(expected), a.slice(range));
+        int[][] range = {{0,2}, {2}, {-1}};
+        assertEquals(np.array(expected), a.get(range));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class NumpyTest extends TestCase {
         np.repeat(a, 3).dump();
 
         a = np.arange(24).reshape(2,2,3,2);
-        NDArray expected = np.repeat(a, new int[]{0,2}, 1).index(0,0);
+        NDArray expected = np.repeat(a, new int[]{0,2}, 1).get(0,0);
         assertEquals(np.array(new int[][]{{6,7},{8,9},{10,11}}), expected);
     }
 
@@ -115,8 +115,8 @@ public class NumpyTest extends TestCase {
         int[] dimens = {2,4,3};
         int[] iter = new int[3];
 
-        int index = 5; // 000,001,002,010,011,012,020
-        while (index-->0) {
+        int get = 5; // 000,001,002,010,011,012,020
+        while (get-->0) {
             np.next_dimen(dimens, iter);
         }
         String actual = Arrays.toString(iter);
@@ -127,7 +127,7 @@ public class NumpyTest extends TestCase {
     public void test_api_swapaxes() {
         NDArray a = np.arange(24).reshape(1,2,3,4);
         NDArray actual = np.swapaxes(a, 1, 3);
-        assertEquals(np.array(new int[]{0, 12}), actual.index(0,0,0));
+        assertEquals(np.array(new int[]{0, 12}), actual.get(0,0,0));
     }
 
     @Test
@@ -269,22 +269,22 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
-    public void test_slice() {
+    public void test_get() {
         NDArray a = np.arange(12).reshape(3,4);
         int[][] range1 = {{1, 3}, {-1}};
-        NDArray b = a.slice(range1);
+        NDArray b = a.get(range1);
         assertEquals("array([7, 11])\n", b.toString());
 
         int[][] range2 = {{ALL}, {-2}};
-        b = a.slice(range2);
+        b = a.get(range2);
         assertEquals("array([2, 6, 10])\n", b.toString());
 
         int[][] range3 = {{-2, -1}, {-2}};
-        b = a.slice(range3);
+        b = a.get(range3);
         assertEquals("array([6])\n", b.toString());
 
         int[][] range4 = {{-1}, {-2}};
-        b = a.slice(range4);
+        b = a.get(range4);
         assertEquals("10", b.toString());
     }
 
@@ -373,7 +373,7 @@ public class NumpyTest extends TestCase {
     public void test_ndarray_choice() {
         NDArray a = np.arange(24).reshape(4,6);
         int[] choice = np.random.choice(4, 4);
-        System.out.println(a.rows(choice));
+        System.out.println(a.choice(choice));
     }
 
     @Test
@@ -406,7 +406,7 @@ public class NumpyTest extends TestCase {
         NDArray boston = np.loadtxt(getClass().getResource("/boston.csv").getPath(), ",");
         double[][] dat = {{4.98, 24.0}, {9.14, 21.6}, {4.03, 34.7}};
         NDArray expected = np.array(dat);
-        NDArray actual = boston.slice(new int[][]{{0,3}, {-2, ALL}});
+        NDArray actual = boston.get(new int[][]{{0,3}, {-2, ALL}});
         assertEquals(expected, actual);
     }
 }

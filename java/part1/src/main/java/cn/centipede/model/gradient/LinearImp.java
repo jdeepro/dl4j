@@ -51,8 +51,8 @@ public class LinearImp {
 
         for (int i = 0; i < epochs; i++) {
             int[] idex = np.random.choice(m, batch_size);
-            NDArray rand = x.rows(idex);
-            NDArray diff = np.dot(rand, w).subtract(y.rows(idex));
+            NDArray rand = x.choice(idex);
+            NDArray diff = np.dot(rand, w).subtract(y.choice(idex));
             NDArray gradient = np.dot(rand.T(), diff).divide(batch_size);
             w = w.subtract(gradient.multiply(alpha));
         }

@@ -17,13 +17,13 @@ public class NDArrayTest extends TestCase {
         NDArray a = Numpy.arange(36).reshape(4,3,3);
         int[] expected = {0, 9, 18, 27};
         int[][] range = {{0}, {0}};
-        assertEquals(Numpy.array(expected), a.T().slice(range));
+        assertEquals(Numpy.array(expected), a.T().get(range));
         System.out.println(a.T());
 
         a = Numpy.arange(12).reshape(4,3);
         int[] expected2 = {1, 4, 7};
         int[][] range2 = {{1}, {0,-1}}; // {{1}, {0, 3}}
-        assertEquals(Numpy.array(expected2), a.T().slice(range2));
+        assertEquals(Numpy.array(expected2), a.T().get(range2));
     }
 
     @Test

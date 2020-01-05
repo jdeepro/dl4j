@@ -1,19 +1,18 @@
-package cn.centipede.model.activation;
+package cn.centipede.model;
 
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
 
 public class Softmax {
-    private NDArray delta;
     private NDArray softmax;
 
-    public double cal_loss(NDArray predict, NDArray label) {
+    public NDArray loss(NDArray predict, NDArray label) {
         int[] pdimens = predict.dimens();
         int batchsize = pdimens[0];
 
         predict(predict);
 
-        delta = np.zeros(pdimens);
+        NDArray delta = np.zeros(pdimens);
         double loss = 0;
 
         for (int i=0; i < batchsize; i++) {
@@ -23,7 +22,9 @@ public class Softmax {
             loss -= np.sum(np.log(softmanx_i).multiply(label_i));
         }
 
-        return loss /= batchsize;
+        loss /= batchsize;
+        System.out.printf("Softmax: loss=%f\n", loss);
+        return delta;
     }
 
     public NDArray predict(NDArray predict) {

@@ -19,7 +19,7 @@ public class Pool {
             for (int ci = 0; ci < c; ci++) {
                 for (int i = 0; i < feature_w; i++) {
                     for (int j = 0; j < feature_w; j++) {
-                        NDArray dat = x.slice(new int[][]{{bi},{i*2,i*2+2},{j*2,j*2+2}, {ci}});
+                        NDArray dat = x.get(new int[][]{{bi},{i*2,i*2+2},{j*2,j*2+2}, {ci}});
                         feature.set(np.max(dat), bi, i, j, ci);
                         int index = np.argmax(dat);
                         this.feature_mask.set(1, bi, i*2+index/2, j*2+index%2, ci);

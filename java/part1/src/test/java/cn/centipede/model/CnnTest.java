@@ -23,7 +23,7 @@ public class CnnTest extends TestCase {
         int rand = np.random.randint(10000);
 
         NDArray label = mnist[1].row(rand);
-        NDArray X = mnist[0].reshape(10000, 28, 28, 1).index(rand);
+        NDArray X = mnist[0].reshape(10000, 28, 28, 1).get(rand);
 
         int actual = cnn.predict(X);
 

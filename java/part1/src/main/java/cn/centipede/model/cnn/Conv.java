@@ -80,12 +80,12 @@ public class Conv {
             this.k_gradient.add(np.dot(this.image_col.get(i).T(), delta_col.row(i)).reshape(this.k.dimens()));
         }
 
-        this.k_gradient.divide(bx);
-        this.b_gradient.add(np.sum(delta_col, new int[]{0, 1}));
-        this.b_gradient.divide(bx);
+        this.k_gradient = this.k_gradient.divide(bx);
+        this.b_gradient = this.b_gradient.add(np.sum(delta_col, new int[]{0, 1}));
+        this.b_gradient = this.b_gradient.divide(bx);
 
         // delta_backward
-        NDArray delta_backward = np.zeros(this.x.dimens());
+        NDArray delta_backward = np.zeros(xshape);
         NDArray k_180 = np.rot90(this.k, 2, new int[]{0,1});
         k_180 = np.swapaxes(k_180, 2, 3);
         NDArray k_180_col = k_180.reshape(-1, ck);
@@ -104,8 +104,8 @@ public class Conv {
             delta_backward.set(np.dot(pad_delta_col, k_180_col).reshape(wx,hx,ck), i);
         }
 
-        this.k.subtract(this.k_gradient.multiply(learning_rate));
-        this.b.subtract(this.b_gradient.multiply(learning_rate));
+        this.k = this.k.subtract(this.k_gradient.multiply(learning_rate));
+        this.b = this.b.subtract(this.b_gradient.multiply(learning_rate));
         return delta_backward;
     }
 
@@ -120,8 +120,8 @@ public class Conv {
         for (int i = 0; i < feature_w; i++) {
             for (int j = 0; j < feature_w; j++) {
                 int[][] range = {{i*stride,i*stride+ksize}, {j*stride,j*stride+ksize}};
-                NDArray slice = x.slice(range).reshape(-1);
-                np.set(image_col, slice, num++);
+                NDArray get = x.get(range).reshape(-1);
+                np.set(image_col, get, num++);
             }
         }
         return image_col;
