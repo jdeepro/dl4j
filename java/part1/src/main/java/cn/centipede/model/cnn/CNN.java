@@ -86,7 +86,7 @@ public class CNN {
         int batch = 3;
 
         for (int epoch =0; epoch < 1; epoch++) {
-            for (int i = 0; i < 2; i+=batch) {
+            for (int i = 0; i < 6000; i+=batch) {
                 NDArray X = data.get(new int[][]{{i, i+batch}});
                 NDArray Y = targets.get(new int[][]{{i, i+batch}});
 

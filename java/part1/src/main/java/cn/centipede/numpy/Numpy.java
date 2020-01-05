@@ -582,7 +582,10 @@ public class Numpy extends NumpyBase{
         return i >= 0;
     }
 
-    private static void doSwap(int[] data, int[] data_dst, int[] dimens, int[] iter, int axis1, int axis2) {
+    /**
+     * for swap axis, do swap data
+     */
+    private static int[] getOffset(int[] dimens, int[] iter, int axis1, int axis2) {
         int[] dimens_dst = Arrays.copyOf(iter, iter.length);
         int a1 = dataOffset(dimens, iter);
 
@@ -595,8 +598,29 @@ public class Numpy extends NumpyBase{
         dimens2[axis1] = dimens2[axis2];
         dimens2[axis2] = t;
         int a2 = dataOffset(dimens2, dimens_dst);
+        return new int[]{a1, a2};
+    }
 
-        data_dst[a2] = data[a1];
+    private static void doSwap(int[] data, int[] data_dst, int[] dimens, int[] iter, int axis1, int axis2) {
+        do {
+            int[] offsets = getOffset(dimens, iter, axis1, axis2);
+            ((int[])data_dst)[offsets[1]] = ((int[])data)[offsets[0]];
+        } while(next_dimen(dimens, iter));
+    }
+
+    private static void doSwap(double[] data, double[] data_dst, int[] dimens, int[] iter, int axis1, int axis2) {
+        do {
+            int[] offsets = getOffset(dimens, iter, axis1, axis2);
+            ((double[])data_dst)[offsets[1]] = ((double[])data)[offsets[0]];
+        } while(next_dimen(dimens, iter));
+    }
+
+    private static void doSwap(Object data, Object data_dst, boolean isInt, int[] dimens, int[] iter, int axis1, int axis2) {
+        if (isInt) {
+            doSwap((int[])data, (int[])data_dst, dimens, iter, axis1, axis2);
+        } else {
+            doSwap((double[])data, (double[])data_dst, dimens, iter, axis1, axis2);
+        }
     }
 
     public static NDArray swapaxes(NDArray a, int axis1, int axis2) {
@@ -606,12 +630,9 @@ public class Numpy extends NumpyBase{
 
         int[] dimens = a.dimens();
         int[] iter = new int[dimens.length];
-        int[] data = (int[])getArrayData(a);
-        int[] data_dst = new int[data.length];
-
-        do {
-            doSwap(data, data_dst, dimens, iter, axis1, axis2);
-        } while(next_dimen(dimens, iter));
+        Object data = getArrayData(a);
+        Object data_dst = Array.newInstance(a.isInt()?int.class:double.class, a.size());
+        doSwap(data, data_dst, a.isInt(), dimens, iter, axis1, axis2);
 
         int t = dimens[axis1];
         dimens[axis1] = dimens[axis2];

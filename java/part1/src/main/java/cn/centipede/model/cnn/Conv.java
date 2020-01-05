@@ -38,14 +38,14 @@ public class Conv {
         this.image_col = new ArrayList<>();
     }
 
-    public NDArray forward(NDArray x) {
-        this.x = x;
+    public NDArray forward(NDArray X) {
+        this.x = X;
         if (this.pad != 0) {
             int[][] pads = {{0,0},{this.pad,this.pad},{this.pad,this.pad},{0,0}};
             this.x = np.pad(this.x,pads);
         }
 
-        int[] xshape = x.dimens();
+        int[] xshape = this.x.dimens();
         int bx = xshape[0];
         int wx = xshape[1];
 
@@ -55,6 +55,7 @@ public class Conv {
 
         int feature_w = (wx - wk) / this.stride + 1;
         NDArray feature = np.zeros(bx, feature_w, feature_w, nk);
+        this.image_col.clear();
 
         NDArray kernel = this.k.reshape(-1, nk);
         for (int i = 0; i < bx; i++) {
@@ -92,8 +93,8 @@ public class Conv {
 
         NDArray pad_delta;
         if (hd-hk+1 != hx) {
-            pad = (hx-hd+hk-1) / 2;
-            int[][] pads = {{0,0},{this.pad,this.pad},{this.pad,this.pad},{0,0}};
+            int pad = (hx-hd+hk-1) / 2;
+            int[][] pads = {{0,0},{pad, pad},{pad, pad},{0,0}};
             pad_delta = np.pad(delta, pads);
         } else {
             pad_delta = delta;
