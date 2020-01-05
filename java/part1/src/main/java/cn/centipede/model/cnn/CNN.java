@@ -85,8 +85,8 @@ public class CNN {
         double lr = 0.01;
         int batch = 3;
 
-        for (int epoch =0; epoch < 10; epoch++) {
-            for (int i = 0; i < 60000; i+=batch) {
+        for (int epoch =0; epoch < 1; epoch++) {
+            for (int i = 0; i < 2; i+=batch) {
                 NDArray X = data.get(new int[][]{{i, i+batch}});
                 NDArray Y = targets.get(new int[][]{{i, i+batch}});
 
@@ -101,7 +101,7 @@ public class CNN {
 
                 NDArray delta = softmax.loss(predict, Y);
                 delta = nn.backward(delta, lr);
-                delta = delta.reshape(batch,4,4,16);
+                delta = delta.reshape(batch, 4, 4, 16);
                 delta = pool2.backward(delta);
                 delta = relu2.backward(delta);
                 delta = conv2.backward(delta, lr);
@@ -123,6 +123,11 @@ public class CNN {
 
         NDArray img2col = Conv.img2col(test.get(1), 5, 1);
         System.out.println(img2col.shape());
+    }
+
+    public static void main(String[] args) {
+        CNN cnn = new CNN();
+        cnn.train();
     }
 
 }

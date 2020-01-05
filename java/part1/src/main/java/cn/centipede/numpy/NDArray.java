@@ -136,24 +136,25 @@ public class NDArray implements Cloneable{
      * for example: 12 => 3,-1 => 3, 4
      */
     public NDArray reshape(int ...dimens) {
+        NDArray ret = new NDArray(this);
         //[:, newaxis]
         if (dimens[0] == ALL) {
-            _dimens = Arrays.copyOf(_dimens, _dimens.length+1);
-            _dimens[_dimens.length-1] = 1;
-            return this;
+            ret._dimens = Arrays.copyOf(_dimens, _dimens.length+1);
+            ret._dimens[_dimens.length] = 1;
+            return ret;
         }
         // dimens[0]==-1
         else if (dimens.length == 1) {
-            _dimens = new int[]{_dimens.length};
-            return this;
+            ret._dimens = new int[]{_dimens.length};
+            return ret;
         }
         //[newaxis, :]
         else if (dimens[1] == ALL) {
             int[] axis = new int[_dimens.length+1];
             System.arraycopy(_dimens, 0, axis, 1, _dimens.length);
-            _dimens = axis;
-            _dimens[0] = 1;
-            return this;
+            ret._dimens = axis;
+            ret._dimens[0] = 1;
+            return ret;
         }
 
         int size = _size, pos = -1;
@@ -166,8 +167,8 @@ public class NDArray implements Cloneable{
         if (pos != -1) {
             dimens[pos] = size;
         }
-        _dimens = dimens;
-        return this;
+        ret._dimens = dimens;
+        return ret;
     }
 
     public NDArray T() {

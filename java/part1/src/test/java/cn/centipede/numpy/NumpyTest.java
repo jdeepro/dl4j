@@ -46,7 +46,7 @@ public class NumpyTest extends TestCase {
 
         a = np.arange(12).reshape(3,4);
         NDArray b = a.clone();
-        a.reshape(np.newaxis, ALL);
+        a = a.reshape(np.newaxis, ALL);
         assertEquals(b, a.row(0));
     }
 
@@ -220,8 +220,8 @@ public class NumpyTest extends TestCase {
 
         e = np.array(new double[][]{
             {0.2, 0.4}, {0.4, 0.1}, {0.6, 0.5}, {0.9, 0.7}, {0.3, 0.8}});
-        r.reshape(ALL, np.newaxis);
-        g.reshape(ALL, np.newaxis);
+        r = r.reshape(ALL, np.newaxis);
+        g = g.reshape(ALL, np.newaxis);
         assertEquals(e, np.hstack(r, g));
 
         double[][] D={{0.2, 0.4, 0.7}, {0.4, 0.1, 0.8}, {0.6, 0.5, 0.2}, {0.9, 0.7, 0.3}, {0.3, 0.8, 0.4}};

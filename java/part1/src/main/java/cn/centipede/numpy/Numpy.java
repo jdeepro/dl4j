@@ -332,7 +332,8 @@ public class Numpy extends NumpyBase{
     public static NDArray stack(NDArray[] arrays, int axis) {
         int[] dimens_o = arrays[0].dimens();
         if (dimens_o.length == 1 && axis == 1) {
-            Stream.of(arrays).forEach(it->it.reshape(ALL, np.newaxis));
+            //Stream.of(arrays).forEach(it->it.reshape(ALL, np.newaxis));
+            for (int i = 0; i < arrays.length; i++) arrays[i] = arrays[i].reshape(ALL, np.newaxis);
         }
 
         NDArray ret = arrays[0];
@@ -349,8 +350,8 @@ public class Numpy extends NumpyBase{
         for (int i = axis; i < dimens_o.length; i++) {
             dimens_d[i+1] = dimens_o[i];
         }
-        ret.reshape(dimens_d);
-        return ret;
+
+        return ret.reshape(dimens_d);
     }
 
     public static NDArray hstack(NDArray a, NDArray b) {
@@ -377,12 +378,13 @@ public class Numpy extends NumpyBase{
         NDArray ret = rows[0];
 
         if (adim[0] > 1) {
-            Stream.of(rows).forEach(it->it.reshape(np.newaxis, ALL));
+            //Stream.of(rows).map(it->it=it.reshape(np.newaxis, ALL));
+            for (int i = 0; i < rows.length; i++) rows[i] = rows[i].reshape(np.newaxis, ALL);
             ret = Stream.of(rows).reduce(Numpy::concatenate).get();
         }
 
         if (adim[0] == 1 && axis > 0) {
-            ret.reshape(np.newaxis, ALL);
+            ret = ret.reshape(np.newaxis, ALL);
         }
         return ret;
     }
@@ -675,8 +677,8 @@ public class Numpy extends NumpyBase{
     }
 
     private static NDArray repeat(NDArray a, int[] repeats, int block, int size) {
-        int[] data = new int[size];
-        int[] src = (int[])getArrayData(a);
+        Object data = a.isInt()? new int[size] :new double[size];
+        Object src = getArrayData(a);
         int count = a.size()/block;
         int offset = 0;
 
@@ -690,7 +692,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray repeat(NDArray a, int[] repeats, int axis) {
-        int[] dimens = a.dimens();
+        int[] dimens = Arrays.copyOf(a.dimens(), a.dimens().length);
         int[] size = new int[dimens.length];
 
         int index = dimens.length-1;
@@ -701,7 +703,7 @@ public class Numpy extends NumpyBase{
         }
 
         if (repeats.length == 1) {
-            dimens[axis] = dimens[axis]+repeats[0];
+            dimens[axis] = dimens[axis]*repeats[0];
         } else {
             dimens[axis] = IntStream.of(repeats).sum();
         }
