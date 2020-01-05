@@ -2,6 +2,7 @@ package cn.centipede.model;
 
 import org.junit.Test;
 
+import cn.centipede.model.activation.Activation;
 import cn.centipede.model.activation.Sigmoid;
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
@@ -36,8 +37,8 @@ public class ActivationTest extends TestCase {
         for (int i = 0; i < 10000; i++) {
             NDArray z = np.dot(x, w);
             NDArray o = sigmoid.forward(z);
-            NDArray delta = y.subtract(o).multiply(sigmoid.backward(o));
-
+            //NDArray delta = y.subtract(o).multiply(sigmoid.backward(o));
+            NDArray delta = sigmoid.backward(y.subtract(o));
             w = w.add(np.dot(x.T(), delta));
         }
 
@@ -67,24 +68,22 @@ public class ActivationTest extends TestCase {
         NDArray W = np.random.rand(new int[]{4,1}).multiply(2).subtract(1);
 
         double learn_rate = 0.11;
-        Activation sigmoid = new Sigmoid();
+        Activation L1_sigmoid = new Sigmoid();
+        Activation L2_sigmoid = new Sigmoid();
         NDArray L1 = null, L2 = null;
 
         for (int i = 0; i < 20000; i++) {
-            L1 = sigmoid.forward(np.dot(X, V));
-            L2 = sigmoid.forward(np.dot(L1, W));
+            L1 = L1_sigmoid.forward(np.dot(X, V));
+            L2 = L2_sigmoid.forward(np.dot(L1, W));
 
-            NDArray L2_delta = Y.T().subtract(L2).multiply(sigmoid.backward(L2));
-            NDArray L1_delta = L2_delta.dot(W.T()).multiply(sigmoid.backward(L1));
+            NDArray L2_delta = L2_sigmoid.backward(Y.T().subtract(L2));
+            NDArray L1_delta = L1_sigmoid.backward(L2_delta.dot(W.T()));
 
             NDArray W_change = L1.T().dot(L2_delta).multiply(learn_rate);
             NDArray V_change = X.T().dot(L1_delta).multiply(learn_rate);
 
             W = W.add(W_change);
             V = V.add(V_change);
-
-            // Error: np.mean(np.abs(Y.T-L2)) -> decrese to 0
-            // System.out.println(np.mean(np.abs(Y.T.subtract(L2))));
         }
 
         double[] expected = {0,1,1,0};

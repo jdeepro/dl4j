@@ -96,6 +96,10 @@ public class Numpy extends NumpyBase{
         return binaryOp(src, dat, "/");
     }
 
+    public static NDArray pow(NDArray src, int pow) {
+        return binaryOp(src, pow, "**");
+    }
+
     public static NDArray negate(NDArray src) {
         Object srcData = getArrayData(src);
 

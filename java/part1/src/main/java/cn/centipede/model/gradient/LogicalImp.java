@@ -1,6 +1,6 @@
 package cn.centipede.model.gradient;
 
-import cn.centipede.model.Activation;
+import cn.centipede.model.activation.Activation;
 import cn.centipede.model.activation.Sigmoid;
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
