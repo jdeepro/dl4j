@@ -12,6 +12,7 @@ import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
 
 import java.awt.Graphics;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
@@ -21,16 +22,15 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.net.URL;
-import java.util.Random;
 import java.awt.geom.AffineTransform;
 import java.awt.BorderLayout;
 
 
 class Handwriting {
-    private static final int WIDTH  = 400;
-    private static final int HEIGHT = 300;
+    private static final int WIDTH  = 200;
+    private static final int HEIGHT = 200;
     private static final int WAIT   = 2500;
-    private static final float BOLD = 24;
+    private static final float BOLD = 12;
 
     private static final String TIP = "请在黑板上写个数字吧";
 
@@ -97,8 +97,11 @@ class Handwriting {
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         graphics = image.getGraphics();
         graphics.clearRect(0, 0, WIDTH, HEIGHT);
-        graphics.setColor(new Color(255, 0, 0));
-        ((Graphics2D) graphics).setStroke(new BasicStroke(BOLD));
+        graphics.setColor(new Color(250, 0, 0));
+
+        Graphics2D g2d = ((Graphics2D) graphics);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setStroke(new BasicStroke(BOLD));
     }
 
     private void setHeader() {
@@ -135,7 +138,6 @@ class Handwriting {
         frame.setVisible(true);
 
         URL url = ClassLoader.getSystemClassLoader().getResource("mnist.npz");
-        System.out.println(url);
         new Thread(()->mnist.loadNpz(url)).start();
     }
 
@@ -170,21 +172,22 @@ class Handwriting {
         panel.repaint();
 
         int[] dat = new int[28*28];
-        Random random = new Random(System.currentTimeMillis());
 
         for (int i = 0; i < 28; i++) {
             for (int j = 0; j < 28; j++) {
                 int clr = hw.getRGB(i, j);
-                int red   = (clr & 0x00ff0000) >> 17; // half red
+                int red   = (clr & 0x00ff0000) >> 16; // half red
                 // int green = (clr & 0x0000ff00) >> 8;
                 // int blue  =  clr & 0x000000ff;
                 // int gray  = (red+green+blue)/3;
-                if (red > 0) dat[i+j*28] = red+random.nextInt(16);
+                if (red > 0) dat[i+j*28] = red;
             }
         }
 
-        NDArray a = np.array(dat, 28, 28).reshape(28,28,1);
-        int predict = mnist.predict(a);
+        NDArray a = np.array(dat, 28, 28);
+        a.dump();
+
+        int predict = mnist.predict(a.reshape(28,28,1));
         String result = String.format("你刚写的是数字 %d 吧？", predict);
 
         SwingUtilities.invokeLater(()->status.setText(result));
