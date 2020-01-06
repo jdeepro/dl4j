@@ -1,6 +1,7 @@
 package cn.centipede.model;
 
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import org.junit.Test;
 
@@ -17,7 +18,8 @@ public class CnnTest extends TestCase {
         NDArray[] mnist = MNIST.numpy(false); // train=false
 
         CNN cnn = new CNN();
-        cnn.loadNpz();
+        URL npzURL = CNN.class.getResource("/mnist.npz");
+        cnn.loadNpz(npzURL);
 
         np.random.seed(System.currentTimeMillis());
         int rand = np.random.randint(10000);

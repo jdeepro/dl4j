@@ -13,8 +13,7 @@ import cn.centipede.numpy.Numpy.np;
 
 /**
  * Yes, I want to implement CCN oops, a little complex for me :)
- * ---------------------------- input->hidden->output
- * ----------------------------
+ * input->hidden->output
  * 
  * @author simbaba
  * @version 0.0
@@ -32,8 +31,7 @@ public class CNN {
 
 
     /** let's any exception just go! */
-    public void loadNpz() {
-        URL npzURL = CNN.class.getResource("/mnist.npz");
+    public void loadNpz(URL npzURL) {
         NpzFile npz;
 
         try {
@@ -83,10 +81,10 @@ public class CNN {
 
         conv1 = new Conv(new int[]{5,5,1,6});   // 24x24x6
         relu1 = new Relu();
-        pool1 = new Pool();                         // 12x12x6
+        pool1 = new Pool();                     // 12x12x6
         conv2 = new Conv(new int[]{5,5,6,16});  // 8x8x16
         relu2 = new Relu();
-        pool2 = new Pool();                         // 4x4x16
+        pool2 = new Pool();                     // 4x4x16
         nn = new Linear(256, 10);
         softmax = new Softmax();
 
