@@ -4,8 +4,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 
 import cn.centipede.model.cnn.CNN;
 import cn.centipede.numpy.NDArray;
@@ -18,6 +22,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -27,14 +32,17 @@ import java.awt.BorderLayout;
 
 
 class Handwriting {
-    private static final int WIDTH  = 200;
-    private static final int HEIGHT = 200;
+    private static final int WIDTH  = 280;
+    private static final int HEIGHT = 280;
+    private static final int CHECK  = 64;
+    private static final int PADING = 6;
     private static final int WAIT   = 2500;
-    private static final float BOLD = 12;
+    private static final float BOLD = 20;
 
     private static final String TIP = "请在黑板上写个数字吧";
 
     private CNN mnist = new CNN();
+    private int[] record = new int[28*28];
 
     private JFrame frame = new JFrame("手写识别Demo");
     private JLabel status = new JLabel(TIP);
@@ -50,6 +58,35 @@ class Handwriting {
         @Override
         public void paint(Graphics g) {
             g.drawImage(image, 0, 0, null);
+        }
+    };
+
+    private JPanel check = new JPanel() {
+        private static final long serialVersionUID = 1L;
+        private Font smallFont = new Font("courier new",Font.PLAIN, 7);
+
+        @Override
+        public void paint(Graphics g) {
+            g.setFont(smallFont);
+            String[] rows = record2Str();
+            for (int i = 0; i < rows.length; i++) {
+                g.drawString(rows[i], PADING, 8+i*10);
+            }
+        }
+
+        private String[] record2Str() {
+            String[] rows = new String[28];
+            int[] row = new int[28];
+
+            for (int i = 0; i < 28; i++) {
+                System.arraycopy(record, i*28, row, 0, 28);
+                StringBuilder sb = new StringBuilder();
+                for (int j = 0; j < 28; j++) {
+                    sb.append(String.format("%-3d", record[i*28+j]));
+                }
+                rows[i] = sb.toString();
+            }
+            return rows;
         }
     };
 
@@ -104,6 +141,28 @@ class Handwriting {
         g2d.setStroke(new BasicStroke(BOLD));
     }
 
+    private void setMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+        JMenu menuFile = new JMenu("File(F)");
+        JMenuItem save = new JMenuItem("Save");
+        JMenuItem exit = new JMenuItem("Exit");
+        menuFile.add(save);
+        menuFile.add(exit);
+
+        JMenu menuMnist = new JMenu("Train(T)");
+        JMenuItem mnist = new JMenuItem("MNIST");
+        JMenuItem evalu = new JMenuItem("Eval");
+        menuMnist.add(mnist);
+        menuMnist.add(evalu);
+
+        menuBar.add(menuFile);
+        menuBar.add(menuMnist);
+
+        JMenu menuAbout = new JMenu("About");
+        menuBar.add(menuAbout);
+    }
+
     private void setHeader() {
         URL url = ClassLoader.getSystemClassLoader().getResource("jdeepro.png");
         ImageIcon icon = new ImageIcon(url);
@@ -118,7 +177,6 @@ class Handwriting {
     }
 
     public Handwriting() {
-        frame.setSize(WIDTH, HEIGHT);
         frame.setForeground(Color.BLUE);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -126,13 +184,22 @@ class Handwriting {
         frame.setLayout(new BorderLayout());
 
         createGraphics();
+        setMenuBar();
         setHeader();
         setFooter();
+
+        JPanel container = new JPanel();
+        frame.add(container);
+        container.setBorder(new EmptyBorder(PADING,PADING,PADING,PADING));
+        container.setLayout(new BorderLayout());
 
         panel.addMouseMotionListener(mouseMotion);
         panel.addMouseListener(mouse);
         panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        frame.add(panel, BorderLayout.CENTER);
+        container.add(panel, BorderLayout.WEST);
+
+        check.setPreferredSize(new Dimension(WIDTH+CHECK, HEIGHT));
+        container.add(check, BorderLayout.EAST);
 
         frame.pack();
         frame.setVisible(true);
@@ -170,8 +237,9 @@ class Handwriting {
         BufferedImage hw = resizeBufferedImage(image, false);
         graphics.clearRect(0, 0, WIDTH, HEIGHT);
         panel.repaint();
+        check.repaint();
 
-        int[] dat = new int[28*28];
+        record = new int[28*28];
 
         for (int i = 0; i < 28; i++) {
             for (int j = 0; j < 28; j++) {
@@ -180,11 +248,11 @@ class Handwriting {
                 // int green = (clr & 0x0000ff00) >> 8;
                 // int blue  =  clr & 0x000000ff;
                 // int gray  = (red+green+blue)/3;
-                if (red > 0) dat[i+j*28] = red;
+                if (red > 0) record[i+j*28] = red;
             }
         }
 
-        NDArray a = np.array(dat, 28, 28);
+        NDArray a = np.array(record, 28, 28);
         a.dump();
 
         int predict = mnist.predict(a.reshape(28,28,1));

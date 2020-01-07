@@ -1,15 +1,15 @@
 package cn.centipede.model;
 
-import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.junit.Test;
+import junit.framework.TestCase;
 
 import cn.centipede.model.cnn.CNN;
 import cn.centipede.model.data.MNIST;
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
-import junit.framework.TestCase;
+
 
 public class CnnTest extends TestCase {
 
