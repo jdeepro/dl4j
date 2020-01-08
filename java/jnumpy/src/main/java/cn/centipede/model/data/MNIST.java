@@ -1,6 +1,8 @@
 package cn.centipede.model.data;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
@@ -23,9 +25,9 @@ public class MNIST {
 
     private static NDArray[] loadMnistData(String images, String labels) throws IOException {
         MnistDataReader reader = new MnistDataReader();
-        images = reader.getClass().getResource("/"+images).getPath();
-        labels = reader.getClass().getResource("/"+labels).getPath();
-        return toNDArray(reader.readData(images, labels));
+        InputStream image= ClassLoader.getSystemClassLoader().getResourceAsStream(images);
+        InputStream label = ClassLoader.getSystemClassLoader().getResourceAsStream(labels);
+        return toNDArray(reader.readData(image, label));
     }
 
     /**

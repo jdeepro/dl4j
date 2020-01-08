@@ -7,18 +7,23 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import cn.centipede.model.cnn.CNN;
+import cn.centipede.model.data.MNIST;
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;
 
 import java.awt.Graphics;
 import java.awt.RenderingHints;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -30,31 +35,44 @@ import java.net.URL;
 import java.awt.geom.AffineTransform;
 import java.awt.BorderLayout;
 
-
 class Handwriting {
-    private static final int WIDTH  = 280;
+    private static final int WIDTH = 280;
     private static final int HEIGHT = 280;
-    private static final int CHECK  = 64;
+    private static final int CHECK = 64;
     private static final int PADING = 6;
-    private static final int WAIT   = 2500;
+    private static final int WAIT = 2500;
     private static final float BOLD = 20;
 
-    private static final String TIP = "请在黑板上写个数字吧";
+    private static final int WRITE_MODE = 0;
+    private static final int MNIST_MODE = 1;
+
+    private static final String CMD_SAVE  = "SAVE";
+    private static final String CMD_EXIT  = "EXIT";
+    private static final String CMD_MNIST = "MNIST";
+    private static final String CMD_EVALU = "EVALU";
+    private static final String CMD_ABOUT = "ABOUT";
+
+    private static final String TIP = "Write a number on the blackboard.";
 
     private CNN mnist = new CNN();
-    private int[] record = new int[28*28];
+    private NDArray[] cache;
+    private int curPage;
+    private int[] record = new int[28 * 28];
 
-    private JFrame frame = new JFrame("手写识别Demo");
+    private JFrame frame = new JFrame("Handwriting Demo");
     private JLabel status = new JLabel(TIP);
+    private Font smallFont = new Font("courier new", Font.PLAIN, 7);
 
     private Graphics graphics;
     private BufferedImage image;
     private int lastX = 0;
     private int lastY = 0;
-    private Thread hClearThread;    
+    private int board = 0; // 0: write mode, 1: mnist
+    private Thread hClearThread;
 
     private JPanel panel = new JPanel() {
         private static final long serialVersionUID = 1L;
+
         @Override
         public void paint(Graphics g) {
             g.drawImage(image, 0, 0, null);
@@ -63,34 +81,21 @@ class Handwriting {
 
     private JPanel check = new JPanel() {
         private static final long serialVersionUID = 1L;
-        private Font smallFont = new Font("courier new",Font.PLAIN, 7);
 
         @Override
         public void paint(Graphics g) {
-            g.setFont(smallFont);
-            String[] rows = record2Str();
-            for (int i = 0; i < rows.length; i++) {
-                g.drawString(rows[i], PADING, 8+i*10);
-            }
-        }
-
-        private String[] record2Str() {
-            String[] rows = new String[28];
-            int[] row = new int[28];
-
-            for (int i = 0; i < 28; i++) {
-                System.arraycopy(record, i*28, row, 0, 28);
-                StringBuilder sb = new StringBuilder();
-                for (int j = 0; j < 28; j++) {
-                    sb.append(String.format("%-3d", record[i*28+j]));
-                }
-                rows[i] = sb.toString();
-            }
-            return rows;
+            drawHexCheck(g);
         }
     };
 
     private MouseAdapter mouse = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                mnistNavPage(true);
+			}
+        }
+
         @Override
         public void mousePressed(MouseEvent e) {
             lastX = e.getX();
@@ -104,22 +109,38 @@ class Handwriting {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (hClearThread == null) {
+            if (hClearThread == null && board == WRITE_MODE) {
                 hClearThread = new Thread(this::waitOrInterupt);
                 hClearThread.start();
             }
         }
 
         private void waitOrInterupt() {
-            try{
+            try {
                 Thread.sleep(WAIT);
                 recognize();
-            }catch (InterruptedException e1) {}
+            } catch (InterruptedException e1) {
+            }
+        }
+    };
+
+    private KeyAdapter navMnist = new KeyAdapter() {
+        @Override
+        public void keyTyped(KeyEvent e) {
+            int key = e.getKeyCode();
+            if (key == KeyEvent.VK_LEFT) {
+                mnistNavPage(false);
+            } else  if (key == KeyEvent.VK_RIGHT) {
+                mnistNavPage(true);
+            }
         }
     };
 
     private MouseMotionAdapter mouseMotion = new MouseMotionAdapter() {
         public void mouseDragged(MouseEvent e) {
+            if (board == MNIST_MODE) {
+                return;
+            }
             int x = e.getX();
             int y = e.getY();
             graphics.drawLine(lastX, lastY, x, y);
@@ -129,6 +150,68 @@ class Handwriting {
             panel.repaint();
         }
     };
+
+    private void drawHexCheck(Graphics g) {
+        g.setFont(smallFont);
+        String[] rows = record2Str();
+        for (int i = 0; i < rows.length; i++) {
+            g.drawString(rows[i], PADING, 8 + i * 10);
+        }
+    }
+
+    private void mnistNavPage(boolean next) {
+        if (next) {
+            curPage++;
+        } else {
+            curPage--;
+        }
+        int max = cache[0].dimens()[0];
+        if (curPage < 0) curPage = 0;
+        if (curPage >= max) curPage = max-1;
+        drawMNIST(curPage);
+    }
+
+    private void loadMNIST(int page, boolean train) {
+        SwingUtilities.invokeLater(() -> status.setText("Loading minist..."));
+        new Thread(()->{
+            cache = MNIST.numpy(train);
+            SwingUtilities.invokeLater(()->{status.setText("load mnist done!");
+                drawMNIST(page);});
+        }).start();
+    }
+
+    private void drawCell(int r, int c, NDArray array) {
+        int[] mnist = (int[])np.getArrayData(array); // 28*28
+        for (int i = 0; i < 28*28; i++) {
+            image.setRGB(c*28+i%28, r*28+i/28, mnist[i]);
+        }
+    }
+
+    private void drawMNIST(int page) {
+        int[][] range = {{page*100, page*100+100}};
+        NDArray dat = cache[0].get(range); // 100*28*28
+        for (int r = 0; r < 10; r++) {
+            for (int c = 0; c < 10; c++) {
+                drawCell(r, c, dat.get(r*10+c));
+            }
+        }
+        panel.repaint();
+    }
+
+    private String[] record2Str() {
+        String[] rows = new String[28];
+        int[] row = new int[28];
+
+        for (int i = 0; i < 28; i++) {
+            System.arraycopy(record, i * 28, row, 0, 28);
+            StringBuilder sb = new StringBuilder();
+            for (int j = 0; j < 28; j++) {
+                sb.append(String.format("%-3d", record[i * 28 + j]));
+            }
+            rows[i] = sb.toString();
+        }
+        return rows;
+    }
 
     private void createGraphics() {
         image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -144,30 +227,38 @@ class Handwriting {
     private void setMenuBar() {
         JMenuBar menuBar = new JMenuBar();
         frame.setJMenuBar(menuBar);
-        JMenu menuFile = new JMenu("File(F)");
+        JMenu menuFile = new JMenu("File");
         JMenuItem save = new JMenuItem("Save");
         JMenuItem exit = new JMenuItem("Exit");
-        menuFile.add(save);
-        menuFile.add(exit);
+        menuFile.add(save).addActionListener(e->onSave());
+        menuFile.add(exit).addActionListener(e->System.exit(0));
 
-        JMenu menuMnist = new JMenu("Train(T)");
+        JMenu menuMnist = new JMenu("Train");
         JMenuItem mnist = new JMenuItem("MNIST");
         JMenuItem evalu = new JMenuItem("Eval");
-        menuMnist.add(mnist);
-        menuMnist.add(evalu);
+        menuMnist.add(mnist).addActionListener(e->onMnist(e));
+        menuMnist.add(evalu).addActionListener(e->onEval());
+
+        JMenu menuHelp = new JMenu("Help");
+        JMenuItem about = new JMenuItem("About");
+        menuHelp.add(about).addActionListener(e->onAbout());
 
         menuBar.add(menuFile);
         menuBar.add(menuMnist);
+        menuBar.add(menuHelp);
 
-        JMenu menuAbout = new JMenu("About");
-        menuBar.add(menuAbout);
+        save.setActionCommand(CMD_SAVE);
+        exit.setActionCommand(CMD_EXIT);
+        mnist.setActionCommand(CMD_MNIST);
+        evalu.setActionCommand(CMD_EVALU);
+        about.setActionCommand(CMD_ABOUT);
     }
 
     private void setHeader() {
         URL url = ClassLoader.getSystemClassLoader().getResource("jdeepro.png");
         ImageIcon icon = new ImageIcon(url);
         JButton banner = new JButton(icon);
-        banner.setPreferredSize(new Dimension(icon.getIconWidth()-1, icon.getIconHeight()-1));
+        banner.setPreferredSize(new Dimension(icon.getIconWidth() - 1, icon.getIconHeight() - 1));
         frame.add(banner, BorderLayout.NORTH);
     }
 
@@ -190,7 +281,7 @@ class Handwriting {
 
         JPanel container = new JPanel();
         frame.add(container);
-        container.setBorder(new EmptyBorder(PADING,PADING,PADING,PADING));
+        container.setBorder(new EmptyBorder(PADING, PADING, PADING, PADING));
         container.setLayout(new BorderLayout());
 
         panel.addMouseMotionListener(mouseMotion);
@@ -198,66 +289,93 @@ class Handwriting {
         panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         container.add(panel, BorderLayout.WEST);
 
-        check.setPreferredSize(new Dimension(WIDTH+CHECK, HEIGHT));
+        check.setPreferredSize(new Dimension(WIDTH + CHECK, HEIGHT));
         container.add(check, BorderLayout.EAST);
 
         frame.pack();
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
         URL url = ClassLoader.getSystemClassLoader().getResource("mnist.npz");
-        new Thread(()->mnist.loadNpz(url)).start();
+        new Thread(() -> mnist.loadNpz(url)).start();
     }
 
-	private BufferedImage resizeBufferedImage(BufferedImage source, boolean flag) {
-		int type = source.getType();
+    private BufferedImage resizeBufferedImage(BufferedImage source, boolean flag) {
+        int type = source.getType();
         BufferedImage target = null;
         int targetW = 28;
         int targetH = 28;
 
-		double sx = (double) targetW / source.getWidth();
+        double sx = (double) targetW / source.getWidth();
         double sy = (double) targetH / source.getHeight();
 
-		if (flag && sx > sy) {
-			sx = sy;
-			targetW = (int) (sx * source.getWidth());
-		} else if(flag && sx <= sy){
-			sy = sx;
-			targetH = (int) (sy * source.getHeight());
-		}
+        if (flag && sx > sy) {
+            sx = sy;
+            targetW = (int) (sx * source.getWidth());
+        } else if (flag && sx <= sy) {
+            sy = sx;
+            targetH = (int) (sy * source.getHeight());
+        }
 
-		target = new BufferedImage(targetW, targetH, type);
+        target = new BufferedImage(targetW, targetH, type);
 
-		Graphics2D g = target.createGraphics();
-		g.drawRenderedImage(source, AffineTransform.getScaleInstance(sx, sy));
-		g.dispose();
-		return target;
-	}
+        Graphics2D g = target.createGraphics();
+        g.drawRenderedImage(source, AffineTransform.getScaleInstance(sx, sy));
+        g.dispose();
+        return target;
+    }
 
-    private void recognize() {
-        BufferedImage hw = resizeBufferedImage(image, false);
+    private void udpateUI(String statusText) {
         graphics.clearRect(0, 0, WIDTH, HEIGHT);
         panel.repaint();
         check.repaint();
+        SwingUtilities.invokeLater(() -> status.setText(statusText));
+    }
 
-        record = new int[28*28];
+    private void recognize() {
+        BufferedImage hw = resizeBufferedImage(image, false);
+
+        if (record != null) {
+            record = new int[28 * 28];
+        }
 
         for (int i = 0; i < 28; i++) {
             for (int j = 0; j < 28; j++) {
                 int clr = hw.getRGB(i, j);
-                int red   = (clr & 0x00ff0000) >> 16; // half red
-                // int green = (clr & 0x0000ff00) >> 8;
-                // int blue  =  clr & 0x000000ff;
-                // int gray  = (red+green+blue)/3;
-                if (red > 0) record[i+j*28] = red;
+                record[i+j*28] = (clr & 0x00ff0000) >> 16;
             }
         }
 
-        NDArray a = np.array(record, 28, 28);
-        a.dump();
+        NDArray a = np.array(record, 28, 28).reshape(28, 28, 1);
+        String result = String.format("Did you just write the number %d?", mnist.predict(a));
+        udpateUI(result);
+    }
 
-        int predict = mnist.predict(a.reshape(28,28,1));
-        String result = String.format("你刚写的是数字 %d 吧？", predict);
+    private void onSave() {
 
-        SwingUtilities.invokeLater(()->status.setText(result));
+    }
+
+    private void onMnist(ActionEvent e) {
+        JMenuItem mnist = (JMenuItem)e.getSource();
+
+        if (board == MNIST_MODE) {
+            mnist.setForeground(Color.BLACK);
+            board = WRITE_MODE;
+            udpateUI(TIP);
+        } else {
+            mnist.setForeground(Color.BLUE);
+            board = MNIST_MODE;
+            loadMNIST(0, false);
+        }
+    }
+
+    private void onEval() {
+    }
+
+    private void onAbout() {
+        JOptionPane.showMessageDialog(frame,
+            "Thanks for giving a try!\nThis project is initiated by Yang.\nAnd the main programmer is simbaba.",
+            "JDeepro",
+            JOptionPane.INFORMATION_MESSAGE);
     }
 }

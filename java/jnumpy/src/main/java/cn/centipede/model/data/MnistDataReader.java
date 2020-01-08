@@ -4,9 +4,8 @@ import java.io.*;
 
 public class MnistDataReader  {
 
-    public MnistMatrix[] readData(String dataFilePath, String labelFilePath) throws IOException {
-
-        DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(dataFilePath)));
+    public MnistMatrix[] readData(InputStream image, InputStream label) throws IOException {
+        DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(image));
         int magicNumber = dataInputStream.readInt();
         int numberOfItems = dataInputStream.readInt();
         int nRows = dataInputStream.readInt();
@@ -17,7 +16,7 @@ public class MnistDataReader  {
         System.out.println("number of rows is: " + nRows);
         System.out.println("number of cols is: " + nCols);
 
-        DataInputStream labelInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(labelFilePath)));
+        DataInputStream labelInputStream = new DataInputStream(new BufferedInputStream(label));
         int labelMagicNumber = labelInputStream.readInt();
         int numberOfLabels = labelInputStream.readInt();
 
