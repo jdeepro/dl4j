@@ -9,6 +9,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
@@ -20,8 +21,6 @@ import cn.centipede.numpy.Numpy.np;
 import java.awt.Graphics;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -56,11 +55,12 @@ class Handwriting {
 
     private CNN mnist = new CNN();
     private NDArray[] cache;
-    private int curPage;
     private int[] record = new int[28 * 28];
 
     private JFrame frame = new JFrame("Handwriting Demo");
     private JLabel status = new JLabel(TIP);
+    private JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 99, 0);
+
     private Font smallFont = new Font("courier new", Font.PLAIN, 7);
 
     private Graphics graphics;
@@ -91,47 +91,24 @@ class Handwriting {
     private MouseAdapter mouse = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                mnistNavPage(true);
-			}
+            if (e.getSource() == panel) {
+                onPanelClicked(e);
+            }
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
-            lastX = e.getX();
-            lastY = e.getY();
-
-            if (hClearThread != null) {
-                hClearThread.interrupt();
-                hClearThread = null;
+            if (e.getSource() == panel) {
+                onPanelPressed(e);
             }
         }
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if (hClearThread == null && board == WRITE_MODE) {
-                hClearThread = new Thread(this::waitOrInterupt);
-                hClearThread.start();
-            }
-        }
-
-        private void waitOrInterupt() {
-            try {
-                Thread.sleep(WAIT);
-                recognize();
-            } catch (InterruptedException e1) {
-            }
-        }
-    };
-
-    private KeyAdapter navMnist = new KeyAdapter() {
-        @Override
-        public void keyTyped(KeyEvent e) {
-            int key = e.getKeyCode();
-            if (key == KeyEvent.VK_LEFT) {
-                mnistNavPage(false);
-            } else  if (key == KeyEvent.VK_RIGHT) {
-                mnistNavPage(true);
+            if (e.getSource() == panel) {
+                onPanelReleased(e);
+            } else {
+                onSliderReleased(e);
             }
         }
     };
@@ -155,19 +132,80 @@ class Handwriting {
         g.setFont(smallFont);
         String[] rows = record2Str();
         for (int i = 0; i < rows.length; i++) {
-            g.drawString(rows[i], PADING, 8 + i * 10);
+            g.drawString(rows[i], PADING, 7 + i * 10);
         }
     }
 
+    private void waitOrInterupt() {
+        try {
+            Thread.sleep(WAIT);
+            recognize();
+        } catch (InterruptedException e1) {
+        }
+    }
+
+    protected void onPanelReleased(MouseEvent e) {
+        if (hClearThread == null && board == WRITE_MODE) {
+            hClearThread = new Thread(this::waitOrInterupt);
+            hClearThread.start();
+        }
+    }
+
+    protected void onPanelPressed(MouseEvent e) {
+        lastX = e.getX();
+        lastY = e.getY();
+
+        if (hClearThread != null) {
+            hClearThread.interrupt();
+            hClearThread = null;
+        }
+    }
+
+    private void fillRecord(int index) {
+        int curPage = slider.getValue();
+        index = curPage*100+index;
+
+        NDArray array = cache[0].row(index);
+        int[] pixles = (int[])np.getArrayData(array);
+
+        System.arraycopy(pixles, 0, record, 0, 28*28);
+        check.repaint();
+    }
+
+    protected void onPanelClicked(MouseEvent e) {
+        if (board != MNIST_MODE || e.getButton() != MouseEvent.BUTTON1 ) {
+            return;
+        }
+
+        if (e.getClickCount() == 2) {
+            onPanelDbClicked(e);
+        } else {
+            fillRecord(e.getX()/28+e.getY()/28*10);
+        }
+    }
+
+    protected void onPanelDbClicked(MouseEvent e) {
+        int x= e.getX();
+        mnistNavPage(x>=WIDTH/2);
+    }
+
+    protected void onSliderReleased(MouseEvent e) {
+        int page = slider.getValue();
+        loadMNIST(page, false);
+    }
+
     private void mnistNavPage(boolean next) {
+        int curPage = slider.getValue();
         if (next) {
             curPage++;
         } else {
             curPage--;
         }
+
         int max = cache[0].dimens()[0];
         if (curPage < 0) curPage = 0;
         if (curPage >= max) curPage = max-1;
+
         drawMNIST(curPage);
     }
 
@@ -196,6 +234,8 @@ class Handwriting {
             }
         }
         panel.repaint();
+        slider.setValue(page);
+        status.setText(String.format("Page: %d/100", page+1));
     }
 
     private String[] record2Str() {
@@ -206,7 +246,7 @@ class Handwriting {
             System.arraycopy(record, i * 28, row, 0, 28);
             StringBuilder sb = new StringBuilder();
             for (int j = 0; j < 28; j++) {
-                sb.append(String.format("%-3d", record[i * 28 + j]));
+                sb.append(String.format("%-3x", record[i * 28 + j]));
             }
             rows[i] = sb.toString();
         }
@@ -263,13 +303,22 @@ class Handwriting {
     }
 
     private void setFooter() {
+        JPanel footer = new JPanel();
         status.setPreferredSize(new Dimension(WIDTH, 24));
-        frame.add(status, BorderLayout.SOUTH);
+        footer.setBorder(new EmptyBorder(PADING, PADING, PADING, PADING));
+        footer.setLayout(new BorderLayout());
+        footer.add(status, BorderLayout.WEST);
+        footer.add(slider, BorderLayout.EAST);
+        slider.setVisible(false);
+        frame.add(footer, BorderLayout.SOUTH);
+
+        slider.addChangeListener(e->{
+            slider.getValue();
+        });
+        slider.addMouseListener(mouse);
     }
 
     public Handwriting() {
-        frame.setForeground(Color.BLUE);
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
@@ -286,7 +335,7 @@ class Handwriting {
 
         panel.addMouseMotionListener(mouseMotion);
         panel.addMouseListener(mouse);
-        panel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        panel.setPreferredSize(new Dimension(WIDTH+PADING, HEIGHT+PADING));
         container.add(panel, BorderLayout.WEST);
 
         check.setPreferredSize(new Dimension(WIDTH + CHECK, HEIGHT));
@@ -357,8 +406,11 @@ class Handwriting {
 
     private void onMnist(ActionEvent e) {
         JMenuItem mnist = (JMenuItem)e.getSource();
+        boolean isMnistMode = (board==MNIST_MODE);
 
-        if (board == MNIST_MODE) {
+        slider.setVisible(!isMnistMode);
+
+        if (isMnistMode) {
             mnist.setForeground(Color.BLACK);
             board = WRITE_MODE;
             udpateUI(TIP);

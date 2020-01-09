@@ -2,7 +2,6 @@ package cn.centipede.model.data;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 
 import cn.centipede.numpy.NDArray;
 import cn.centipede.numpy.Numpy.np;

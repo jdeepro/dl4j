@@ -44,15 +44,6 @@ public class NpzFile {
         return list;
     }
 
-    private NpzEntry parseHeader(ZipEntry entry) {
-        try {
-            return parseHeader(zf, entry);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new RuntimeException("Parse Header failed!");
-    }
-
     private ByteBuffer getBuffers(ZipEntry entry, int step) throws IOException {
         InputStream is = zf.getInputStream(entry);
         ByteBuffer chunk = ByteBuffer.allocate(0);
@@ -68,8 +59,13 @@ public class NpzFile {
         return chunk;
     }
 
-    private NpzEntry parseHeader(ZipFile zf, ZipEntry entry) throws IOException {
-        ByteBuffer chunk = getBuffers(entry, 1<<18);
+    private NpzEntry parseHeader(ZipEntry entry) {
+        ByteBuffer chunk;
+        try {
+            chunk = getBuffers(entry, 1 << 18);
+        } catch (IOException e) {
+            throw new RuntimeException("Parse Header failed!");
+        }
         Header header = Header.parseHeader(chunk);
         String entryName = entry.getName();
         entryName = entryName.substring(0, entryName.lastIndexOf("."));
