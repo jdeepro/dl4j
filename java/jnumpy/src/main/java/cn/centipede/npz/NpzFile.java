@@ -7,12 +7,11 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import cn.centipede.numpy.NDArray;
 
@@ -28,73 +27,73 @@ import cn.centipede.numpy.NDArray;
  * @sample [org.jetbrains.bio.npy.npzExample]
  */
 public class NpzFile {
-    private ZipFile zf;
+    private List<NpzEntry> npzList = new ArrayList<>();;
+    private HashMap<String, NDArray> npzMap = new HashMap<>();;
 
-    public NpzFile(Path path) {
-        try {
-            zf = new ZipFile(path.toFile(), ZipFile.OPEN_READ, Charset.forName("US-ASCII"));
+    public NpzFile(InputStream is) {
+        try(ZipInputStream zis=new ZipInputStream(is, Charset.forName("US-ASCII"))) {
+            parseNpz(zis);
         } catch (IOException e) {
-            e.printStackTrace();
+           throw new RuntimeException(e.getMessage());
         }
     }
 
-    public List<NpzEntry> introspect() {
-        List<NpzEntry> list = zf.stream().map(this::parseHeader).collect(Collectors.toList());
-        list.stream().forEach(System.out::println);
-        return list;
-    }
-
-    private ByteBuffer getBuffers(ZipEntry entry, int step) throws IOException {
-        InputStream is = zf.getInputStream(entry);
-        ByteBuffer chunk = ByteBuffer.allocate(0);
-
-        int remaining = is.available();
-        if (remaining > 0) {
-            chunk = ByteBuffer.allocate(remaining);
+    private void parseNpz(ZipInputStream zis) throws IOException {
+        ZipEntry entry = zis.getNextEntry();
+        while(entry != null) {
+            NDArray array = readEntry(zis, entry);
+            npzMap.put(entry.getName(), array);
+            entry = zis.getNextEntry();
         }
-
-        Channels.newChannel(is).read(chunk);
-        chunk = chunk.asReadOnlyBuffer();
-        chunk.flip();
-        return chunk;
     }
 
-    private NpzEntry parseHeader(ZipEntry entry) {
-        ByteBuffer chunk;
+    private NDArray readEntry(ZipInputStream zis, ZipEntry entry) {
         try {
-            chunk = getBuffers(entry, 1 << 18);
-        } catch (IOException e) {
-            throw new RuntimeException("Parse Header failed!");
-        }
-        Header header = Header.parseHeader(chunk);
-        String entryName = entry.getName();
-        entryName = entryName.substring(0, entryName.lastIndexOf("."));
-        return new NpzEntry(entryName, header.getType(), header.shape);
-    }
-
-    public void close() {
-        try {
-            zf.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public NDArray get(String name) {
-        ZipEntry entry = zf.getEntry(name + ".npy");
-        try {
-            return NpyFile.read(getBuffers(entry, 1 << 18));
+            ByteBuffer chunk = getBuffers(zis, entry.getCompressedSize());
+            Header header = parseHeader(chunk, entry);
+            return NpyFile.read(header, chunk);
         } catch (IOException e) {
             e.printStackTrace();
         }
         throw new RuntimeException("Read Npy failed!");
     }
 
+    public NDArray get(String name) {
+        return npzMap.get(name+".npy");
+    }
+
+    private ByteBuffer getBuffers(ZipInputStream zin, long step) throws IOException {
+        ByteBuffer chunk = ByteBuffer.allocate(0);
+
+        int remaining = zin.available();
+        if (remaining > 0) {
+            chunk = ByteBuffer.allocate((int)step);
+        }
+
+        Channels.newChannel(zin).read(chunk);
+        chunk = chunk.asReadOnlyBuffer();
+        chunk.flip();
+        return chunk;
+    }
+
+    public List<NpzEntry> introspect() {
+        npzList.stream().forEach(System.out::println);
+        return npzList;
+    }
+
+    private Header parseHeader(ByteBuffer chunk, ZipEntry entry) {
+        Header header = Header.parseHeader(chunk);
+        String entryName = entry.getName();
+        entryName = entryName.substring(0, entryName.lastIndexOf("."));
+        NpzEntry npzEntry = new NpzEntry(entryName, header.getType(), header.shape);
+        npzList.add(npzEntry);
+        return header;
+    }
+
     public static void main(String[] args) throws IOException, URISyntaxException {
-        URL url = NpzFile.class.getResource("/mnist.npz");
-        NpzFile npz = new NpzFile(Paths.get(url.toURI()));
+        InputStream stream = NpzFile.class.getResourceAsStream("/mnist.npz");
+        NpzFile npz = new NpzFile(stream);
         npz.get("k1").dump();
         npz.get("b1").dump();
-        npz.close();
     }
 }

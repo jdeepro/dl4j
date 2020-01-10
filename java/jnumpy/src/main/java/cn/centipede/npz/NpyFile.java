@@ -24,8 +24,7 @@ import cn.centipede.numpy.Numpy.np;
  */
 public class NpyFile {
 
-	public static NDArray read(ByteBuffer chunks) {
-        Header header = Header.parseHeader(chunks);
+	public static NDArray read(Header header, ByteBuffer chunks) {
         int size = IntStream.of(header.shape).reduce(1, (a,b)->a*b);
 
         chunks.order(header.order);

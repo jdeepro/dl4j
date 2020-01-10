@@ -1,8 +1,8 @@
 package cn.centipede.model.cnn;
 
-import java.net.URISyntaxException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Paths;
 
 import cn.centipede.model.activation.Relu;
 import cn.centipede.model.Softmax;
@@ -34,9 +34,9 @@ public class CNN {
     public void loadNpz(URL npzURL) {
         NpzFile npz;
 
-        try {
-            npz = new NpzFile(Paths.get(npzURL.toURI()));
-        } catch (URISyntaxException e) {
+        try (InputStream stream = npzURL.openStream()){
+            npz = new NpzFile(stream);
+        } catch (IOException e) {
            throw new RuntimeException(e.getMessage());
         }
 
@@ -46,7 +46,6 @@ public class CNN {
         conv2.b = npz.get("b2");
         nn.W = npz.get("w3");
         nn.b = npz.get("b3");
-        npz.close();
     }
 
     public int predict(NDArray X) {

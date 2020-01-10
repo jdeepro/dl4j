@@ -1,5 +1,6 @@
 package cn.centipede.demo;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,6 +31,8 @@ import java.awt.Font;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.awt.geom.AffineTransform;
 import java.awt.BorderLayout;
@@ -45,8 +48,8 @@ class Handwriting {
     private static final int WRITE_MODE = 0;
     private static final int MNIST_MODE = 1;
 
-    private static final String CMD_SAVE  = "SAVE";
-    private static final String CMD_EXIT  = "EXIT";
+    private static final String CMD_SAVE = "SAVE";
+    private static final String CMD_EXIT = "EXIT";
     private static final String CMD_MNIST = "MNIST";
     private static final String CMD_EVALU = "EVALU";
     private static final String CMD_ABOUT = "ABOUT";
@@ -56,12 +59,14 @@ class Handwriting {
     private CNN mnist = new CNN();
     private NDArray[] cache;
     private int[] record = new int[28 * 28];
+    private int[] predict = new int[100]; // failed is true
 
     private JFrame frame = new JFrame("Handwriting Demo");
     private JLabel status = new JLabel(TIP);
     private JSlider slider = new JSlider(JSlider.HORIZONTAL, 0, 99, 0);
 
     private Font smallFont = new Font("courier new", Font.PLAIN, 7);
+    private ImageIcon appIcon;
 
     private Graphics graphics;
     private BufferedImage image;
@@ -163,30 +168,31 @@ class Handwriting {
 
     private void fillRecord(int index) {
         int curPage = slider.getValue();
-        index = curPage*100+index;
+        index = curPage * 100 + index;
 
         NDArray array = cache[0].row(index);
-        int[] pixles = (int[])np.getArrayData(array);
+        int[] pixles = (int[]) np.getArrayData(array);
 
-        System.arraycopy(pixles, 0, record, 0, 28*28);
+        System.arraycopy(pixles, 0, record, 0, 28 * 28);
         check.repaint();
     }
 
     protected void onPanelClicked(MouseEvent e) {
-        if (board != MNIST_MODE || e.getButton() != MouseEvent.BUTTON1 ) {
+        if (board != MNIST_MODE || e.getButton() != MouseEvent.BUTTON1) {
             return;
         }
 
         if (e.getClickCount() == 2) {
             onPanelDbClicked(e);
         } else {
-            fillRecord(e.getX()/28+e.getY()/28*10);
+            fillRecord(e.getX() / 28 + e.getY() / 28 * 10);
         }
     }
 
     protected void onPanelDbClicked(MouseEvent e) {
-        int x= e.getX();
-        mnistNavPage(x>=WIDTH/2);
+        int x = e.getX();
+        predict = new int[100];
+        mnistNavPage(x >= WIDTH / 2);
     }
 
     protected void onSliderReleased(MouseEvent e) {
@@ -203,39 +209,44 @@ class Handwriting {
         }
 
         int max = cache[0].dimens()[0];
-        if (curPage < 0) curPage = 0;
-        if (curPage >= max) curPage = max-1;
+        if (curPage < 0)
+            curPage = 0;
+        if (curPage >= max)
+            curPage = max - 1;
 
         drawMNIST(curPage);
     }
 
     private void loadMNIST(int page, boolean train) {
-        SwingUtilities.invokeLater(() -> status.setText("Loading minist..."));
-        new Thread(()->{
+        status.setText("Loading minist...");
+        new Thread(() -> {
             cache = MNIST.numpy(train);
-            SwingUtilities.invokeLater(()->{status.setText("load mnist done!");
-                drawMNIST(page);});
+            SwingUtilities.invokeLater(() -> {
+                status.setText("load mnist done!");
+                drawMNIST(page);
+            });
         }).start();
     }
 
     private void drawCell(int r, int c, NDArray array) {
-        int[] mnist = (int[])np.getArrayData(array); // 28*28
-        for (int i = 0; i < 28*28; i++) {
-            image.setRGB(c*28+i%28, r*28+i/28, mnist[i]);
+        int[] mnist = (int[]) np.getArrayData(array); // 28*28
+        boolean isFailed = predict[r*10+c]>=10;
+        for (int i = 0; i < 28 * 28; i++) { // pixel by pixel
+            image.setRGB(c * 28 + i % 28, r * 28 + i / 28, isFailed?((mnist[i]!=0)?0xFF0000:0):mnist[i]);
         }
     }
 
     private void drawMNIST(int page) {
-        int[][] range = {{page*100, page*100+100}};
+        int[][] range = { { page * 100, page * 100 + 100 } };
         NDArray dat = cache[0].get(range); // 100*28*28
         for (int r = 0; r < 10; r++) {
             for (int c = 0; c < 10; c++) {
-                drawCell(r, c, dat.get(r*10+c));
+                drawCell(r, c, dat.get(r * 10 + c));
             }
         }
         panel.repaint();
         slider.setValue(page);
-        status.setText(String.format("Page: %d/100", page+1));
+        status.setText(String.format("Page: %d/100", page + 1));
     }
 
     private String[] record2Str() {
@@ -270,18 +281,18 @@ class Handwriting {
         JMenu menuFile = new JMenu("File");
         JMenuItem save = new JMenuItem("Save");
         JMenuItem exit = new JMenuItem("Exit");
-        menuFile.add(save).addActionListener(e->onSave());
-        menuFile.add(exit).addActionListener(e->System.exit(0));
+        menuFile.add(save).addActionListener(e -> onSave());
+        menuFile.add(exit).addActionListener(e -> System.exit(0));
 
         JMenu menuMnist = new JMenu("Train");
         JMenuItem mnist = new JMenuItem("MNIST");
         JMenuItem evalu = new JMenuItem("Eval");
-        menuMnist.add(mnist).addActionListener(e->onMnist(e));
-        menuMnist.add(evalu).addActionListener(e->onEval());
+        menuMnist.add(mnist).addActionListener(e -> onMnist(e));
+        menuMnist.add(evalu).addActionListener(e -> onEval());
 
         JMenu menuHelp = new JMenu("Help");
         JMenuItem about = new JMenuItem("About");
-        menuHelp.add(about).addActionListener(e->onAbout());
+        menuHelp.add(about).addActionListener(e -> onAbout());
 
         menuBar.add(menuFile);
         menuBar.add(menuMnist);
@@ -296,9 +307,9 @@ class Handwriting {
 
     private void setHeader() {
         URL url = ClassLoader.getSystemClassLoader().getResource("jdeepro.png");
-        ImageIcon icon = new ImageIcon(url);
-        JButton banner = new JButton(icon);
-        banner.setPreferredSize(new Dimension(icon.getIconWidth() - 1, icon.getIconHeight() - 1));
+        appIcon = new ImageIcon(url);
+        JButton banner = new JButton(appIcon);
+        banner.setPreferredSize(new Dimension(appIcon.getIconWidth() - 1, appIcon.getIconHeight() - 1));
         frame.add(banner, BorderLayout.NORTH);
     }
 
@@ -312,7 +323,7 @@ class Handwriting {
         slider.setVisible(false);
         frame.add(footer, BorderLayout.SOUTH);
 
-        slider.addChangeListener(e->{
+        slider.addChangeListener(e -> {
             slider.getValue();
         });
         slider.addMouseListener(mouse);
@@ -335,7 +346,7 @@ class Handwriting {
 
         panel.addMouseMotionListener(mouseMotion);
         panel.addMouseListener(mouse);
-        panel.setPreferredSize(new Dimension(WIDTH+PADING, HEIGHT+PADING));
+        panel.setPreferredSize(new Dimension(WIDTH + PADING, HEIGHT + PADING));
         container.add(panel, BorderLayout.WEST);
 
         check.setPreferredSize(new Dimension(WIDTH + CHECK, HEIGHT));
@@ -391,7 +402,7 @@ class Handwriting {
         for (int i = 0; i < 28; i++) {
             for (int j = 0; j < 28; j++) {
                 int clr = hw.getRGB(i, j);
-                record[i+j*28] = (clr & 0x00ff0000) >> 16;
+                record[i + j * 28] = (clr & 0x00ff0000) >> 16;
             }
         }
 
@@ -401,7 +412,15 @@ class Handwriting {
     }
 
     private void onSave() {
-
+        try {
+            String fileName = System.currentTimeMillis()+"_jdeepro.png";
+            ImageIO.write(image, "png", new File(fileName));
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(frame,
+                e.getMessage(),
+                "Save Failed!",
+            JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     private void onMnist(ActionEvent e) {
@@ -421,13 +440,48 @@ class Handwriting {
         }
     }
 
+    private int[] evalCurPage(int page) {
+        int[][] range = { { page * 100, page * 100 + 100 } };
+
+        NDArray test = cache[0].get(range); // 100*28*28
+        NDArray label = cache[1].get(range);
+        int[] actual = (int[])np.getArrayData(label);
+
+        for (int i = 0; i < actual.length; i++) {
+            NDArray dat = test.get(i);
+            int number = mnist.predict(dat.reshape(28,28,1));
+            predict[i] = (number!=actual[i])?number+10:number;
+        }
+        return actual;
+    }
+
+    private String failedIDs(int[] actuals) {
+        StringBuilder sb = new StringBuilder("(");
+        for (int i = 0; i < predict.length; i++) {
+            if (predict[i] >= 10) {
+                sb.append(predict[i]-10).append(">").append(actuals[i]).append(", ");
+            }
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
     private void onEval() {
+        int page = slider.getValue();
+        status.setText("Eval current page...");
+
+        new Thread(() -> { int[] actuals = evalCurPage(page);
+            SwingUtilities.invokeLater(() -> {
+                drawMNIST(page);
+                status.setText("Failed ID: " + failedIDs(actuals));
+            });
+        }).start();
     }
 
     private void onAbout() {
         JOptionPane.showMessageDialog(frame,
             "Thanks for giving a try!\nThis project is initiated by Yang.\nAnd the main programmer is simbaba.",
             "JDeepro",
-            JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.INFORMATION_MESSAGE, appIcon);
     }
 }
