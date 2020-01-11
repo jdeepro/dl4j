@@ -4,7 +4,7 @@
   <groupId>cn.centipede</groupId>
   <artifactId>handwriting</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.0</version>
+  <version>1.2.1</version>
   <name>handwriting</name>
   <url>http://maven.apache.org</url>
   <dependencies>

@@ -80,6 +80,7 @@ class Handwriting {
 
         @Override
         public void paint(Graphics g) {
+            super.paint(g);
             g.drawImage(image, 0, 0, null);
         }
     };
@@ -89,6 +90,7 @@ class Handwriting {
 
         @Override
         public void paint(Graphics g) {
+            super.paint(g);
             drawHexCheck(g);
         }
     };
@@ -309,6 +311,7 @@ class Handwriting {
         URL url = ClassLoader.getSystemClassLoader().getResource("jdeepro.png");
         appIcon = new ImageIcon(url);
         JButton banner = new JButton(appIcon);
+        banner.setFocusPainted(false);
         banner.setPreferredSize(new Dimension(appIcon.getIconWidth() - 1, appIcon.getIconHeight() - 1));
         frame.add(banner, BorderLayout.NORTH);
     }
@@ -387,9 +390,11 @@ class Handwriting {
 
     private void udpateUI(String statusText) {
         graphics.clearRect(0, 0, WIDTH, HEIGHT);
-        panel.repaint();
-        check.repaint();
-        SwingUtilities.invokeLater(() -> status.setText(statusText));
+        SwingUtilities.invokeLater(() -> {
+            panel.repaint();
+            check.repaint();
+            status.setText(statusText);}
+        );
     }
 
     private void recognize() {
