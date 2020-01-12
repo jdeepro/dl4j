@@ -1,24 +1,29 @@
-# jdeepro
+# Jdeepro
+![Handwriting](./jdeepro.png)
 
-#### 项目介绍(Introduction)
-人工智能基础教程，使用Latex编写，基于Java实现。
+#### Introduction
+This is a project for Java beginner and artificial intelligence, written in Latex, based on Java.
 
-The basics of artificial intelligence, written in Latex, based on Java.
+Jdeepro is a deep learning framework, 
+providers tools and libraries written specially to take advantage of the Java™ Virtual Machine (JVM), 
+written for the Java and Scala languages.
 
 
-jdeepro is a framework of deep learning tools and libraries written specially to take advantage of the Java™ Virtual Machine (JVM), written for the Java and Scala languages.
+### Just working as expected.
+Expected to give you a production release soon.
+Welcome have a try and send me your patches.
+
+#### Our vision
+1. To be the first Numpy java impl.
+2. Give you an consistent experience with Python numpy.
+3. Basic guide for AI beginners.
 
 
-### 警告：刚好能够工作（Just work as expected.）
-:) :) :)
-Welcome to have a try!
+#### 2020/1/12 Demo Handwriting
+![Handwriting](./demo-handwriting.png)
 
-#### Our Hope
-1. Numpy参考实现 (Numpy reference impl)
-2. Matplot参考实现 (Matplot reference impl)
-3. AI基础算法实现 (AI basic algorithm impl)
 
-#### 2019/11/17 梯度下降 （gradient descend）
+#### 2019/11/17 Gradient Descend
 ![SGD](./sgd-sample.png)
 
 ``` java
@@ -108,17 +113,16 @@ double[][] expected2 = {{16.0}, {23.0}, {30.0}, {37.0}, {44.0}, {51.0}, {58.0}, 
 assertEquals(Numpy.array(expected2), y);
 ```
 
-#### 参与人员 Attendees
+#### Attendees
 1. simbaba 2. jianyang 3. Tatsumi 4. xiaohui
 
 #### 示例代码 Sample
-与Python相关接口非常相近，从Python迁移到Java非常容易。
-Similar to Python, you can quikly shift from Python to Java.
+Similar to Python, give you an consistent experience, you can quikly shift from Python to Java.
 
-#### jshell中的运行效果(running result in jshell):
+#### Running result in jshell Environment
 ![Matplot示例](./jshell.png)
 
-#### matplot的运行效果：
+#### Similar Matplot：
 ![Matplot示例](./jplot.png)
 
 ```java
@@ -140,7 +144,6 @@ axes.plot(x, v->Math.sin(v), "y=sin(x)");
 
 plot.show();
 ```
-Numpy算法实现，支持Vector和Matrix，接口与Numpy基本一致。
 Easy to use, you can quickly learn how to integrate to your code.
 
 ```java
