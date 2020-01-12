@@ -11,11 +11,16 @@ import static cn.centipede.numpy.Numpy.ALL;
 public class NumpyTest extends TestCase {
 
     @Test
-    public void test_api_at() {
+    public void test_api_get() {
         NDArray a = np.arange(12).reshape(3,4);
         int[] expected = {4,5,6,7};
         assertEquals(np.array(expected), a.get(1));
         assertEquals(np.array(6), a.get(1,2));
+
+        a = np.arange(36).reshape(4,3,3);
+        expected = new int[]{8, 17};
+        int[][] range = {{0,2}, {2}, {-1}};
+        assertEquals(np.array(expected), a.get(range));
     }
 
     @Test
@@ -48,14 +53,6 @@ public class NumpyTest extends TestCase {
         NDArray b = a.clone();
         a = a.reshape(np.newaxis, ALL);
         assertEquals(b, a.row(0));
-    }
-
-    @Test
-    public void test_api_get() {
-        NDArray a = np.arange(36).reshape(4,3,3);
-        int[] expected = {8, 17};
-        int[][] range = {{0,2}, {2}, {-1}};
-        assertEquals(np.array(expected), a.get(range));
     }
 
     @Test
