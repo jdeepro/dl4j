@@ -7,7 +7,7 @@ public class Softmax {
     private NDArray softmax;
 
     public NDArray loss(NDArray predict, NDArray label) {
-        int[] pdimens = predict.dimens();
+        int[] pdimens = predict.shape();
         int batchsize = pdimens[0];
 
         predict(predict);
@@ -28,10 +28,10 @@ public class Softmax {
     }
 
     public NDArray predict(NDArray predict) {
-        int[] pdimens = predict.dimens();
+        int[] pdimens = predict.shape();
         int batchsize = pdimens[0];
 
-        softmax = np.zeros(predict.dimens());
+        softmax = np.zeros(predict.shape());
 
         for (int  i=0; i < batchsize; i++) {
             NDArray predict_tmp = predict.row(i).subtract(np.max(predict.row(i)));

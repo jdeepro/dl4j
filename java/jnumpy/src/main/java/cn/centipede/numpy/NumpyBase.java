@@ -47,7 +47,7 @@ public class NumpyBase {
      */
     public static Object getArray(NDArray array) {
         Object real = getArrayData(array);
-        int[] dim = array.dimens();
+        int[] dim = array.shape();
         return ArrayHelper.struct(real, dim);
     }
 

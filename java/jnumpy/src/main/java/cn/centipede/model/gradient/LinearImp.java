@@ -8,12 +8,12 @@ public class LinearImp {
     public static double loss(NDArray x, NDArray y, NDArray w) {
         NDArray diff = x.dot(w).subtract(y);
         double cost = np.dot(diff.T(), diff).asDouble();
-        return cost/(x.dimens()[0]*2);
+        return cost/(x.shape()[0]*2);
     }
 
     public static NDArray BGD(NDArray x, NDArray y, double alpha, int epochs, double epsilon) {
-        int m = x.dimens()[0];
-        int n = x.dimens()[1];
+        int m = x.shape()[0];
+        int n = x.shape()[1];
         NDArray w = np.ones(n);
 
         for (int i = 0; i < epochs; i++) {
@@ -25,8 +25,8 @@ public class LinearImp {
     }
 
     public static NDArray SGD(NDArray x, NDArray y, double alpha, int epochs, double epsilon) {
-        int m = x.dimens()[0];
-        int n = x.dimens()[1];
+        int m = x.shape()[0];
+        int n = x.shape()[1];
         NDArray w = np.ones(n);
         //int[] choice = np.random.choice(m, m);
 
@@ -43,8 +43,8 @@ public class LinearImp {
     }
 
     public static NDArray MBGD(NDArray x, NDArray y, double alpha, int epochs, double epsilon) {
-        int m = x.dimens()[0];
-        int n = x.dimens()[1];
+        int m = x.shape()[0];
+        int n = x.shape()[1];
         NDArray w = np.ones(n);
 
         int batch_size = 5;

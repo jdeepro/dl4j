@@ -14,7 +14,7 @@ public class MnistTest extends TestCase {
         assertEquals("2", mnist[1].row(1).toString()); // lable
 
         NDArray test = mnist[0].reshape(10000, 28, 28, 1).row(1);
-        assertEquals("(28, 28, 1)", test.shape());
+        assertEquals("(28, 28, 1)", test.dimens());
     }
 
 }

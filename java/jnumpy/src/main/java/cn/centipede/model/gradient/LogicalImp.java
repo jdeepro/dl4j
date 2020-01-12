@@ -8,7 +8,7 @@ import cn.centipede.numpy.Numpy.np;
 public class LogicalImp {
 
     public static double loss(NDArray x, NDArray y, NDArray w) {
-    int m = x.dimens()[0];
+    int m = x.shape()[0];
     Activation sigmoid = new Sigmoid();
     NDArray h = sigmoid.forward(np.dot(x, w));
 

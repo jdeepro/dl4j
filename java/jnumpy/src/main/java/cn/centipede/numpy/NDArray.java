@@ -67,7 +67,7 @@ public class NDArray implements Cloneable{
     }
 
     public NDArray(NDArray array) {
-        this(array.data(), array.dataIndex(), array.dimens());
+        this(array.data(), array.dataIndex(), array.shape());
     }
 
     public boolean isInt() {
@@ -97,10 +97,6 @@ public class NDArray implements Cloneable{
 
     public int ndim() {
         return _dimens.length;
-    }
-
-    public int[] dimens() {
-        return _dimens;
     }
 
     /**
@@ -240,7 +236,11 @@ public class NDArray implements Cloneable{
      * shape(NDArray(new int[]{5,7}))=>(2,)
      * @return (2,3)
      */
-    public String shape() {
+    public int[] shape() {
+        return _dimens;
+    }
+
+    public String dimens() {
         if (_dimens.length == 0) {
             return "()"; // just one number
         }
@@ -272,7 +272,7 @@ public class NDArray implements Cloneable{
             System.arraycopy(array.dataIndex(), 0, idata, i*step, step);
         }
 
-        int[] subDimens = arrays[0].dimens();
+        int[] subDimens = arrays[0].shape();
         int[] dimens = new int[subDimens.length+1];
         dimens[0] = arrays.length;
         System.arraycopy(subDimens, 0, dimens, 1, subDimens.length);
@@ -503,7 +503,7 @@ public class NDArray implements Cloneable{
 
 	public void dump() {
         System.out.println();
-        System.out.println("shape=" + shape());
+        System.out.println("shape=" + dimens());
         System.out.println("array=");
         System.out.println(this);
 	}

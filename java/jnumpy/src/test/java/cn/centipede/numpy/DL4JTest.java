@@ -12,8 +12,8 @@ public class DL4JTest extends TestCase {
     @Test
     public void test_dl4j_T() {
         NDArray a = np.array(new int[]{3, 4});
-        assertEquals("(2,)", a.shape());
-        assertEquals("(2,)", a.T().shape());
+        assertEquals("(2,)", a.dimens());
+        assertEquals("(2,)", a.T().dimens());
     }
 
     @Test

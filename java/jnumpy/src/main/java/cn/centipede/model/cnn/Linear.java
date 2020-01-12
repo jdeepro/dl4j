@@ -30,7 +30,7 @@ public class Linear {
 
     public NDArray backward(NDArray delta, double learning_rate) {
         // 梯度计算
-        int batch_size = this.x.dimens()[0];
+        int batch_size = this.x.shape()[0];
         this.W_gradient = np.dot(this.x.T(), delta).divide(batch_size); // bxin bxout
         this.b_gradient = np.sum(delta, 0).divide(batch_size);
         NDArray delta_backward = np.dot(delta, this.W.T()); // bxout inxout

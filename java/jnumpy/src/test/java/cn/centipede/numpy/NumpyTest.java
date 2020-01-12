@@ -38,7 +38,7 @@ public class NumpyTest extends TestCase {
     @Test
     public void test_api_row() {
         NDArray a = np.array(new int[][]{{1,2,3}});
-        assertEquals("(3,)", a.row(0).shape());
+        assertEquals("(3,)", a.row(0).dimens());
 
         a = np.arange(12).reshape(3,4);
         int[] expected = {4,5,6,7};
@@ -59,10 +59,10 @@ public class NumpyTest extends TestCase {
     }
 
     @Test
-    public void test_shape() {
+    public void test_api_shape() {
         int[] dat = new int[]{2,4};
         NDArray a = np.array(dat);
-        assertEquals("(2,)", a.shape());
+        assertEquals("(2,)", a.dimens());
     }
 
     @Test
@@ -101,7 +101,7 @@ public class NumpyTest extends TestCase {
         assertEquals(b, np.pad(a, pad));
 
         a = np.arange(16).reshape(2,2,2,2);
-        assertEquals("(6, 6, 6, 6)", np.pad(a, new int[]{2}).shape());
+        assertEquals("(6, 6, 6, 6)", np.pad(a, new int[]{2}).dimens());
 
         NDArray arr3D = np.array(new int[][][]{{{1, 1, 2, 2, 3, 4}, {1, 1, 2, 2, 3, 4}, {1, 1, 2, 2, 3, 4}},
         {{0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5}, {0, 1, 2, 3, 4, 5}},
@@ -313,14 +313,14 @@ public class NumpyTest extends TestCase {
     @Test
     public void test_arange() {
         NDArray a = np.arange(12).reshape(3,4);
-        assertEquals("(3, 4)", a.shape());
+        assertEquals("(3, 4)", a.dimens());
     }
 
     @Test
     public void test_random() {
         NDArray a = np.random.rand(4,4);
         System.out.println(a);
-        assertEquals("(4, 4)", a.shape());
+        assertEquals("(4, 4)", a.dimens());
     }
 
     @Test

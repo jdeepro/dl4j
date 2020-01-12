@@ -34,6 +34,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.awt.geom.AffineTransform;
 import java.awt.BorderLayout;
 
@@ -193,12 +194,13 @@ class Handwriting {
 
     protected void onPanelDbClicked(MouseEvent e) {
         int x = e.getX();
-        predict = new int[100];
+        Arrays.fill(predict, 0);
         mnistNavPage(x >= WIDTH / 2);
     }
 
     protected void onSliderReleased(MouseEvent e) {
         int page = slider.getValue();
+        Arrays.fill(predict, 0);
         loadMNIST(page, false);
     }
 
@@ -210,12 +212,8 @@ class Handwriting {
             curPage--;
         }
 
-        int max = cache[0].dimens()[0];
-        if (curPage < 0)
-            curPage = 0;
-        if (curPage >= max)
-            curPage = max - 1;
-
+        int max = cache[0].shape()[0]/100;
+        curPage = (curPage+max)%max;
         drawMNIST(curPage);
     }
 
@@ -461,14 +459,15 @@ class Handwriting {
     }
 
     private String failedIDs(int[] actuals) {
-        StringBuilder sb = new StringBuilder("(");
+        StringBuilder sb = new StringBuilder("Recognition Error: (");
+        int count = 0;
         for (int i = 0; i < predict.length; i++) {
             if (predict[i] >= 10) {
+                count++;
                 sb.append(predict[i]-10).append(">").append(actuals[i]).append(", ");
             }
         }
-        sb.append(")");
-        return sb.toString();
+        return count>0?sb.append(")").toString():"Al Recognition Passed!";
     }
 
     private void onEval() {
@@ -478,7 +477,7 @@ class Handwriting {
         new Thread(() -> { int[] actuals = evalCurPage(page);
             SwingUtilities.invokeLater(() -> {
                 drawMNIST(page);
-                status.setText("Failed ID: " + failedIDs(actuals));
+                status.setText(failedIDs(actuals));
             });
         }).start();
     }

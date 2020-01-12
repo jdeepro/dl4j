@@ -4,14 +4,14 @@
   <groupId>cn.centipede</groupId>
   <artifactId>handwriting</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
   <name>handwriting</name>
   <url>http://maven.apache.org</url>
   <dependencies>
     <dependency>
       <groupId>cn.centipede</groupId>
       <artifactId>jnumpy</artifactId>
-      <version>0.2.0</version>
+      <version>0.2.1</version>
     </dependency>
   </dependencies>
   <build>

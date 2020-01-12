@@ -45,11 +45,11 @@ public class Conv {
             this.x = np.pad(this.x,pads);
         }
 
-        int[] xshape = this.x.dimens();
+        int[] xshape = this.x.shape();
         int bx = xshape[0];
         int wx = xshape[1];
 
-        int[] kshape = k.dimens();
+        int[] kshape = k.shape();
         int wk = kshape[0];
         int nk = kshape[3];
 
@@ -68,17 +68,17 @@ public class Conv {
     }
 
     public NDArray backward(NDArray delta, double learning_rate) {
-        int[] xshape = this.x.dimens(); // batch,14,14,inchannel
+        int[] xshape = this.x.shape(); // batch,14,14,inchannel
         int bx = xshape[0], wx = xshape[1], hx = xshape[2];
-        int[] kshape = this.k.dimens(); // 5,5,inChannel,outChannel
+        int[] kshape = this.k.shape(); // 5,5,inChannel,outChannel
         int wk = kshape[0], hk = kshape[1], ck = kshape[2];
-        int[] dshape = delta.dimens();  // batch,10,10,outChannel
+        int[] dshape = delta.shape();  // batch,10,10,outChannel
         int bd = dshape[0], hd = dshape[2], cd = dshape[3];
 
         // self.k_gradient,self.b_gradient
         NDArray delta_col = delta.reshape(bd, -1, cd);
         for (int i = 0; i < bx; i++) {
-            this.k_gradient.add(np.dot(this.image_col.get(i).T(), delta_col.row(i)).reshape(this.k.dimens()));
+            this.k_gradient.add(np.dot(this.image_col.get(i).T(), delta_col.row(i)).reshape(this.k.shape()));
         }
 
         this.k_gradient = this.k_gradient.divide(bx);
@@ -111,7 +111,7 @@ public class Conv {
     }
 
     public static NDArray img2col(NDArray x, int ksize, int stride) {
-        int[] shape = x.dimens();
+        int[] shape = x.shape();
         int wx = shape[0], cx = shape[2];
         int feature_w = (wx - ksize) / stride + 1;
 

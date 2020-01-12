@@ -77,7 +77,7 @@ public class Numpy extends NumpyBase{
         Object srcData = getArrayData(src);
         Object datArray = flattenDat(dat);
         Object ret = Operator.binaryOp(srcData, datArray, op);
-        return new NDArray(ret, src.dimens());
+        return new NDArray(ret, src.shape());
     }
 
     public static NDArray add(NDArray src, Object dat) {
@@ -109,7 +109,7 @@ public class Numpy extends NumpyBase{
             srcData = DoubleStream.of((double[])srcData).map(n->-n).toArray();
         }
 
-        return new NDArray(srcData,  src.dimens());
+        return new NDArray(srcData,  src.shape());
     }
 
     public static NDArray exp(NDArray src) {
@@ -121,7 +121,7 @@ public class Numpy extends NumpyBase{
             srcData = DoubleStream.of((double[])srcData).map(n->Math.exp(n)).toArray();
         }
 
-        return new NDArray(srcData,  src.dimens());
+        return new NDArray(srcData,  src.shape());
     }
 
     public static NDArray log(NDArray src) {
@@ -132,7 +132,7 @@ public class Numpy extends NumpyBase{
         } else {
             srcData = DoubleStream.of((double[])srcData).map(n->Math.log(n)).toArray();
         }
-        return new NDArray(srcData,  src.dimens());
+        return new NDArray(srcData,  src.shape());
     }
 
     public static NDArray abs(NDArray src) {
@@ -143,7 +143,7 @@ public class Numpy extends NumpyBase{
         } else {
             srcData = DoubleStream.of((double[])srcData).map(n->n>=0?n:-n).toArray();
         }
-        return new NDArray(srcData,  src.dimens());
+        return new NDArray(srcData,  src.shape());
     }
 
     /**
@@ -170,7 +170,7 @@ public class Numpy extends NumpyBase{
         } else {
             srcData = DoubleStream.of((double[])srcData).map(n->1/n).toArray();
         }
-        return new NDArray(srcData,  src.dimens());
+        return new NDArray(srcData,  src.shape());
     }
 
     /**
@@ -180,7 +180,7 @@ public class Numpy extends NumpyBase{
      * @return NDArray
      */
     public static NDArray dot(NDArray a, NDArray b) {
-        int[] aDim = a.dimens(), bDim = b.dimens();
+        int[] aDim = a.shape(), bDim = b.shape();
         Object aData = a.data(), bData = b.data();
 
         /** a is number */
@@ -225,7 +225,7 @@ public class Numpy extends NumpyBase{
         } else {
             data = DoubleStream.of((double[]) data).map(n->n*b).toArray();
         }
-        return Numpy.array(data, a.dimens());
+        return Numpy.array(data, a.shape());
     }
 
     public static NDArray dot(NDArray a, double b) {
@@ -235,7 +235,7 @@ public class Numpy extends NumpyBase{
         } else {
             data = DoubleStream.of((double[]) data).map(n->n*b).toArray();
         }
-        return Numpy.array(data, a.dimens());
+        return Numpy.array(data, a.shape());
     }
 
     /**
@@ -304,8 +304,8 @@ public class Numpy extends NumpyBase{
             return mergeArray(a, b, axis);
         }
 
-        int[] adim = a.dimens();
-        int[] bdim = b.dimens();
+        int[] adim = a.shape();
+        int[] bdim = b.shape();
 
         if (adim.length > 1 && bdim.length == 1) {
             bdim = new int[]{1, bdim[0]};
@@ -330,7 +330,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray stack(NDArray[] arrays, int axis) {
-        int[] dimens_o = arrays[0].dimens();
+        int[] dimens_o = arrays[0].shape();
         if (dimens_o.length == 1 && axis == 1) {
             //Stream.of(arrays).forEach(it->it.reshape(ALL, np.newaxis));
             for (int i = 0; i < arrays.length; i++) arrays[i] = arrays[i].reshape(ALL, np.newaxis);
@@ -355,12 +355,12 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray hstack(NDArray a, NDArray b) {
-        return concatenate(a, b, a.dimens().length>1?1:0);
+        return concatenate(a, b, a.shape().length>1?1:0);
     }
 
     public static NDArray vstack(NDArray a, NDArray b) {
         NDArray ret = concatenate(a, b, 0);
-        int[] dimens = a.dimens();
+        int[] dimens = a.shape();
         return dimens.length>1?ret:ret.reshape(2, dimens[0]);
     }
 
@@ -369,7 +369,7 @@ public class Numpy extends NumpyBase{
      * internal use only.
      */
     static NDArray mergeArray(NDArray a, NDArray b, int axis) {
-        int[] adim = a.dimens();
+        int[] adim = a.shape();
         NDArray[] rows = new NDArray[adim[0]];
         for (int i = 0; i < adim[0]; i++) {
             rows[i] = concatenate(a.row(i), b.row(i), axis-1);
@@ -404,7 +404,7 @@ public class Numpy extends NumpyBase{
             index[i] = ALL;
         }
 
-        int[] dimens = array.dimens();
+        int[] dimens = array.shape();
 
         NDArray ret = array.get(index);
         for (int i = 1; i < dimens[axis-1]; i++) {
@@ -429,7 +429,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static boolean compare(NDArray src, NDArray dst) {
-        if (!Arrays.equals(src.dimens(), dst.dimens())) {
+        if (!Arrays.equals(src.shape(), dst.shape())) {
             return false;
         }
         Object srcData = getArrayData(src);
@@ -446,7 +446,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static boolean same(NDArray src, NDArray dst, double slope) {
-        if (!Arrays.equals(src.dimens(), dst.dimens())) {
+        if (!Arrays.equals(src.shape(), dst.shape())) {
             return false;
         }
         Object srcData = getArrayData(src);
@@ -499,7 +499,7 @@ public class Numpy extends NumpyBase{
 
     private static NDArray _pad(NDArray array, int[] pads) {
         int left = pads[0], right = pads[1];
-        int[] dimens = array.dimens();
+        int[] dimens = array.shape();
 
         if (dimens.length == 1) {
             Object data = padData(array, left, right);
@@ -524,7 +524,7 @@ public class Numpy extends NumpyBase{
         pads = Arrays.copyOfRange(pads, 2, pads.length);
         NDArray first = _pad(array.row(0), pads);
 
-        for (int i = 1; i < array.dimens()[0]; i++) {
+        for (int i = 1; i < array.shape()[0]; i++) {
             NDArray row = array.row(i);
             row = _pad(row, pads);
             first = vstack(first, row);
@@ -539,7 +539,7 @@ public class Numpy extends NumpyBase{
             pads_[i*2+1] = pads[i][1];
         }
 
-        int[] dimens = array.dimens();
+        int[] dimens = array.shape();
         NDArray ret = _pad(array, pads_);
 
         for (int i=0; i < dimens.length; i++) {
@@ -550,7 +550,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray pad(NDArray array, int[] pads) {
-        int[] dimens = array.dimens();
+        int[] dimens = array.shape();
         int[] pads_ = Arrays.copyOfRange(pads, 0, dimens.length * 2);
         if (pads.length == 1) {
             pads_[1] = pads_[0];
@@ -628,7 +628,7 @@ public class Numpy extends NumpyBase{
             return a.T();
         }
 
-        int[] dimens = a.dimens();
+        int[] dimens = a.shape();
         int[] iter = new int[dimens.length];
         Object data = getArrayData(a);
         Object data_dst = Array.newInstance(a.isInt()?int.class:double.class, a.size());
@@ -642,7 +642,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray flipud(NDArray a) {
-        int[] dimens = a.dimens();
+        int[] dimens = a.shape();
         NDArray ret = a.row(dimens[0]-1);
         for (int i = dimens[0]-2; i >= 0; i--) {
             ret = concatenate(ret, a.row(i));
@@ -667,7 +667,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray rot90(NDArray a) {
-        int[] dimens = a.dimens();
+        int[] dimens = a.shape();
         int[][] range = new int[2][];
         range[0] = new int[]{ALL};
         range[1] = new int[1];
@@ -678,7 +678,7 @@ public class Numpy extends NumpyBase{
             ret = np.concatenate(a.get(range), ret);
         }
 
-        if (a.dimens().length == 2) {
+        if (a.shape().length == 2) {
             return ret.reshape(dimens[1], dimens[0]);
         }
 
@@ -713,7 +713,7 @@ public class Numpy extends NumpyBase{
     }
 
     public static NDArray repeat(NDArray a, int[] repeats, int axis) {
-        int[] dimens = Arrays.copyOf(a.dimens(), a.dimens().length);
+        int[] dimens = Arrays.copyOf(a.shape(), a.shape().length);
         int[] size = new int[dimens.length];
 
         int index = dimens.length-1;
@@ -779,7 +779,7 @@ public class Numpy extends NumpyBase{
     }
 
     private static NDArray max(NDArray a, int axis, boolean argmax) {
-        int[] dimens = a.dimens();
+        int[] dimens = a.shape();
         int retSize = 1;
 
         for (int i = 0; i < dimens.length; i++) {

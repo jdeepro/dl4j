@@ -7,12 +7,12 @@ public class Pool {
     NDArray feature_mask;
 
     public NDArray forward(NDArray x) {
-        int[] xshape = x.dimens();
+        int[] xshape = x.shape();
         int b = xshape[0], w = xshape[1], h = xshape[2], c = xshape[3];
         int feature_w = w / 2;
         NDArray feature = np.zeros(new int[]{b, feature_w, feature_w, c});
 
-        // 记录最大池化时最大值的位置信息用于反向传播
+        // record postion info of the maximum pool for backward.
         this.feature_mask = np.zeros(new int[]{b, w, h, c});
 
         for (int bi = 0; bi < b; bi++) {
