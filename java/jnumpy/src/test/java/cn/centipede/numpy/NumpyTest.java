@@ -11,6 +11,18 @@ import static cn.centipede.numpy.Numpy.ALL;
 public class NumpyTest extends TestCase {
 
     @Test
+    /**
+     * I think not need to support this feature.
+     * >>> a[:2,:-1]
+     * array([[0, 1, 2],
+     *        [4, 5, 6]])
+     */
+    public void test_api_slice() {
+      NDArray a = np.arange(12).reshape(3,4);
+      a.get(new int[][]{{ALL, 2}, {ALL, -1}}).dump();
+    }
+
+    @Test
     public void test_api_get() {
         NDArray a = np.arange(12).reshape(3,4);
         int[] expected = {4,5,6,7};
