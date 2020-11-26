@@ -166,7 +166,7 @@ public class Numpy extends NumpyBase{
         Object srcData = getArrayData(src);
 
         if (src.isInt()) {
-            srcData = IntStream.of((int[])srcData).mapToDouble(n->1/n).toArray();
+            srcData = IntStream.of((int[])srcData).mapToDouble(n->1.0/n).toArray();
         } else {
             srcData = DoubleStream.of((double[])srcData).map(n->1/n).toArray();
         }

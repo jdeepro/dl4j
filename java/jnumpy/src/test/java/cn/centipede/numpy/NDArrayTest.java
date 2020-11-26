@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 import java.util.Arrays;
 import org.junit.Test;
 
+import cn.centipede.numpy.Numpy.np;
+
 public class NDArrayTest extends TestCase {
     @Test
     public void test_create() {
@@ -41,5 +43,13 @@ public class NDArrayTest extends TestCase {
         assertEquals("(3, 4)", a.dimens());
         a = a.reshape(2,6);
         assertEquals("(2, 6)", a.dimens());
+    }
+
+    @Test
+    public void test_reciprocal() {
+        int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
+        NDArray a = new NDArray(dat, 3,4);
+        a = a.reciprocal(2);
+        assertEquals(a.get(0,1), np.array(1.0));
     }
 }

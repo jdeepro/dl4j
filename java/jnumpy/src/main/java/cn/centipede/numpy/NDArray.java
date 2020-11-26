@@ -435,6 +435,11 @@ public class NDArray implements Cloneable{
         return Numpy.reciprocal(this);
     }
 
+    /** INT/NDArray => 2/a */
+    public NDArray reciprocal(int n) {
+      return Numpy.reciprocal(this).multiply(n);
+  }
+
     public boolean same(NDArray dst, double slope) {
         return Numpy.same(this, dst, slope);
     }
