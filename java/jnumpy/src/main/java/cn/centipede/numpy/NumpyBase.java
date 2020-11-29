@@ -4,6 +4,11 @@ import java.lang.reflect.Array;
 import java.util.stream.IntStream;
 
 
+/**
+ * inertal complex function
+ * let Numpy keep simple with open api
+ * @author simbaba
+ */
 public class NumpyBase {
 
     /**
@@ -62,13 +67,23 @@ public class NumpyBase {
         int[] index = array.dataIndex();
 
         if (data instanceof int[]) {
-            return IntStream.of(index).map(i-> (int) Array.get(data, i)).toArray();
+          int[] ret = new int[array.size()];
+          for (int i=0; i<ret.length;i++){ret[i]=(int)Array.get(data, index[i]);}
+          return ret;
+        } else if (data instanceof boolean[]) {
+          boolean[] ret = new boolean[array.size()];
+          for (int i=0; i<ret.length;i++){ret[i]=(boolean)Array.get(data, index[i]);}
+          return ret;
+        } else if (data instanceof double[]) {
+          double[] ret = new double[array.size()];
+          for (int i=0; i<ret.length;i++){ret[i]=(double)Array.get(data, index[i]);}
+          return ret;
         } else if (data instanceof Integer) {
             return new int[]{(int)data};
         } else if (data instanceof Double) {
             return new double[]{(double)data};
-        } else {
-            return IntStream.of(index).mapToDouble(i-> (double) Array.get(data, i)).toArray();
+        } else {//if (data instanceof Boolean) {
+          return new boolean[]{(boolean)data};
         }
     }
 

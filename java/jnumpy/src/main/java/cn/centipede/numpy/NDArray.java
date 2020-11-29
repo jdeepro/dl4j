@@ -206,8 +206,23 @@ public class NDArray implements Cloneable{
      * @param data number
      * @param index int[]
      */
+    public NDArray set(Object dat, int[][] index) {
+        NDArray slices = slice(index);
+        int rows = slices.shape()[0];
+        for (int i = 0; i < rows; i++) {
+          slices.get(i).set(dat);
+        }
+        return this;
+    }
+
     public NDArray set(Object data, int... index) {
-        NDArray row = row(index[0]);
+        NDArray row;
+        if (index.length != 0) {
+          row = row(index[0]);
+        } else {
+          row = this;
+        }
+
         if (index.length > 1) {
             row.set(data, Arrays.copyOfRange(index, 1, index.length));
             return this;
@@ -415,6 +430,10 @@ public class NDArray implements Cloneable{
         return Numpy.subtract(this, dat);
     }
 
+    public NDArray subtract_after(Object dat) {
+      return Numpy.subtract_after(this, dat);
+    }
+
     public NDArray multiply(Object dat) {
         return Numpy.multiply(this, dat);
     }
@@ -511,5 +530,99 @@ public class NDArray implements Cloneable{
         System.out.println("shape=" + dimens());
         System.out.println("array=");
         System.out.println(this);
-	}
+  }
+  
+    /*********************************************
+     * support operator overloading for X script
+     * jsx feature will release soon.
+     * easy as python but still java
+     * @date: 2020/11/27
+     *********************************************/
+    public NDArray operator_set(Object dat, int... index) {
+      positive(index);
+      return set(dat, index);
+  }
+    public NDArray operator_set(Object dat, int[][] index) {
+      positive(index);
+      return set(dat, index);
+    }
+
+    public NDArray operator_plus(Object dat) {
+      return add(dat);
+    }
+
+    public NDArray operator_minus(Object dat) {
+      return subtract(dat);
+    }
+
+    public NDArray operator_minus_after(Object dat) {
+      return subtract_after(dat);
+    }
+
+    public NDArray operator_reciprocal(int dat) {
+      return reciprocal(dat);
+    }
+
+    public NDArray operator_multiply(Object dat) {
+      return multiply(dat);
+    }
+
+    public NDArray operator_divide(Object dat) {
+      return divide(dat);
+    }
+
+    public NDArray operator_power(int exp) {
+      return np.pow(this, exp);
+    }
+
+    public boolean operator_equals(Object dat) {
+      return equals(dat);
+    }
+
+    public NDArray operator_lessThan(Object dat) {
+      return lessThan(dat);
+    }
+
+    public NDArray operator_greaterThan(Object dat) {
+      return greaterThan(dat);
+    }
+
+    ////////////////////////////////////////////////
+    public NDArray lessThan(Object dat) {
+      if (dat instanceof Integer) return compare((int)dat, true);
+      else return compare((double)dat, false);
+    }
+
+    public NDArray greaterThan(Object dat) {
+      if (dat instanceof Integer) return compare((int)dat, false);
+      else return compare((double)dat, true);
+    }
+
+    private NDArray compare(int dat, boolean less) {
+      boolean[] retDat = new boolean[_size];
+      NDArray ret = new NDArray(retDat, _dimens);
+
+      NDArray src = clone();
+      int[] srcDat = (int[])src._data;
+
+      for (int i = 0; i < _size; i++) {
+        retDat[i] = less? (srcDat[i] < dat) : (srcDat[i] > dat);
+      }
+
+      return ret;
+    }
+
+    private NDArray compare(double dat, boolean less) {
+      boolean[] retDat = new boolean[_size];
+      NDArray ret = new NDArray(retDat, _dimens);
+
+      NDArray src = clone();
+      double[] srcDat = (double[])src._data;
+
+      for (int i = 0; i < _size; i++) {
+        retDat[i] = less? (srcDat[i] < dat) : (srcDat[i] > dat);
+      }
+
+      return ret;
+    }
 }

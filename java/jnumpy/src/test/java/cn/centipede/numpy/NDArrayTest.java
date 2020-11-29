@@ -52,4 +52,56 @@ public class NDArrayTest extends TestCase {
         a = a.reciprocal(2);
         assertEquals(a.get(0,1), np.array(1.0));
     }
+
+    @Test
+    public void test_compare() {
+        int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
+        NDArray a = new NDArray(dat, 3,4);
+        a = a.lessThan(5);
+        // a.get(0,1).dump();
+        assertEquals(a.get(0,1), np.array(true));
+    }
+
+    @Test
+    public void test_operator_set() {
+        int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
+        NDArray a = new NDArray(dat, 3,4);
+        a.operator_set(2, new int[][]{{0,2}});
+
+        int[] expected = {2,2,2,2,2,2,2,2};
+        assertEquals(a.get(new int[][]{{0,2}}), np.array(expected, 2,4));
+    }
+
+    @Test
+    public void test_operator_pow() {
+        int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
+        NDArray a = new NDArray(dat, 3,4);
+        NDArray b = a.operator_power(2);
+        NDArray actual = b.get(new int[][]{{1},{1}});
+        assertEquals(actual, np.array(36));
+    }
+
+    @Test
+    public void test_operator_multiply() {
+        int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
+        NDArray a = new NDArray(dat, 3,4);
+        NDArray b=a.operator_multiply(2);
+        b.dump();
+    }
+
+    @Test
+    public void test_operator_subtract_after() {
+        int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
+        NDArray a = new NDArray(dat, 3,4);
+        a=a.subtract_after(1);
+        a.dump();
+    }
+
+    @Test
+    public void test_operator_reciprocal() {
+        int[] dat = {1,2,3,4,5,6,7,8,9,10,11,12};
+        NDArray a = new NDArray(dat, 3,4);
+        a=a.operator_reciprocal(2);
+        a.dump();
+    }
 }

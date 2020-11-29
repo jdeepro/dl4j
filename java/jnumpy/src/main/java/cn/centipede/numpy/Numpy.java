@@ -88,6 +88,10 @@ public class Numpy extends NumpyBase{
         return binaryOp(src, dat, "-");
     }
 
+    public static NDArray subtract_after(NDArray src, Object dat) {
+      return binaryOp(src, dat, "-|");
+    }
+
     public static NDArray multiply(NDArray src, Object dat) {
         return binaryOp(src, dat, "*");
     }
@@ -440,6 +444,8 @@ public class Numpy extends NumpyBase{
 
         if (srcData instanceof int[]) {
             return Arrays.equals((int[])srcData, (int[])dstData);
+        } else if (srcData instanceof boolean[]) {
+          return Arrays.equals((boolean[])srcData, (boolean[])dstData);
         } else {
             return Arrays.equals((double[])srcData, (double[])dstData);
         }

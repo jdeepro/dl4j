@@ -72,8 +72,9 @@ public class Operator {
         case "+" : ret = Operator.doOp(src, dat, (a,b)->a+b); break;
         case "-" : ret = Operator.doOp(src, dat, (a,b)->a-b); break;
         case "*" : ret = Operator.doOp(src, dat, (a,b)->a*b); break;
+        case "-|" : ret = Operator.doOp(src, dat, (a,b)->b-a); break;
         case "//" : ret = Operator.doOp(src, dat, (a,b)->a/b); break;
-        case "**": ret = Operator.doOp(src, dat, (a,b)->{while(b-->0)a*=a;return a;}); break;
+        case "**": ret = Operator.doOp(src, dat, (a,b)->{int t=a;while(--b>0)a*=t;return a;}); break;
         default: throw new RuntimeException("Not support operator!");
         }
         return ret;
@@ -86,6 +87,7 @@ public class Operator {
         case "-" : ret = Operator.doOp(src, dat, (a,b)->a-b); break;
         case "*" : ret = Operator.doOp(src, dat, (a,b)->a*b); break;
         case "/" : ret = Operator.doOp(src, dat, (a,b)->a/b); break;
+        case "-|" : ret = Operator.doOp(src, dat, (a,b)->b-a); break;
         case "**": ret = Operator.doOp(src, dat, (a,b)->Math.pow(a,b)); break;
         default: throw new RuntimeException("Not support operator!");
         }
@@ -99,6 +101,7 @@ public class Operator {
         case "-" : ret = Operator.doOp(src, dat, (a,b)->a-b); break;
         case "*" : ret = Operator.doOp(src, dat, (a,b)->a*b); break;
         case "/" : ret = Operator.doOp(src, dat, (a,b)->a/b); break;
+        case "-|" : ret = Operator.doOp(src, dat, (a,b)->b-a); break;
         case "**": ret = Operator.doOp(src, dat, (a,b)->Math.pow(a,b)); break;
         default: throw new RuntimeException("Not support operator!");
         }
@@ -112,6 +115,7 @@ public class Operator {
         case "-" : ret = Operator.doOp(src, dat, (a,b)->a-b); break;
         case "*" : ret = Operator.doOp(src, dat, (a,b)->a*b); break;
         case "/" : ret = Operator.doOp(src, dat, (a,b)->a/b); break;
+        case "-|" : ret = Operator.doOp(src, dat, (a,b)->b-a); break;
         case "**": ret = Operator.doOp(src, dat, (a,b)->Math.pow(a,b)); break;
         default: throw new RuntimeException("Not support operator!");
         }

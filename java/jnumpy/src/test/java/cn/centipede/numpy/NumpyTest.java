@@ -57,6 +57,8 @@ public class NumpyTest extends TestCase {
         NDArray a = np.array(new int[][]{{1,2,3}});
         assertEquals("(3,)", a.row(0).dimens());
 
+        int[][][] x = new int[][][]{new int[][]{new int[]{1,2}}, new int[][]{new int[]{1,2}},};
+
         a = np.arange(12).reshape(3,4);
         int[] expected = {4,5,6,7};
         assertEquals(np.array(expected), a.row(1));

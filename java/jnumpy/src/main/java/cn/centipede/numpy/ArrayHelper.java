@@ -113,7 +113,8 @@ class ArrayHelper {
         int offset = cell * row;
 
         boolean isIntArray = data instanceof int[];
-        Object object= Array.newInstance(isIntArray?int.class:double.class, cell);
+        boolean isBooleanArray = data instanceof boolean[];
+        Object object= Array.newInstance(isBooleanArray?boolean.class:(isIntArray?int.class:double.class), cell);
 
         for (int i = 0; i < cell; i++) {
             Array.set(object, i, Array.get(data, idata[i+offset]));
