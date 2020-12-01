@@ -59,7 +59,7 @@ public class Conv {
 
         NDArray kernel = this.k.reshape(-1, nk);
         for (int i = 0; i < bx; i++) {
-            NDArray image_col = img2col(this.x.row(i), wk, this.stride);
+            NDArray image_col = img2col(this.x.get(i), wk, this.stride);
             NDArray ifeature = (np.dot(image_col, kernel).add(this.b)).reshape(feature_w,feature_w,nk);
             feature.set(ifeature, i);
             this.image_col.add(image_col);
@@ -78,7 +78,7 @@ public class Conv {
         // self.k_gradient,self.b_gradient
         NDArray delta_col = delta.reshape(bd, -1, cd);
         for (int i = 0; i < bx; i++) {
-            this.k_gradient.add(np.dot(this.image_col.get(i).T(), delta_col.row(i)).reshape(this.k.shape()));
+            this.k_gradient.add(np.dot(this.image_col.get(i).T(), delta_col.get(i)).reshape(this.k.shape()));
         }
 
         this.k_gradient = this.k_gradient.divide(bx);
@@ -101,7 +101,7 @@ public class Conv {
         }
 
         for (int i = 0; i < bx; i++) {
-            NDArray pad_delta_col = img2col(pad_delta.row(i), wk, this.stride);
+            NDArray pad_delta_col = img2col(pad_delta.get(i), wk, this.stride);
             delta_backward.set(np.dot(pad_delta_col, k_180_col).reshape(wx,hx,ck), i);
         }
 

@@ -67,7 +67,7 @@ public class CNN {
     public NDArray onehot(NDArray targets, int num) {
         NDArray result = np.zeros(num, 10);
         for(int i = 0; i < num; i++) {
-            result.set(1, i, targets.row(i).asInt());
+            result.set(1, i, targets.get(i).asInt());
         }
         return result;
     }
@@ -120,7 +120,7 @@ public class CNN {
 
     public void eval() {
         NDArray[] mnist = MNIST.numpy(false); // train=false
-        mnist[1].row(1).dump(); // lable
+        mnist[1].get(1).dump(); // lable
 
         NDArray test = mnist[0].reshape(10000, 28, 28, 1);
         // System.out.println(test.shape());

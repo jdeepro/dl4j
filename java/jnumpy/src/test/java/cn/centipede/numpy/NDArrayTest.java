@@ -104,4 +104,11 @@ public class NDArrayTest extends TestCase {
         a=a.operator_reciprocal(2);
         a.dump();
     }
+
+    @Test
+    public void test_rows_vs_get() {
+        NDArray a = np.arange(24).reshape(2,2,2,3);
+        a.row(0).dump();
+        a.get(0).dump();
+    }
 }
