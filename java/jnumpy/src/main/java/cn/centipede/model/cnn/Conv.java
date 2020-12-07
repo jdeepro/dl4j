@@ -54,17 +54,23 @@ public class Conv {
         int nk = kshape[3];
 
         int feature_w = (wx - wk) / this.stride + 1;
-        NDArray feature = np.zeros(bx, feature_w, feature_w, nk);
+        NDArray feature1 = np.zeros(bx, feature_w, feature_w, nk);
+        NDArray feature2 = np.zeros(bx, feature_w, feature_w, nk);
         this.image_col.clear();
 
         NDArray kernel = this.k.reshape(-1, nk);
         for (int i = 0; i < bx; i++) {
             NDArray image_col = img2col(this.x.get(i), wk, this.stride);
             NDArray ifeature = (np.dot(image_col, kernel).add(this.b)).reshape(feature_w,feature_w,nk);
-            feature.set(ifeature, i);
+            feature1.set(ifeature, i);
+            feature2.set(ifeature, new int[][]{{i}});
+            if (i==0 && !feature1.same(feature2, 0.1)) {
+              feature1.dump();
+              feature2.dump();
+            }
             this.image_col.add(image_col);
         }
-        return feature;
+        return feature1;
     }
 
     public NDArray backward(NDArray delta, double learning_rate) {

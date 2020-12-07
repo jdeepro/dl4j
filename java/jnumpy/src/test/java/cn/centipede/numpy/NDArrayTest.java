@@ -111,4 +111,19 @@ public class NDArrayTest extends TestCase {
         a.row(0).dump();
         a.get(0).dump();
     }
+
+    @Test
+    public void test_set_param_1_or_more() {
+        int n = 2;
+        NDArray b = Numpy.random.rand(n,n,3);
+        //a.operator_set(b, 1);
+
+        NDArray feature1 = np.zeros(1, n, n, 3);
+        NDArray feature2 = np.zeros(1, n, n, 3);
+
+        feature1.operator_set(b, 0);
+        feature2.operator_set(b, new int[][]{{0}});
+
+        assertTrue(feature1.same(feature2, 0.1));
+    }
 }

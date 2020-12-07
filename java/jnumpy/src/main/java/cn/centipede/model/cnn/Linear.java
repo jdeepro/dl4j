@@ -15,7 +15,7 @@ public class Linear {
     }
 
     private void init(int inChannel, int outChannel) {
-        double scale = Math.sqrt(inChannel/2);
+        double scale = Math.sqrt(inChannel/2.0);
         this.W = np.random.standard_normal(inChannel, outChannel).divide(scale);
         this.b = np.random.standard_normal(outChannel).divide(scale);
         this.W_gradient = np.zeros(inChannel, outChannel);

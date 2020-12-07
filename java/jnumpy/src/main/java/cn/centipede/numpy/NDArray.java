@@ -208,17 +208,14 @@ public class NDArray implements Cloneable{
      */
     public NDArray set(Object dat, int[][] index) {
         NDArray slices = slice(index);
-        int rows = slices.shape()[0];
-        for (int i = 0; i < rows; i++) {
-          slices.get(i).set(dat);
-        }
+        slices.set(dat);
         return this;
     }
 
     public NDArray set(Object data, int... index) {
         NDArray row;
         if (index.length != 0) {
-          row = row(index[0]);
+          row = get(index[0]);
         } else {
           row = this;
         }
@@ -229,18 +226,11 @@ public class NDArray implements Cloneable{
         }
 
         int[] idata = row.dataIndex();
+
         if (data instanceof NDArray) {
-            NDArray array = (NDArray)data;
-            int i = 0;
-            data = np.getArrayData(array);
-            for (int indx : idata) Array.set(_data, indx, Array.get(data, i++));
+            fillArray(np.getArrayData((NDArray)data), idata);
         } else {
-            if (data.getClass().isArray()) {
-                int i = 0;
-                for (int indx : idata) Array.set(_data, indx, Array.get(data, i++));
-            } else {
-                for (int indx : idata) Array.set(_data, indx, data);
-            }
+            fillArray(data, idata);
         }
         return this;
     }
@@ -400,14 +390,14 @@ public class NDArray implements Cloneable{
         /** one slice to select rows */
         if (range.length == 1) {
             return range[0].length > 1 ?
-                merge(rows(range[0][0], range[0][1])) : row(range[0][0]); // this is an array!
+                merge(rows(range[0][0], range[0][1])) : get(range[0][0]); // this is an array!
         }
 
         int[][] left = Arrays.copyOfRange(range, 1, range.length);
 
         /** select a row to slice */
         if (range[0].length == 1) {
-            return row(range[0][0]).slice(left);
+            return get(range[0][0]).slice(left);
         }
 
         /** select rows to slice */
@@ -541,7 +531,8 @@ public class NDArray implements Cloneable{
     public NDArray operator_set(Object dat, int... index) {
       positive(index);
       return set(dat, index);
-  }
+    }
+
     public NDArray operator_set(Object dat, int[][] index) {
       positive(index);
       return set(dat, index);
@@ -624,5 +615,86 @@ public class NDArray implements Cloneable{
       }
 
       return ret;
+    }
+
+    private void fillArray(Object data, int[] idata) {
+      if (data instanceof int[]) {
+        fillArray((int[])data, idata);
+      } else if (data instanceof double[]) {
+        fillArray((double[])data, idata);
+      } else if (data instanceof Integer) {
+        fillArray((int)data, idata);
+      } else if (data instanceof Double) {
+        fillArray((double)data, idata);
+      } else if (data instanceof Boolean) {
+        fillArray((boolean)data, idata);
+      } else if (data instanceof boolean[]) {
+        fillArray((boolean[])data, idata);
+      } else {
+        // Not support!!!!
+      }
+    }
+
+    private void fillArray(int data, int[] idata) {
+        if (_data instanceof double[]) {
+            double[] dst = (double[])_data;
+            for (int idex: idata) { dst[idex] = data;}
+        } else {
+            int[] dst = (int[])_data;
+            for (int idex: idata) {dst[idex] = data;}
+        }
+    }
+
+    private void fillArray(double data, int[] idata) {
+        double[] dst = (double[])_data;
+        for (int idex: idata) {dst[idex] = data;}
+    }
+
+    private void fillArray(boolean data, int[] idata) {
+        boolean[] dst = (boolean[])_data;
+        for (int idex: idata) {dst[idex] = data;}
+    }
+
+    private void fillArray(int[] data, int[] idata) {
+        if (_data instanceof int[]) {
+            fillData((int[])_data, data, idata);
+        } else if (_data instanceof double[]) {
+            fillData((double[])_data, data, idata);
+        } else {
+            // Not support!!!!
+        }
+    }
+
+    private void fillData(double[] dst, int[] data, int[] idata) {
+        int i = 0;
+        for (int idex: idata) {
+          dst[idex] = data[i++%data.length];
+        }
+    }
+
+    private void fillData(int[] dst, int[] data, int[] idata) {
+        int i = 0;
+        for (int idex: idata) {
+          dst[idex] = data[i++%data.length];
+        }
+    }
+
+    private void fillArray(double[] data, int[] idata) {
+        int i = 0;
+        if (_isInt) {
+            int[] dst = (int[])_data;
+            for (int idex: idata) {dst[idex] = (int)data[i++%data.length];}
+        } else {
+            double[] dst = (double[])_data;
+            for (int idex: idata) {dst[idex] = data[i++%data.length];}
+        }
+    }
+
+    private void fillArray(boolean[] data, int[] idata) {
+          boolean[] dst = (boolean[])_data;
+          int i = 0;
+          for (int idex: idata) {
+            dst[idex] = data[i++%data.length];
+          }
     }
 }

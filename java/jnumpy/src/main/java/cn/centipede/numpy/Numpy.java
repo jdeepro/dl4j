@@ -889,6 +889,7 @@ public class Numpy extends NumpyBase{
         }
         return a;
     }
+
     public static NDArray checkset(NDArray a, NDArray x, IntPredicate check, int value) {
         int[] iadata = a.dataIndex();
         int[] ixdata = x.dataIndex();
@@ -901,4 +902,34 @@ public class Numpy extends NumpyBase{
         }
         return a;
     }
+
+    public static NDArray checkset(NDArray a, NDArray x, double condValue, int newValue) {
+      int[] iadata = a.dataIndex();
+      int[] ixdata = x.dataIndex();
+
+      int[] adata = (int[])a.data();
+      int[] xdata = (int[])x.data();
+
+      for (int i = 0; i < a.size(); i++) {
+        if (xdata[ixdata[i]] < condValue) {
+          adata[iadata[i]] = newValue;
+        }
+      }
+      return a;
+  }
+
+  public static NDArray checkset(NDArray a, NDArray x, double condValue, double newValue) {
+    int[] iadata = a.dataIndex();
+    int[] ixdata = x.dataIndex();
+
+    double[] adata = (double[])a.data();
+    double[] xdata = (double[])x.data();
+
+    for (int i = 0; i < a.size(); i++) {
+      if (xdata[ixdata[i]] < condValue) {
+        adata[iadata[i]] = newValue;
+      }
+    }
+    return a;
+  }
 }
