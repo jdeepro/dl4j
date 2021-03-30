@@ -1,6 +1,13 @@
 # Jdeepro
 ![Handwriting](./jdeepro.png)
 
+## A new Language tool will be released to this repository.
+## This is a JVM language made by xtext framework.
+
+A little cool, please firt take a look for a preview.
+
+![JPY](./jpy.png)
+
 #### Introduction
 This is a project for Java beginner and artificial intelligence, written in Latex, based on Java.
 
